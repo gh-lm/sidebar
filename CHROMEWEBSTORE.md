@@ -47,7 +47,7 @@ Productivity
 | `tabs` | "Pin this page" needs the address of the tab you are on, to fill it into the dialog, and the "open in the main window" button opens the panel's page in a tab. Only the URL is read, never page content. |
 | `favicon` | Draws the site icon on each pinned button, from the browser's own cache. No network request. |
 | `declarativeNetRequestWithHostAccess` | Two things, for one site at a time and only after you have granted permission for it: removes the headers that stop a site being shown in a panel, and asks that site for its phone layout, because the panel is about a phone wide. |
-| Optional site access | Requested one site at a time, from your click, when you open a pinned panel. Never requested at install. |
+| Optional site access | Never requested at install. Asked one site at a time, from your click, when you open that site in the panel — plus all seven search engines together on the first search, rather than seven separate prompts. Information also offers a single "allow every site" for anyone who would rather not be asked again; it is off by default and revocable from the same button. |
 
 ## Trader status
 

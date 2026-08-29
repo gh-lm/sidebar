@@ -952,3 +952,17 @@ dialog#siteDialog input {
 }
 
 #panel-search.active { display: flex; flex-direction: column; }
+
+/* The escape hatch from being asked per site. Deliberately plain and
+   deliberately reversible from the same button. */
+.allow-all {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.875rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--panel-border);
+}
+.allow-all > div { flex: 1; min-width: 0; }
+.allow-all-title { margin: 0 0 0.125rem; font-size: 0.875rem; font-weight: 600; }
+.allow-all .btn-secondary { flex: 0 0 auto; white-space: nowrap; }

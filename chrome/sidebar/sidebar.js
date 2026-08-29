@@ -187,6 +187,8 @@ function renderEngines() {
     b.setAttribute("aria-label", `Search with ${e.name}`);
     b.setAttribute("aria-pressed", String(e.id === engine.id));
     b.addEventListener("click", async () => {
+      // Ask first, while the click still counts as a gesture.
+      await ensureEngineAccess();
       engine = e;
       await chrome.storage.local.set({ searchEngine: e.id });
       renderEngines();
@@ -205,6 +207,31 @@ function searchUrlFor(q) {
   return looksLikeUrl
     ? (q.startsWith("http") ? q : `https://${q}`)
     : engine.url + encodeURIComponent(q);
+}
+
+// Every engine is a different site, so asking one at a time meant a prompt
+// for each — seven interruptions to use a search box. Ask for all of them
+// once instead, at the first search, in a single prompt.
+const ENGINE_ORIGINS = [
+  "*://duckduckgo.com/*",
+  "*://www.google.com/*",
+  "*://www.bing.com/*",
+  "*://www.startpage.com/*",
+  "*://www.mojeek.com/*",
+  "*://www.qwant.com/*",
+];
+
+let engineAccessAsked = false;
+
+async function ensureEngineAccess() {
+  if (engineAccessAsked) return;
+  engineAccessAsked = true;
+  try {
+    if (await chrome.permissions.contains({ origins: ENGINE_ORIGINS })) return;
+    await chrome.permissions.request({ origins: ENGINE_ORIGINS });
+  } catch {
+    /* not a user gesture, or declined — the per-site ask still covers it */
+  }
 }
 
 async function runSearch(q) {
@@ -286,10 +313,12 @@ async function renderRecentSearches(list) {
   }
 }
 
-searchForm.addEventListener("submit", (e) => {
+searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  runSearch(searchBox.value);
+  const q = searchBox.value;
   searchBox.value = "";
+  await ensureEngineAccess();
+  runSearch(q);
 });
 
 // ---- Scratchpad ----
@@ -891,6 +920,49 @@ if (chrome.bookmarks?.onChanged) {
 for (const link of document.querySelectorAll(".info-link")) {
   link.addEventListener("click", () => openPanelSite(link.dataset.site));
 }
+
+// ---- Site access ----
+// One prompt instead of one per site, for anyone who would rather not be
+// asked again. Off by default and revocable from the same button, because
+// "allow everything" should be a decision someone makes rather than one
+// they are walked into.
+const ALL_SITES = ["*://*/*"];
+const allowAllBtn = document.getElementById("allowAllBtn");
+const allowAllState = document.getElementById("allowAllState");
+
+async function paintAllowAll() {
+  if (!allowAllBtn) return;
+  let on = false;
+  try {
+    on = await chrome.permissions.contains({ origins: ALL_SITES });
+  } catch {
+    /* treat as off */
+  }
+  allowAllBtn.textContent = on ? "Take it back" : "Allow all";
+  allowAllState.textContent = on
+    ? "Allowed. Panels and snippets work everywhere without asking."
+    : "Sidemorphic will ask once for each site you open in the panel.";
+}
+
+allowAllBtn?.addEventListener("click", async () => {
+  let on = false;
+  try {
+    on = await chrome.permissions.contains({ origins: ALL_SITES });
+  } catch {
+    /* treat as off */
+  }
+  try {
+    if (on) await chrome.permissions.remove({ origins: ALL_SITES });
+    else await chrome.permissions.request({ origins: ALL_SITES });
+  } catch {
+    /* declined */
+  }
+  paintAllowAll();
+});
+
+paintAllowAll();
+chrome.permissions.onAdded?.addListener(paintAllowAll);
+chrome.permissions.onRemoved?.addListener(paintAllowAll);
 
 // ---- Appearance ----
 // Three states, cycling: follow the browser, force light, force dark. The

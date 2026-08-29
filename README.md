@@ -30,6 +30,11 @@ pinned panel it asks permission for that one site, because loading a site in a
 panel means removing its anti-framing headers for that host. Decline and the
 site opens in a normal tab instead.
 
+The search engines are asked for together on the first search, so that is one
+prompt rather than seven. Information offers a single "allow every site" for
+anyone who would rather not be asked at all — off by default, and revocable
+from the same button.
+
 ## Layout
 
 | Path | What it is |
