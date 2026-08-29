@@ -391,7 +391,15 @@ function renderRailSites(webPanels) {
     });
     const img = document.createElement("img");
     img.className = "rail-site-icon";
-    img.src = `https://icons.duckduckgo.com/ip3/${host}.ico`;
+    // Chrome's own cached favicon, served from the profile. The browser
+    // version fetched these from DuckDuckGo's icon service, which told a
+    // third party every site the user had pinned, every time the panel
+    // opened — indefensible in a privacy extension, and a remote request
+    // in a package that should make none.
+    const favicon = new URL(chrome.runtime.getURL("/_favicon/"));
+    favicon.searchParams.set("pageUrl", url);
+    favicon.searchParams.set("size", "32");
+    img.src = favicon.toString();
     img.alt = "";
     img.addEventListener("error", () => {
       img.remove();

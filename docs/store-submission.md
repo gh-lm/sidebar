@@ -22,7 +22,7 @@ cd extension && zip -r ../sidemorphic-0.1.0.zip . -x '.*'
 
 ## Still to do before first submission
 
-- [ ] Sidemorphic icons and logo — `extension/icons/*` and `extension/newtab/logo.png` are still the old browser's.
+- [ ] Sidemorphic icons and logo — `chrome/icons/*` and `chrome/newtab/logo.png` are still the old browser's.
 - [ ] Privacy policy hosted at a public URL (required: the listing asks for one).
 - [ ] Listing copy, 1280x800 screenshots, small promo tile.
 - [ ] Decide the search engine on the new tab page (currently DuckDuckGo).

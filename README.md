@@ -31,10 +31,10 @@ site opens in a normal tab instead.
 
 | Path | What it is |
 |---|---|
-| `extension/` | The extension itself — load this unpacked, and zip this for the store |
-| `docs/store-submission.md` | Everything the Chrome Web Store listing needs |
+| `chrome/` | The extension itself — load this unpacked; `package.sh` zips it for the store |
+| `CHROMEWEBSTORE.md` | Listing copy, single purpose, permission justifications |
 
 ## Developing
 
-Load `extension/` at `chrome://extensions` with Developer mode on. There is no
+Load `chrome/` at `chrome://extensions` with Developer mode on. There is no
 build step.
