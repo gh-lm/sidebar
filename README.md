@@ -8,6 +8,9 @@ Sidemorphic is a plain MV3 extension for the Chrome Web Store. It grew out of
 Lightmorphic Browser, a Chromium AppImage; shipping a whole browser was more
 than the idea needed, so the extension is now the product.
 
+Requires Chrome 114 or newer, or a Chromium browser that installs Web Store
+extensions — Edge, Brave, Vivaldi, Opera. There is no Firefox version.
+
 ## What it does
 
 - **Panels** — pin any site to the rail and open it beside the page you're on.

@@ -3,6 +3,7 @@
   "name": "Sidemorphic",
   "version": "0.1.0",
   "description": "A private side panel for Chrome: pinned web panels, a clean new tab, and cookie controls.",
+  "minimum_chrome_version": "114",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
