@@ -189,24 +189,12 @@ let notepadSaveTimer = null;
 async function loadNotepad() {
   const { notepadText = "" } = await chrome.storage.local.get("notepadText");
   notepad.value = notepadText;
-
-  if (await isConfigured()) {
-    const { value } = await pull("settings");
-    if (value?.notepadText !== undefined && value.notepadText !== notepadText) {
-      notepad.value = value.notepadText;
-      await chrome.storage.local.set({ notepadText: value.notepadText });
-    }
-  }
 }
 
 notepad.addEventListener("input", () => {
   clearTimeout(notepadSaveTimer);
   notepadSaveTimer = setTimeout(async () => {
     await chrome.storage.local.set({ notepadText: notepad.value });
-    if (await isConfigured()) {
-      const { value, version } = await pull("settings");
-      await push("settings", { ...(value || {}), notepadText: notepad.value }, version);
-    }
   }, 600);
 });
 
@@ -571,6 +559,12 @@ addSnippetForm.addEventListener("submit", async (e) => {
   addSnippetText.value = "";
   loadSnippets();
 });
+
+// ---- Start ----
+loadNotepad();
+loadWebPanels();
+loadBookmarks();
+loadSnippets();
 
 chrome.bookmarks.onCreated.addListener(loadBookmarks);
 chrome.bookmarks.onRemoved.addListener(loadBookmarks);
