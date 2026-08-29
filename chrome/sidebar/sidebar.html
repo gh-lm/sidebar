@@ -100,7 +100,13 @@
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4h5v5"/><path d="M16 4l-7 7"/><path d="M15.5 12.5V16H4V4.5h3.5"/></svg>
           </button>
         </div>
-        <iframe id="webPanelFrame" class="web-frame" hidden></iframe>
+        <!-- The frame is deliberately wider than this box and the overflow is
+             clipped, which crops the page's own scrollbar off the right edge.
+             Without that the scrollbar eats the page's right-hand gutter and
+             everything looks shoved over. -->
+        <div class="frame-clip" id="frameClip" hidden>
+          <iframe id="webPanelFrame" class="web-frame"></iframe>
+        </div>
       </section>
 
       <section id="panel-snippets" class="panel-view">

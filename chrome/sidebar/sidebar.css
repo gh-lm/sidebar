@@ -350,11 +350,24 @@ body {
 /* Pinned sites render at the panel's natural (narrow) width, same as a
    phone viewport -- a responsive site's own media queries do the rest.
    No user-agent spoofing needed or wanted. */
-.web-frame {
+.frame-clip {
   flex: 1;
+  min-height: 0;
   width: 100%;
   border: 1px solid var(--panel-border);
   border-radius: var(--radius);
+  overflow: hidden;
+}
+.frame-clip[hidden] { display: none; }
+
+.web-frame {
+  display: block;
+  border: 0;
+  height: 100%;
+  /* Wider than the clip by the width of a scrollbar, so the scrollbar lands
+     outside the visible area and the page keeps both its gutters. --sb is
+     measured at load, because it is not the same on every platform. */
+  width: calc(100% + var(--sb, 15px));
 }
 
 .app-footer {

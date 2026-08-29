@@ -53,6 +53,18 @@ document.getElementById("railLogo")?.addEventListener("click", () => {
   openPanelSite("https://sidemorphic.lightmorphic.com");
 });
 
+// How wide this platform draws a scrollbar. Measured rather than guessed:
+// it is 15px on most desktop Linux, 0 on overlay-scrollbar systems, and
+// getting it wrong either leaves a stripe or crops the page.
+(function measureScrollbar() {
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:absolute;top:-9999px;width:100px;height:100px;overflow:scroll";
+  document.body.appendChild(probe);
+  const w = probe.offsetWidth - probe.clientWidth;
+  probe.remove();
+  document.documentElement.style.setProperty("--sb", `${w}px`);
+})();
+
 // ---- Framing pinned sites ----
 // Most big sites (BBC, Google, etc.) send X-Frame-Options or a CSP
 // frame-ancestors directive that forbids being loaded in an iframe --
@@ -140,7 +152,7 @@ async function loadInFrame(frame, url) {
     return;
   }
   frame.src = url;
-  frame.hidden = false;
+  frameClip.hidden = false;
 }
 
 // ---- Search ----
@@ -353,6 +365,7 @@ notepad.addEventListener("input", () => {
 // headers are stripped per-host in loadInFrame so sites that block
 // iframing (BBC etc.) still load.
 const webPanelFrame = document.getElementById("webPanelFrame");
+const frameClip = document.getElementById("frameClip");
 const panelsEmpty = document.getElementById("panelsEmpty");
 const panelNav = document.getElementById("panelNav");
 const panelNavHost = document.getElementById("panelNavHost");
