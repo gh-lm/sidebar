@@ -1,8 +1,8 @@
 # Sidemorphic
 
-A private side panel for Chrome. Pinned web panels, notes, bookmarks,
-snippets, a clean new tab, and cookie controls — in one panel that stays put
-while you browse.
+A private side panel for Chrome. Pin any website to the rail and it opens
+beside the page you are reading, like a small window — plus notes, bookmarks,
+snippets and a clean new tab, in one panel that stays put while you browse.
 
 Sidemorphic is a plain MV3 extension for the Chrome Web Store. It grew out of
 Lightmorphic Browser, a Chromium AppImage; shipping a whole browser was more
@@ -17,8 +17,6 @@ extensions — Edge, Brave, Vivaldi, Opera. There is no Firefox version.
 - **Notes** — a scratchpad that's always one click away.
 - **Bookmarks** — browse and add without leaving the page.
 - **Snippets** — text you retype often; click one to copy it.
-- **Cookies** — allow, session-only, or block, globally or per site.
-- **Privacy defaults** — password saving and autofill off on first run.
 
 ## Site access
 

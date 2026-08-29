@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Sidemorphic",
   "version": "0.1.0",
-  "description": "A private side panel for Chrome: pinned web panels, a clean new tab, and cookie controls.",
+  "description": "Pin any website to a side panel and open it beside the page you're reading. Plus notes, bookmarks and snippets. Private by default.",
   "minimum_chrome_version": "114",
   "icons": {
     "16": "icons/icon-16.png",
@@ -39,9 +39,6 @@
     "sidePanel",
     "storage",
     "clipboardWrite",
-    "contentSettings",
-    "browsingData",
-    "privacy",
     "tabs",
     "bookmarks",
     "declarativeNetRequestWithHostAccess",

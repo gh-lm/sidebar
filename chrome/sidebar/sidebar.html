@@ -26,9 +26,6 @@
       <button class="rail-btn" data-panel="snippets" role="tab" aria-selected="false" data-tip="Snippets" aria-label="Snippets">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="10" height="13" rx="1.2"/><path d="M8 3.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H8a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M7.5 9h5M7.5 12h5"/></svg>
       </button>
-      <button class="rail-btn" data-panel="privacy" role="tab" aria-selected="false" data-tip="Cookies" aria-label="Cookie controls">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2.5a7.5 7.5 0 1 0 7.5 7.5 3 3 0 0 1-3.6-4.2A3 3 0 0 1 10 2.5z"/><circle cx="8" cy="9" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="12.5" r=".9" fill="currentColor" stroke="none"/><circle cx="7.5" cy="13" r=".7" fill="currentColor" stroke="none"/></svg>
-      </button>
       <div class="rail-divider"></div>
       <!-- Pinned sites render here as favicon buttons, Vivaldi-style -->
       <div class="rail-sites" id="railSites"></div>
@@ -80,40 +77,21 @@
         </form>
       </section>
 
-      <section id="panel-privacy" class="panel-view">
-        <h2 class="settings-heading">Cookies</h2>
-        <label class="select-row">Everywhere
-          <select id="cookieGlobal">
-            <option value="allow">Allow</option>
-            <option value="session_only">This session only</option>
-            <option value="block">Block all</option>
-          </select>
-        </label>
-        <p class="hint">&ldquo;This session only&rdquo; accepts cookies so sites work, then wipes them when you close the browser. Set a different rule for any individual site below &mdash; open the site, then use &ldquo;Cookies here&rdquo;.</p>
-        <div class="panel-list" id="cookieRuleList"></div>
-
-        <h2 class="settings-heading">This site</h2>
-        <label class="select-row">Cookies here
-          <select id="cookieSite">
-            <option value="default">Same as everywhere</option>
-            <option value="allow">Allow</option>
-            <option value="session_only">This session only</option>
-            <option value="block">Block</option>
-          </select>
-        </label>
-      </section>
-
       <section id="panel-settings" class="panel-view">
-        <h2 class="settings-heading">Privacy defaults</h2>
-        <p class="hint">On first run Sidemorphic turns off Chrome's password saving and autofill for addresses and cards. Change them back any time in Chrome's own settings &mdash; it is applied once, not enforced.</p>
+        <h2 class="settings-heading">Pinned sites</h2>
+        <p class="hint">Open a site, then press <strong>+</strong> on the rail. Its address is filled in for you and you can edit it before saving. It becomes an icon on the rail; click the icon to open that site here in the panel, like a small window beside the page you are reading.</p>
+        <p class="hint">Right-click an icon to change its address or remove it. Drag icons to reorder them.</p>
 
         <h2 class="settings-heading">Site access</h2>
-        <p class="hint">Sidemorphic starts with access to no websites at all. A pinned panel asks your permission for that one site the first time you open it, and nothing else.</p>
+        <p class="hint">Sidemorphic starts with access to no websites at all. The first time you open a pinned site here, your browser asks permission for that one site &mdash; needed because showing a site in a panel means dropping the headers that normally stop it. Say no and it opens in an ordinary tab instead. You can take access back any time from the browser's extension settings.</p>
+
+        <h2 class="settings-heading">Keyboard</h2>
+        <p class="hint" id="shortcutHint">Checking&hellip;</p>
 
         <h2 class="settings-heading">About</h2>
         <div class="status-row">
           <span class="status-dot ok"></span>
-          <span>Sidemorphic <span id="aboutVersion">&hellip;</span></span>
+          <span>Sidemorphic <span id="aboutVersion">&hellip;</span> &mdash; nothing leaves your browser</span>
         </div>
       </section>
 

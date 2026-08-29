@@ -34,82 +34,6 @@ for (const btn of document.querySelectorAll(".rail-btn[data-panel]")) {
   });
 }
 
-function askWorkerToApply() {
-  chrome.runtime.sendMessage({ type: "sidemorphic-apply-settings" }).catch(() => {});
-}
-
-// The host of whatever page the user is looking at - the "this site"
-// controls follow the active tab.
-async function currentSiteHost() {
-  try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    return new URL(tab?.url || "").hostname || null;
-  } catch {
-    return null;
-  }
-}
-
-// ---- Cookies ----
-const cookieGlobal = document.getElementById("cookieGlobal");
-const cookieSite = document.getElementById("cookieSite");
-
-const COOKIE_MODE_LABELS = { allow: "Allow", session_only: "This session only", block: "Block" };
-const cookieRuleList = document.getElementById("cookieRuleList");
-
-async function renderCookieControls() {
-  const { cookieGlobalSetting = "allow", cookieSiteRules = {} } =
-    await chrome.storage.local.get(["cookieGlobalSetting", "cookieSiteRules"]);
-  cookieGlobal.value = cookieGlobalSetting;
-  const host = await currentSiteHost();
-  cookieSite.disabled = !host;
-  cookieSite.value = (host && cookieSiteRules[host]) || "default";
-
-  // Every per-site rule, visible and removable in one place.
-  cookieRuleList.innerHTML = "";
-  for (const [h, setting] of Object.entries(cookieSiteRules)) {
-    const item = document.createElement("div");
-    item.className = "panel-item";
-    const label = document.createElement("span");
-    label.textContent = `${h} — ${COOKIE_MODE_LABELS[setting] ?? setting}`;
-    const remove = document.createElement("button");
-    remove.textContent = "×";
-    remove.title = "Remove this rule (back to the Everywhere setting)";
-    remove.addEventListener("click", async () => {
-      const { cookieSiteRules: cur = {} } = await chrome.storage.local.get("cookieSiteRules");
-      delete cur[h];
-      await chrome.storage.local.set({ cookieSiteRules: cur });
-      askWorkerToApply();
-    });
-    item.append(label, remove);
-    cookieRuleList.appendChild(item);
-  }
-}
-renderCookieControls();
-
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && (changes.cookieSiteRules || changes.cookieGlobalSetting)) {
-    renderCookieControls();
-  }
-});
-
-cookieGlobal.addEventListener("change", async () => {
-  await chrome.storage.local.set({ cookieGlobalSetting: cookieGlobal.value });
-  askWorkerToApply();
-});
-
-cookieSite.addEventListener("change", async () => {
-  const host = await currentSiteHost();
-  if (!host) return;
-  const { cookieSiteRules: cur = {} } = await chrome.storage.local.get("cookieSiteRules");
-  if (cookieSite.value === "default") delete cur[host];
-  else cur[host] = cookieSite.value;
-  await chrome.storage.local.set({ cookieSiteRules: cur });
-  askWorkerToApply();
-});
-
-chrome.tabs.onActivated.addListener(() => renderCookieControls());
-chrome.tabs.onUpdated.addListener((id, info) => { if (info.url || info.status === "complete") renderCookieControls(); });
-
 // ---- Framing pinned sites ----
 // Most big sites (BBC, Google, etc.) send X-Frame-Options or a CSP
 // frame-ancestors directive that forbids being loaded in an iframe --
@@ -592,3 +516,18 @@ chrome.bookmarks.onChanged.addListener(loadBookmarks);
 // ---- About ----
 const aboutVersion = document.getElementById("aboutVersion");
 if (aboutVersion) aboutVersion.textContent = `v${chrome.runtime.getManifest().version}`;
+
+// Show the shortcut the browser ACTUALLY bound, not the one the manifest
+// asked for. People rebind them and browsers refuse some; a label that
+// lies is worse than no label.
+const shortcutHint = document.getElementById("shortcutHint");
+if (shortcutHint && chrome.commands?.getAll) {
+  chrome.commands.getAll().then((cmds) => {
+    const bound = cmds.find((c) => c.name === "_execute_action")?.shortcut;
+    shortcutHint.textContent = bound
+      ? `${bound} opens and closes this panel. Change it at chrome://extensions/shortcuts.`
+      : "No keyboard shortcut is set. Add one at chrome://extensions/shortcuts.";
+  }).catch(() => {
+    shortcutHint.textContent = "Set a shortcut at chrome://extensions/shortcuts.";
+  });
+}

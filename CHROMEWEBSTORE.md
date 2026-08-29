@@ -3,18 +3,18 @@
 ## Single purpose
 
 Sidemorphic gives you one side panel that holds the things you keep reaching
-for while browsing — pinned websites, notes, bookmarks and saved snippets —
-plus cookie controls for the site you are on.
+for while browsing: pinned websites that open beside the page you are on,
+notes, bookmarks and saved snippets.
 
 ## Description
 
 Sidemorphic puts a private side panel beside whatever you are reading.
 
-Pin a site to the rail and open it in the panel — your mail, a chat, docs,
-anything you keep flicking tabs to reach. Keep a notepad one click away. Browse
-and add bookmarks without leaving the page. Save snippets of text you retype
-often and copy one with a click. And set cookies to allow, session-only or blocked, either everywhere or
-for one site.
+Pin a site to the rail and it opens right here in the panel, like a small
+window beside whatever you are reading — your mail, a chat, docs, anything you
+keep flicking tabs to reach. Keep a notepad one click away. Browse and add
+bookmarks without leaving the page. Save snippets of text you retype often and
+copy one with a click.
 
 It starts with access to no websites at all. When you open a pinned panel it
 asks permission for that one site, and nothing else. Nothing is sent anywhere:
@@ -33,13 +33,10 @@ Productivity
 |---|---|
 | `sidePanel` | The extension is a side panel. |
 | `clipboardWrite` | Copies a saved snippet to the clipboard when you click it. |
-| `storage` | Notes, snippets, pinned panels and cookie rules are saved in the browser. Nothing leaves it. |
-| `tabs` | The cookie controls and "pin this page" need the address of the page you are looking at. Only the URL is read. |
+| `storage` | Notes, snippets and pinned panels are saved in the browser. Nothing leaves it. |
+| `tabs` | "Pin this page" needs the address of the tab you are on, to fill it into the dialog. Only the URL is read, never page content. |
 | `bookmarks` | The bookmarks panel lists your bookmarks and adds new ones. |
 | `favicon` | Draws the site icon on each pinned button, from the browser's own cache. No network request. |
-| `contentSettings` | Applies your cookie choice through Chrome's own cookie engine, so it persists like a setting you made yourself. |
-| `browsingData` | Clears cookies at startup for sites set to "this session only". Chrome keeps those after a crash, which would break the promise. |
-| `privacy` | Turns off password saving and autofill once, on first run. |
 | `declarativeNetRequestWithHostAccess` | Removes the headers that stop a site being shown in a panel — for one site, only after you have granted permission for it. |
 | Optional site access | Requested one site at a time, from your click, when you open a pinned panel. Never requested at install. |
 
