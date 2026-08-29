@@ -21,8 +21,12 @@
 /* Follow the browser's own light/dark mode automatically -- the panel is
    dark when the browser is dark, light when it's light, and tracks the OS
    on "auto". Standard prefers-color-scheme, no toggle, no override. */
+/* Dark applies when the browser asks for it AND the user has not chosen
+   light, or when the user has chosen dark outright. Written twice rather
+   than once, because a media query cannot be overridden by an attribute
+   from inside itself. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #09090b; --fg: #fafafa;
     --panel: #1b1d29; --panel-border: rgba(255,255,255,.09);
     --border: #27272a; --muted: #1c1c1f; --muted-fg: #a1a1aa;
@@ -30,6 +34,17 @@
     --tip-bg: #fafafa; --tip-fg: #111827;
   }
 }
+
+:root[data-theme="dark"] {
+  --bg: #09090b; --fg: #fafafa;
+  --panel: #1b1d29; --panel-border: rgba(255,255,255,.09);
+  --border: #27272a; --muted: #1c1c1f; --muted-fg: #a1a1aa;
+  --danger: #f34236; --danger-bg: #350f0c;
+  --tip-bg: #fafafa; --tip-fg: #111827;
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 
 * { box-sizing: border-box; }
 
@@ -828,4 +843,23 @@ dialog#siteDialog input {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--on-accent);
+}
+
+/* Theme button: a circle holding a sun or a moon. In automatic it shows
+   whichever is actually on screen, with a dot to say the browser is
+   choosing — a third neutral icon would tell you nothing about what you
+   are looking at. */
+.rail-theme { position: relative; color: var(--muted-fg); }
+.rail-theme:hover { color: var(--fg); }
+.rail-theme svg { width: 18px; height: 18px; }
+
+.rail-theme[data-mode="auto"]::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
 }

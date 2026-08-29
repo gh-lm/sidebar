@@ -834,6 +834,48 @@ for (const link of document.querySelectorAll(".info-link")) {
   link.addEventListener("click", () => openPanelSite(link.dataset.site));
 }
 
+// ---- Appearance ----
+// Three states, cycling: follow the browser, force light, force dark. The
+// icon shows what is on screen NOW rather than what was chosen, so in
+// automatic it changes with the browser and carries a dot to say so.
+const railTheme = document.getElementById("railTheme");
+
+const SUN =
+  '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="3.6"/><path d="M10 1.8v2M10 16.2v2M18.2 10h-2M3.8 10h-2M15.8 4.2l-1.4 1.4M5.6 14.4l-1.4 1.4M15.8 15.8l-1.4-1.4M5.6 5.6L4.2 4.2"/></svg>';
+const MOON =
+  '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16.2 12.4A7 7 0 0 1 7.6 3.8a7 7 0 1 0 8.6 8.6z"/></svg>';
+
+const MODES = ["auto", "light", "dark"];
+const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+function paintTheme(mode) {
+  const root = document.documentElement;
+  if (mode === "auto") root.removeAttribute("data-theme");
+  else root.setAttribute("data-theme", mode);
+
+  const dark = mode === "dark" || (mode === "auto" && prefersDark.matches);
+  railTheme.innerHTML = dark ? MOON : SUN;
+  railTheme.dataset.mode = mode;
+  railTheme.dataset.tip =
+    mode === "auto" ? "Appearance: following the browser" : `Appearance: always ${mode}`;
+  railTheme.setAttribute("aria-label", railTheme.dataset.tip);
+}
+
+chrome.storage.local.get("theme").then(({ theme = "auto" }) => paintTheme(theme));
+
+railTheme.addEventListener("click", async () => {
+  const now = railTheme.dataset.mode || "auto";
+  const next = MODES[(MODES.indexOf(now) + 1) % MODES.length];
+  await chrome.storage.local.set({ theme: next });
+  paintTheme(next);
+});
+
+// In automatic, follow the browser as it changes rather than waiting for
+// the panel to be reopened.
+prefersDark.addEventListener("change", () => {
+  if ((railTheme.dataset.mode || "auto") === "auto") paintTheme("auto");
+});
+
 // ---- First run ----
 // Chrome gives an extension no install-time dialog, so the panel says it
 // the first time it is opened instead.
