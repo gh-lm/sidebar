@@ -37,5 +37,5 @@ where you go.
 fonts or images, no requests to any service — including ours. Site icons come
 from the browser's own cache.
 
-Published at https://lightmorphic.github.io/sidemorphic/ — source at
+Published at https://lightmorphic.github.io/sidemorphic/privacy.html — source at
 https://github.com/lightmorphic/sidemorphic

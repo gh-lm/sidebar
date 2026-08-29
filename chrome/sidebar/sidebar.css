@@ -147,6 +147,12 @@ body {
 
 .rail-spacer { flex: 1; }
 
+/* The mark sits under the close chevron: an identity, not a tab, so it
+   never takes the active highlight. */
+.rail-logo { padding: 0; }
+.rail-logo img { display: block; border-radius: 5px; }
+.rail-logo:hover img { opacity: 0.85; }
+
 /* Close chevron: quieter than the tab icons, and pointing off the right
    edge, the way the panel leaves. */
 .rail-btn-min { color: var(--muted-fg); }
@@ -671,7 +677,7 @@ dialog#siteDialog input {
   display: block;
   width: 100%;
   box-sizing: border-box;
-  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
   font: inherit;
   color: inherit;
   background: var(--panel);
@@ -687,3 +693,70 @@ dialog#siteDialog input {
   margin-top: 1.5rem;
   opacity: 0.7;
 }
+
+/* ---- Information ---- */
+.info-hero {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.info-hero img { border-radius: 12px; }
+.info-hero h2 { margin: 0; font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
+.info-hero p { margin: 0.125rem 0 0; color: var(--muted-fg); font-size: 0.875rem; }
+
+.info-card {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 0.875rem;
+}
+
+/* The drawing carries the idea; the words underneath explain it. Both use
+   currentColor and the accent, so they follow the theme with the rest. */
+.info-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 0.75rem;
+  color: var(--fg);
+  stroke-width: 1.4;
+}
+
+.info-card h3 {
+  margin: 0 0 0.375rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.info-card p { margin: 0 0 0.625rem; font-size: 0.875rem; line-height: 1.55; }
+.info-card p:last-child { margin-bottom: 0; }
+
+.info-aside { color: var(--muted-fg); font-size: 0.8125rem !important; }
+
+.info-links {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1.25rem 0 0;
+}
+
+.info-link {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.125rem;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.625rem 0.75rem;
+  cursor: pointer;
+}
+
+.info-link:hover { border-color: var(--accent); }
+.info-link span { font-weight: 600; font-size: 0.875rem; }
+.info-link small { color: var(--muted-fg); font-size: 0.75rem; }

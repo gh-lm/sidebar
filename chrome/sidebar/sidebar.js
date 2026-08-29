@@ -24,17 +24,34 @@ setTimeout(async () => {
 // Only tab buttons (data-panel) switch views. The "+" button and the
 // pinned-site favicons are .rail-btn too but have their own handlers --
 // binding them here used to deactivate every view when "+" was clicked.
-for (const btn of document.querySelectorAll(".rail-btn[data-panel]")) {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".rail-btn").forEach((b) => {
-      b.classList.toggle("active", b === btn);
-      b.setAttribute("aria-selected", String(b === btn));
-    });
-    document.querySelectorAll(".panel-view").forEach((p) => {
-      p.classList.toggle("active", p.id === `panel-${btn.dataset.panel}`);
-    });
+const HOME_PANEL = "scratchpad";
+
+function showPanel(name) {
+  document.querySelectorAll(".rail-btn[data-panel]").forEach((b) => {
+    const on = b.dataset.panel === name;
+    b.classList.toggle("active", on);
+    b.setAttribute("aria-selected", String(on));
+  });
+  document.querySelectorAll(".panel-view").forEach((p) => {
+    p.classList.toggle("active", p.id === `panel-${name}`);
   });
 }
+
+for (const btn of document.querySelectorAll(".rail-btn[data-panel]")) {
+  btn.addEventListener("click", () => {
+    // Clicking the tab you are already on takes you back out of it —
+    // otherwise there is no way to shut Information again without picking
+    // something else, which is not what pressing the same button means.
+    const alreadyHere = btn.classList.contains("active");
+    showPanel(alreadyHere && btn.dataset.panel !== HOME_PANEL ? HOME_PANEL : btn.dataset.panel);
+  });
+}
+
+// The mark under the chevron opens the Sidemorphic site in the panel,
+// like any pinned site.
+document.getElementById("railLogo")?.addEventListener("click", () => {
+  openPanelSite("https://sidemorphic.lightmorphic.com");
+});
 
 // ---- Framing pinned sites ----
 // Most big sites (BBC, Google, etc.) send X-Frame-Options or a CSP
@@ -688,6 +705,12 @@ if (chrome.bookmarks?.onChanged) {
   chrome.bookmarks.onCreated.addListener(refresh);
   chrome.bookmarks.onRemoved.addListener(refresh);
   chrome.bookmarks.onMoved.addListener(refresh);
+}
+
+// The two links at the bottom of Information open in the panel itself,
+// the same as any pinned site.
+for (const link of document.querySelectorAll(".info-link")) {
+  link.addEventListener("click", () => openPanelSite(link.dataset.site));
 }
 
 // ---- First run ----

@@ -3,47 +3,391 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sidemorphic — privacy</title>
+<title>Sidemorphic — a private side panel for Chrome</title>
+<meta name="description" content="Pin any website to a side panel and read it beside the page you're on. Plus a scratchpad and snippets. Syncs through your bookmarks — no account, no server.">
+<link rel="icon" href="img/mark.png">
+<meta property="og:title" content="Sidemorphic">
+<meta property="og:description" content="A private side panel for Chrome. Pin any site, keep a scratchpad, drop snippets where you're typing. No account, no server.">
+<meta property="og:image" content="img/mark.png">
 <style>
-  @font-face { font-family: "Manrope"; src: url("Manrope.woff2") format("woff2");
-               font-weight: 200 800; font-display: swap; }
-  :root { color-scheme: light dark;
-    --bg:#ffffff; --fg:#09090b; --panel:#ffffff; --panel-border:rgba(24,24,40,.10);
-    --muted-fg:#71717a; --accent:#fbc711; --brand-navy:#111827;
-    --shadow-panel:0 1px 2px rgba(24,24,40,.05), 0 8px 24px -16px rgba(24,24,40,.18);
-    --panel-radius:1.375rem; }
+  @font-face {
+    font-family: "Manrope";
+    src: url("Manrope.woff2") format("woff2");
+    font-weight: 200 800;
+    font-display: swap;
+  }
+
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff; --fg: #09090b;
+    --panel: #ffffff; --panel-border: rgba(24,24,40,.10);
+    --border: #e4e4e7; --muted: #f4f4f5; --muted-fg: #71717a;
+    --accent: #fbc711; --accent-hover: #ddaf0f; --on-accent: #645007;
+    --navy: #111827;
+    --shadow: 0 1px 2px rgba(24,24,40,.05), 0 24px 60px -32px rgba(24,24,40,.35);
+    --radius: 0.875rem;
+    --panel-radius: 1.375rem;
+  }
+
   @media (prefers-color-scheme: dark) {
-    :root { --bg:#09090b; --fg:#fafafa; --panel:#1b1d29;
-            --panel-border:rgba(255,255,255,.09); --muted-fg:#a1a1aa;
-            --shadow-panel:0 1px 2px rgba(0,0,0,.35), 0 8px 24px -16px rgba(0,0,0,.6); } }
-  body { margin:0; background:var(--bg); color:var(--fg);
-         font-family:"Manrope", system-ui, sans-serif; line-height:1.6;
-         display:flex; justify-content:center; padding:3rem 1.25rem; }
-  main { max-width:65ch; width:100%; background:var(--panel);
-         border:1px solid var(--panel-border); border-radius:var(--panel-radius);
-         box-shadow:var(--shadow-panel); padding:2.5rem; }
-  h1 { font-size:2rem; font-weight:700; letter-spacing:-0.02em; margin:0 0 .5rem; }
-  .mark { display:block; width:56px; height:56px; margin-bottom:1.25rem; }
-  p { margin:0 0 1.1rem; }
-  footer { margin-top:2rem; color:var(--muted-fg); font-size:.8125rem; }
-  a { color:#1b74bc; }
-  @media (prefers-color-scheme: dark) { a { color:#2295f1; } }
+    :root {
+      --bg: #09090b; --fg: #fafafa;
+      --panel: #14161f; --panel-border: rgba(255,255,255,.09);
+      --border: #27272a; --muted: #17171b; --muted-fg: #a1a1aa;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 24px 60px -30px rgba(0,0,0,.9);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Manrope", system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 1.5rem; }
+
+  /* ---- header ---- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: none;
+    background: var(--bg);
+    border-bottom: 1px solid var(--panel-border);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 0;
+  }
+
+  .bar img { border-radius: 8px; }
+  .bar strong { font-size: 1.0625rem; letter-spacing: -0.01em; }
+  .bar nav { margin-left: auto; display: flex; gap: 1.25rem; align-items: center; font-size: 0.9375rem; }
+  .bar nav a { color: var(--muted-fg); text-decoration: none; }
+  .bar nav a:hover { color: var(--fg); }
+
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 700;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+  }
+  .btn:hover { background: var(--accent-hover); }
+  .btn-quiet {
+    background: transparent;
+    color: var(--fg);
+    border-color: var(--border);
+    font-weight: 600;
+  }
+  .btn-quiet:hover { border-color: var(--accent); background: transparent; }
+
+  /* ---- hero ---- */
+  .hero { padding: 5rem 0 3rem; }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4.25rem);
+    line-height: 1.03;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+    margin: 0 0 1.25rem;
+    max-width: 16ch;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(180deg, transparent 62%, var(--accent) 62%);
+  }
+
+  .hero p {
+    font-size: 1.1875rem;
+    color: var(--muted-fg);
+    max-width: 46ch;
+    margin: 0 0 2rem;
+  }
+
+  .cta { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+  .cta small { color: var(--muted-fg); font-size: 0.8125rem; width: 100%; margin-top: 0.25rem; }
+
+  /* ---- the scrolling demonstration ----
+     The page is the product: a column of features on the left, and on the
+     right a panel that stays put and changes as you pass each one. */
+  .demo {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 4rem;
+    padding: 2rem 0 6rem;
+    align-items: start;
+  }
+
+  .steps { display: grid; gap: 1px; }
+
+  .step {
+    padding: 5rem 0;
+    border-top: 1px solid var(--panel-border);
+    opacity: 0.35;
+    transition: opacity 0.35s ease;
+  }
+  .step:first-child { border-top: 0; }
+  .step.on { opacity: 1; }
+
+  .step h2 {
+    font-size: clamp(1.6rem, 3vw, 2.125rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.875rem;
+    font-weight: 700;
+  }
+
+  .step p { margin: 0 0 0.875rem; font-size: 1.0625rem; max-width: 44ch; }
+  .step p.aside { color: var(--muted-fg); font-size: 0.9375rem; }
+
+  .tagline {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted-fg);
+    margin-bottom: 0.875rem;
+  }
+
+  .stage { position: sticky; top: 7rem; }
+
+  /* A browser window with the panel down its right — the thing itself. */
+  .frame {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--panel-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .frame-bar {
+    display: flex;
+    gap: 0.375rem;
+    padding: 0.75rem 0.875rem;
+    border-bottom: 1px solid var(--panel-border);
+    background: var(--muted);
+  }
+  .frame-bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--border); }
+
+  .shots { position: relative; aspect-ratio: 400 / 780; }
+
+  .shots img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+  }
+  .shots img.on { opacity: 1; }
+
+  /* ---- closing ---- */
+  .close-out {
+    border-top: 1px solid var(--panel-border);
+    padding: 5rem 0 6rem;
+    text-align: center;
+  }
+  .close-out h2 {
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    letter-spacing: -0.03em;
+    margin: 0 0 1rem;
+    font-weight: 800;
+  }
+  .close-out p { color: var(--muted-fg); max-width: 48ch; margin: 0 auto 2rem; font-size: 1.0625rem; }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 3.5rem 0 0;
+    text-align: left;
+  }
+
+  .fact {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+  }
+  .fact b { display: block; font-size: 1.75rem; letter-spacing: -0.02em; }
+  .fact span { color: var(--muted-fg); font-size: 0.9375rem; }
+
+  footer {
+    border-top: 1px solid var(--panel-border);
+    padding: 2rem 0 3rem;
+    color: var(--muted-fg);
+    font-size: 0.875rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    align-items: center;
+  }
+  footer nav { margin-left: auto; display: flex; gap: 1.25rem; }
+  footer a { text-decoration: none; }
+  footer a:hover { color: var(--fg); }
+
+  :where(a, button):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 900px) {
+    .demo { grid-template-columns: 1fr; gap: 2rem; }
+    .stage { position: static; max-width: 400px; }
+    .step { padding: 2.5rem 0; opacity: 1; }
+    .shots img { position: relative; opacity: 1; display: none; }
+    .shots img.on { display: block; }
+    .bar nav a:not(.btn) { display: none; }
+  }
 </style>
 </head>
 <body>
+
+<header>
+  <div class="wrap bar">
+    <img src="img/mark.png" alt="" width="26" height="26">
+    <strong>Sidemorphic</strong>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="https://github.com/lightmorphic/sidemorphic">Source</a>
+      <a class="btn" href="https://github.com/lightmorphic/sidemorphic">Get it</a>
+    </nav>
+  </div>
+</header>
+
 <main>
-<img class="mark" src="icon.png" alt="" width="56" height="56">
-<h1>Sidemorphic privacy statement</h1>
-<p>Sidemorphic collects nothing, sends nothing, and has no server.</p>
-<p><strong>What it stores, and where.</strong> Your scratchpad, snippets and pinned sites are saved as ordinary bookmarks, in a folder called &quot;Sidemorphic&quot; in your Other Bookmarks, with a copy in the browser&#x27;s extension storage. Sidemorphic itself sends nothing anywhere: there is no account, no server of ours, and no network request of any kind.</p>
-<p><strong>Syncing.</strong> Because that data is bookmarks, your browser&#x27;s own sync carries it to your other machines, exactly as it carries the rest of your bookmarks — under whatever settings and encryption your browser provides, between you and your browser maker. We are not involved and cannot see it. If you do not sync bookmarks, nothing leaves the machine. Deleting the folder deletes the data. There is no account and nothing to sign in to.</p>
-<p><strong>Snippets and the page you are on.</strong> Clicking a snippet copies it and, if you have granted access to that site, inserts it at your cursor. It writes your own text in and reads nothing out — no page content, no form values. Decline the permission and the snippet is still on your clipboard to paste yourself.</p>
-<p><strong>Website access.</strong> Sidemorphic installs with access to no websites. The first time you open a pinned site in the panel, the browser asks whether to grant access to that one site — this is needed because showing a site in a panel means removing the headers that normally stop it being framed. You can decline, and the site opens in an ordinary tab instead. You can withdraw access at any time from the browser&#x27;s extension settings.</p>
-<p><strong>What it reads about your browsing.</strong> When you press &quot;+&quot; to pin a site, it reads the address of the tab you are on so it can fill that address in for you. It is shown on screen, saved only if you press Save, and used nowhere else. Sidemorphic does not read page content, and does not keep any history of where you go.</p>
-<p><strong>No third parties.</strong> No analytics, no tracking, no remote code, no external fonts or images, no requests to any service — including ours. Site icons come from the browser&#x27;s own cache.</p>
-<p>Published at <a href="https://lightmorphic.github.io/sidemorphic/">https://lightmorphic.github.io/sidemorphic/</a> — source at <a href="https://github.com/lightmorphic/sidemorphic">github.com/lightmorphic/sidemorphic</a></p>
-<footer>Sidemorphic is a browser extension. Source:
-<a href="https://github.com/lightmorphic/sidemorphic">github.com/lightmorphic/sidemorphic</a></footer>
+  <section class="wrap hero">
+    <h1>The tab you keep <em>going back to</em>, beside the one you're reading.</h1>
+    <p>Sidemorphic puts a panel down the side of Chrome and keeps it there. Pin
+      the sites you check all day, keep a scratchpad, and drop the text you
+      retype straight into whatever box you're in.</p>
+    <div class="cta">
+      <a class="btn" href="https://github.com/lightmorphic/sidemorphic">Get Sidemorphic</a>
+      <a class="btn btn-quiet" href="#how">See how it works</a>
+      <small>Chrome, Edge, Brave, Vivaldi and Opera. No account. No server. Nothing to sign up to.</small>
+    </div>
+  </section>
+
+  <section class="wrap demo" id="how">
+    <div class="steps">
+      <article class="step on" data-shot="scratchpad">
+        <span class="tagline">Somewhere to put things</span>
+        <h2>A scratchpad that is always one click away</h2>
+        <p>The half-thought, the address someone read out, the paragraph you
+          are not sure about yet. It is there when you open the panel and it
+          is still there tomorrow.</p>
+        <p class="aside">No files, no documents, no saving. You type, it stays.</p>
+      </article>
+
+      <article class="step" data-shot="snippets">
+        <span class="tagline">Text you retype</span>
+        <h2>Snippets that land where your cursor is</h2>
+        <p>Your phone number, your address, the reply you send twice a week.
+          Click one and it goes straight into the box you were typing in,
+          at the cursor — not onto the clipboard for you to find later.</p>
+        <p class="aside">Right-click to edit. Click away and it saves. There is
+          nothing to press.</p>
+      </article>
+
+      <article class="step" data-shot="info">
+        <span class="tagline">Your bookmarks, doing the work</span>
+        <h2>It follows you between machines, with no account</h2>
+        <p>Everything you save is kept as ordinary bookmarks in one folder. If
+          your browser syncs bookmarks — and Brave and Vivaldi do, even though
+          they sync nothing else about extensions — then your panel follows you
+          too.</p>
+        <p class="aside">Nothing is sent to us, because there is no us to send
+          it to. No account, no server, no analytics.</p>
+      </article>
+
+      <article class="step" data-shot="light">
+        <span class="tagline">Access to nothing</span>
+        <h2>It starts with permission for no websites at all</h2>
+        <p>Most extensions ask to read and change your data on every site you
+          visit, on the day you install them. Sidemorphic asks for one site at a
+          time, at the moment you first open it in the panel — and you can take
+          it back whenever you like.</p>
+        <p class="aside">Light or dark, taken from your browser.</p>
+      </article>
+    </div>
+
+    <div class="stage">
+      <div class="frame">
+        <div class="frame-bar"><i></i><i></i><i></i></div>
+        <div class="shots">
+          <img class="on" data-shot="scratchpad" src="img/web-scratchpad.png" alt="The Sidemorphic panel showing the scratchpad" width="400" height="780">
+          <img data-shot="snippets" src="img/web-snippets.png" alt="The panel showing saved snippets" width="400" height="780">
+          <img data-shot="info" src="img/web-info.png" alt="The panel showing the information pages" width="400" height="780">
+          <img data-shot="light" src="img/web-light.png" alt="The panel in light mode" width="400" height="780">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap close-out">
+    <h2>Small on purpose.</h2>
+    <p>It does four things and gets out of the way. No feed, no assistant, no
+      upsell, and nothing that phones home.</p>
+    <a class="btn" href="https://github.com/lightmorphic/sidemorphic">Get Sidemorphic</a>
+
+    <div class="facts">
+      <div class="fact"><b>0</b><span>websites it can touch when you install it</span></div>
+      <div class="fact"><b>0</b><span>accounts, servers or sign-ups</span></div>
+      <div class="fact"><b>1</b><span>bookmarks folder holding all of it</span></div>
+      <div class="fact"><b>~100&nbsp;KB</b><span>the whole extension</span></div>
+    </div>
+  </section>
 </main>
+
+<footer class="wrap">
+  <span>Sidemorphic — part of <a href="https://lightmorphic.com">Lightmorphic</a>.</span>
+  <nav>
+    <a href="privacy.html">Privacy</a>
+    <a href="https://github.com/lightmorphic/sidemorphic">Source</a>
+  </nav>
+</footer>
+
+<script>
+  // The panel on the right follows whichever feature you are reading. No
+  // library: one observer, and a fallback that simply shows everything if
+  // the browser has no IntersectionObserver.
+  const steps = [...document.querySelectorAll(".step")];
+  const shots = [...document.querySelectorAll(".shots img")];
+
+  function show(name) {
+    steps.forEach((s) => s.classList.toggle("on", s.dataset.shot === name));
+    shots.forEach((i) => i.classList.toggle("on", i.dataset.shot === name));
+  }
+
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        const seen = entries.filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (seen) show(seen.target.dataset.shot);
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.5, 1] }
+    );
+    steps.forEach((s) => io.observe(s));
+  } else {
+    steps.forEach((s) => s.classList.add("on"));
+  }
+</script>
 </body>
 </html>

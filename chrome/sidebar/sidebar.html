@@ -14,6 +14,9 @@
       <button class="rail-btn rail-btn-min" id="railMinimize" type="button" data-tip="Close &mdash; the toolbar icon reopens it" aria-label="Close the panel (the toolbar icon reopens it)">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>
       </button>
+      <button class="rail-btn rail-logo" id="railLogo" type="button" data-tip="Sidemorphic &mdash; what it is and what is new" aria-label="Open the Sidemorphic website">
+        <img src="../icons/icon-32.png" alt="" width="22" height="22">
+      </button>
       <button class="rail-btn active" data-panel="scratchpad" role="tab" aria-selected="true" data-tip="Scratchpad" aria-label="Scratchpad">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h9l3 3v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v3h3"/><path d="M6.5 9.5h7M6.5 12.5h7M6.5 15.5h4"/></svg>
       </button>
@@ -55,32 +58,103 @@
       </section>
 
       <section id="panel-snippets" class="panel-view">
-        <h2 class="settings-heading">Snippets</h2>
-        <p class="hint">Click one to drop it into whatever box you were typing in. Right-click to edit &mdash; changes save when you click away.</p>
-        <div class="panel-list" id="snippetList"></div>
         <textarea id="addSnippetText" class="snippet-add" rows="2" placeholder="Add a snippet &mdash; type it here, then click away"></textarea>
+        <p class="hint">Click one to drop it into whatever box you were typing in. Right-click to edit.</p>
+        <div class="panel-list" id="snippetList"></div>
       </section>
 
       <section id="panel-information" class="panel-view">
-        <h2 class="settings-heading">Pinned sites</h2>
-        <p class="hint">Open a site, then press <strong>+</strong> on the rail. Its address is filled in for you and you can edit it before saving. It becomes an icon on the rail; click the icon to open that site here in the panel, like a small window beside the page you are reading.</p>
-        <p class="hint">Right-click an icon to change its address or remove it. Drag icons to reorder them.</p>
+        <div class="info-hero">
+          <img src="../icons/icon-128.png" alt="" width="52" height="52">
+          <div>
+            <h2>Sidemorphic</h2>
+            <p>A panel that stays put while you read.</p>
+          </div>
+        </div>
 
-        <h2 class="settings-heading">Site access</h2>
-        <p class="hint">Sidemorphic starts with access to no websites at all. The first time you open a pinned site here, your browser asks permission for that one site &mdash; needed because showing a site in a panel means dropping the headers that normally stop it. Say no and it opens in an ordinary tab instead. You can take access back any time from the browser's extension settings.</p>
+        <article class="info-card">
+          <svg class="info-art" viewBox="0 0 220 96" role="img" aria-label="A web page with a panel down its right-hand side">
+            <rect x="1" y="1" width="218" height="94" rx="9" fill="none" stroke="currentColor" opacity=".25"/>
+            <rect x="12" y="14" width="120" height="7" rx="3.5" fill="currentColor" opacity=".22"/>
+            <rect x="12" y="30" width="140" height="5" rx="2.5" fill="currentColor" opacity=".14"/>
+            <rect x="12" y="42" width="132" height="5" rx="2.5" fill="currentColor" opacity=".14"/>
+            <rect x="12" y="54" width="138" height="5" rx="2.5" fill="currentColor" opacity=".14"/>
+            <rect x="12" y="66" width="96" height="5" rx="2.5" fill="currentColor" opacity=".14"/>
+            <rect x="163" y="9" width="46" height="78" rx="7" fill="var(--accent)" opacity=".16"/>
+            <rect x="163" y="9" width="46" height="78" rx="7" fill="none" stroke="var(--accent)"/>
+            <rect x="170" y="18" width="26" height="4" rx="2" fill="var(--accent)"/>
+            <rect x="170" y="28" width="32" height="4" rx="2" fill="currentColor" opacity=".3"/>
+            <rect x="170" y="38" width="22" height="4" rx="2" fill="currentColor" opacity=".3"/>
+            <circle cx="204" cy="20" r="2.5" fill="var(--accent)"/>
+          </svg>
+          <h3>Pin a site, read it here</h3>
+          <p>Open a site, press <strong>+</strong> on the rail, and it becomes an icon. Click the icon and the site opens in the panel, beside whatever you are reading &mdash; mail, a chat, docs, anything you keep flicking tabs for.</p>
+          <p class="info-aside">Right-click an icon to change or remove it. Drag to reorder.</p>
+        </article>
 
-        <h2 class="settings-heading">Syncing</h2>
-        <p class="hint">Your pinned sites, scratchpad and snippets are kept in a bookmarks folder called <strong>Sidemorphic</strong>, in Other Bookmarks. If your browser syncs bookmarks, they travel with them &mdash; no account here, no server of ours. Brave and Vivaldi sync bookmarks but not extension data, which is why they live there. Don't rename the folder, but you can move it.</p>
+        <article class="info-card">
+          <svg class="info-art" viewBox="0 0 220 96" role="img" aria-label="A bookmarks folder holding the saved items">
+            <path d="M14 24h30l6 8h44a6 6 0 0 1 6 6v34a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V30a6 6 0 0 1 6-6z" fill="var(--accent)" opacity=".18"/>
+            <path d="M14 24h30l6 8h44a6 6 0 0 1 6 6v34a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V30a6 6 0 0 1 6-6z" fill="none" stroke="var(--accent)"/>
+            <rect x="20" y="44" width="60" height="5" rx="2.5" fill="currentColor" opacity=".35"/>
+            <rect x="20" y="56" width="48" height="5" rx="2.5" fill="currentColor" opacity=".25"/>
+            <rect x="20" y="68" width="54" height="5" rx="2.5" fill="currentColor" opacity=".25"/>
+            <path d="M118 52h34" stroke="currentColor" opacity=".35" stroke-dasharray="4 4"/>
+            <path d="M148 47l6 5-6 5" fill="none" stroke="currentColor" opacity=".45" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="162" y="26" width="48" height="52" rx="7" fill="none" stroke="currentColor" opacity=".3"/>
+            <rect x="170" y="36" width="32" height="4" rx="2" fill="currentColor" opacity=".3"/>
+            <rect x="170" y="46" width="24" height="4" rx="2" fill="currentColor" opacity=".3"/>
+            <rect x="170" y="56" width="30" height="4" rx="2" fill="currentColor" opacity=".3"/>
+          </svg>
+          <h3>It follows you, with no account</h3>
+          <p>Your scratchpad, snippets and pinned sites are kept as ordinary bookmarks, in a folder called <strong>Sidemorphic</strong> in Other Bookmarks. If your browser syncs bookmarks, they travel with them.</p>
+          <p class="info-aside">No sign-in, no server of ours, nothing sent to us. Delete the folder and the data is gone. Move it wherever you like, but keep its name.</p>
+        </article>
 
-        <h2 class="settings-heading">Snippets</h2>
-        <p class="hint">Click a snippet to drop it into the box you were typing in. The first time you do that on a site, your browser asks whether Sidemorphic may act there &mdash; say yes once and it stops asking. Say no and the snippet is still copied, ready to paste yourself.</p>
-        <p class="hint">Right-click a snippet to edit it. There is nothing to press: clicking away saves, Escape leaves it alone, and emptying it deletes it. The small mark on the right deletes: it turns into a bin when you point at it, then a red tick asking whether you meant it. Click the tick to delete, or move away to leave it alone.</p>
+        <article class="info-card">
+          <svg class="info-art" viewBox="0 0 220 96" role="img" aria-label="A snippet moving into a text box on a page">
+            <rect x="10" y="20" width="76" height="20" rx="6" fill="var(--accent)" opacity=".2"/>
+            <rect x="10" y="20" width="76" height="20" rx="6" fill="none" stroke="var(--accent)"/>
+            <rect x="18" y="28" width="44" height="4" rx="2" fill="var(--accent)"/>
+            <path d="M94 42h30" stroke="currentColor" opacity=".4" stroke-linecap="round"/>
+            <path d="M120 37l6 5-6 5" fill="none" stroke="currentColor" opacity=".5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="134" y="26" width="76" height="44" rx="7" fill="none" stroke="currentColor" opacity=".3"/>
+            <rect x="142" y="36" width="30" height="4" rx="2" fill="currentColor" opacity=".3"/>
+            <rect x="174" y="34" width="2" height="9" rx="1" fill="var(--accent)"/>
+            <rect x="142" y="50" width="52" height="4" rx="2" fill="currentColor" opacity=".18"/>
+          </svg>
+          <h3>Snippets go where you were typing</h3>
+          <p>Click a snippet and it lands at your cursor in the box you were last in. The first time on a site, your browser asks whether Sidemorphic may act there &mdash; say yes once and it stops asking.</p>
+          <p class="info-aside">Say no and the snippet is copied instead, ready to paste. Right-click a snippet to edit it: clicking away saves, Escape leaves it, emptying it deletes it. The mark on the right becomes a bin, then a red tick asking whether you meant it.</p>
+        </article>
 
-        <h2 class="settings-heading">Closing it</h2>
-        <p class="hint">The chevron at the top of the rail closes the panel, which is what gives the page its full width back. Chrome fixes the panel's width and gives extensions no control over it, so there is no half-open state worth having &mdash; hiding what is inside would leave the page just as squeezed. The toolbar icon brings it back.</p>
+        <article class="info-card">
+          <svg class="info-art" viewBox="0 0 220 96" role="img" aria-label="A padlock with a single site allowed">
+            <rect x="74" y="42" width="72" height="42" rx="8" fill="var(--accent)" opacity=".18"/>
+            <rect x="74" y="42" width="72" height="42" rx="8" fill="none" stroke="var(--accent)"/>
+            <path d="M92 42V32a18 18 0 0 1 36 0v10" fill="none" stroke="var(--accent)"/>
+            <circle cx="110" cy="60" r="5" fill="var(--accent)"/>
+            <rect x="107.5" y="62" width="5" height="10" rx="2.5" fill="var(--accent)"/>
+          </svg>
+          <h3>It starts with access to nothing</h3>
+          <p>Sidemorphic installs with permission for no websites at all. It asks about one site at a time, at the moment you first open it or paste into it, and you can take that back whenever you like from the browser's extension settings.</p>
+          <p class="info-aside">Showing a site in a panel means dropping the headers that normally stop a site being framed &mdash; which is why it has to ask.</p>
+        </article>
 
-        <h2 class="settings-heading">Keyboard</h2>
-        <p class="hint" id="shortcutHint">Checking&hellip;</p>
+        <article class="info-card">
+          <h3>Closing it</h3>
+          <p>The chevron at the top of the rail closes the panel, which is what gives the page its full width back. Chrome fixes the panel's width and gives extensions no say over it, so there is no half-open state worth having. The toolbar icon brings it back.</p>
+          <p class="info-aside" id="shortcutHint">Checking&hellip;</p>
+        </article>
+
+        <div class="info-links">
+          <button type="button" class="info-link" data-site="https://sidemorphic.lightmorphic.com">
+            <span>Sidemorphic</span><small>sidemorphic.lightmorphic.com</small>
+          </button>
+          <button type="button" class="info-link" data-site="https://lightmorphic.com">
+            <span>See it in use</span><small>lightmorphic.com</small>
+          </button>
+        </div>
 
         <p class="hint version-line">Sidemorphic <span id="aboutVersion">&hellip;</span></p>
       </section>
