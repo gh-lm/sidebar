@@ -25,10 +25,10 @@ asks permission for that one site, and nothing else. Nothing is sent anywhere:
 no accounts, no servers, no analytics, no remote code. Everything stays in your
 browser.
 
-Search is in the panel too, with six engines that do not profile you —
-DuckDuckGo, Startpage, Brave, Mojeek, Qwant and Ecosia — and the results open
-in the panel. Sidemorphic does not touch your new tab page, or anything else
-in the browser.
+Search is in the panel too: the mark, the name, one box — and eight engines
+behind a single line of text. DuckDuckGo to start with, plus Startpage, Brave,
+Mojeek, Qwant, Google, Google Images and Bing. Results open in the panel.
+Sidemorphic does not touch your new tab page, or anything else in the browser.
 
 ## Category
 

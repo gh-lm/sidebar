@@ -135,20 +135,29 @@ const searchForm = document.getElementById("searchForm");
 const searchBox = document.getElementById("searchBox");
 const searchRecent = document.getElementById("searchRecent");
 
-// Six engines, all of which say they do not build a profile of you.
-// DuckDuckGo is the default because it is the one most people already know;
-// the rest are here so the default is a choice rather than an assumption.
+// Eight engines. The privacy ones lead because that is the point of the
+// thing, but Google and Bing are here because leaving them out would not
+// stop anyone using them — it would just mean doing it somewhere else.
 const ENGINES = [
-  { id: "ddg", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=" },
-  { id: "startpage", name: "Startpage", url: "https://www.startpage.com/sp/search?query=" },
-  { id: "brave", name: "Brave", url: "https://search.brave.com/search?q=" },
-  { id: "mojeek", name: "Mojeek", url: "https://www.mojeek.com/search?q=" },
-  { id: "qwant", name: "Qwant", url: "https://www.qwant.com/?q=" },
-  { id: "ecosia", name: "Ecosia", url: "https://www.ecosia.org/search?q=" },
+  { id: "ddg", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=", site: "https://duckduckgo.com" },
+  { id: "google", name: "Google", url: "https://www.google.com/search?q=", site: "https://www.google.com" },
+  { id: "gimages", name: "Google Images", url: "https://www.google.com/search?tbm=isch&q=", site: "https://images.google.com" },
+  { id: "bing", name: "Bing", url: "https://www.bing.com/search?q=", site: "https://www.bing.com" },
+  { id: "startpage", name: "Startpage", url: "https://www.startpage.com/sp/search?query=", site: "https://www.startpage.com" },
+  { id: "brave", name: "Brave", url: "https://search.brave.com/search?q=", site: "https://search.brave.com" },
+  { id: "mojeek", name: "Mojeek", url: "https://www.mojeek.com/search?q=", site: "https://www.mojeek.com" },
+  { id: "qwant", name: "Qwant", url: "https://www.qwant.com/?q=", site: "https://www.qwant.com" },
 ];
 
 let engine = ENGINES[0];
 
+const engineButton = document.getElementById("engineButton");
+const engineMenu = document.getElementById("engineMenu");
+const engineName = document.getElementById("engineName");
+
+// No icons in this list. Chrome only has a favicon for a site the profile
+// has actually visited, so a fresh install would show a column of grey
+// globes — worse than no icon at all. The names are the labels.
 async function loadEngine() {
   const { searchEngine } = await chrome.storage.local.get("searchEngine");
   engine = ENGINES.find((e) => e.id === searchEngine) || ENGINES[0];
@@ -156,26 +165,54 @@ async function loadEngine() {
 }
 
 function renderEngines() {
-  const box = document.getElementById("searchEngines");
-  if (!box) return;
-  box.innerHTML = "";
+  engineName.textContent = engine.name;
+  engineButton.title = `Searching with ${engine.name} — click to change`;
+  engineMenu.innerHTML = "";
   for (const e of ENGINES) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "engine";
-    b.textContent = e.name;
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "engine-row";
+    row.setAttribute("role", "option");
     const on = e.id === engine.id;
-    b.setAttribute("aria-pressed", String(on));
-    b.title = on ? `Searching with ${e.name}` : `Search with ${e.name} instead`;
-    b.addEventListener("click", async () => {
+    row.setAttribute("aria-selected", String(on));
+    const label = document.createElement("span");
+    label.textContent = e.name;
+    row.append(label);
+    if (on) {
+      const tick = document.createElement("span");
+      tick.className = "engine-tick";
+      tick.textContent = "✓";
+      row.append(tick);
+    }
+    row.addEventListener("click", async () => {
       engine = e;
       await chrome.storage.local.set({ searchEngine: e.id });
+      closeEngineMenu();
       renderEngines();
       searchBox.focus();
     });
-    box.appendChild(b);
+    engineMenu.appendChild(row);
   }
 }
+
+function openEngineMenu() {
+  engineMenu.hidden = false;
+  engineButton.setAttribute("aria-expanded", "true");
+}
+
+function closeEngineMenu() {
+  engineMenu.hidden = true;
+  engineButton.setAttribute("aria-expanded", "false");
+}
+
+engineButton.addEventListener("click", (e) => {
+  e.stopPropagation();
+  engineMenu.hidden ? openEngineMenu() : closeEngineMenu();
+});
+document.addEventListener("click", closeEngineMenu);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeEngineMenu();
+});
 
 function searchUrlFor(q) {
   // Bare domains and addresses go straight there; anything else searches.

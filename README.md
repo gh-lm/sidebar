@@ -14,8 +14,8 @@ extensions — Edge, Brave, Vivaldi, Opera. There is no Firefox version.
 ## What it does
 
 - **Panels** — pin any site to the rail and open it beside the page you're on.
-- **Search** — the panel opens on a search box, with six engines that do not
-  profile you. Results open in the panel.
+- **Search** — the panel opens on a search box, with eight engines behind one
+  line of text. Results open in the panel.
 - **Scratchpad** — somewhere to put things, always one click away.
 - **Snippets** — text you retype often; click one to drop it into the box
   you were typing in, right-click to edit it.

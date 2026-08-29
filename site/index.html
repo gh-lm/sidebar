@@ -398,29 +398,24 @@
     color: #d7d8de;
     background: #1c1f2b;
     border: 1px solid rgba(255,255,255,.1);
-    border-radius: 9px;
-    padding: 0.5rem 0.6rem;
+    border-radius: 999px;
+    padding: 0.5rem 0.85rem;
   }
   .demo-go {
     display: grid;
     place-items: center;
     width: 2rem;
-    border-radius: 9px;
+    border-radius: 999px;
     background: var(--accent);
     color: #3f3204;
     font-weight: 700;
   }
 
-  .demo-engines { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.6rem; }
-  .demo-engines b, .demo-engines span {
-    font-size: 0.6875rem;
-    font-weight: 600;
-    border-radius: 999px;
-    padding: 0.2rem 0.5rem;
-    border: 1px solid rgba(255,255,255,.14);
-    color: #9ea0ab;
-  }
-  .demo-engines b { background: var(--accent); border-color: var(--accent); color: #3f3204; }
+  .demo-stage { display: flex; flex-direction: column; align-items: center; padding: 1.5rem 0 0.5rem; }
+  .demo-stage img { border-radius: 11px; }
+  .demo-stage b { margin: 0.5rem 0 1rem; font-size: 1.0625rem; letter-spacing: -0.02em; }
+  .demo-stage .demo-search { width: 100%; }
+  .demo-engine { margin-top: 0.6rem; font-size: 0.75rem; color: #8a8c96; }
 
   .demo-h { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: #8a8c96; margin: 0 0 0.75rem; }
   .demo-site { border: 1px solid rgba(255,255,255,.1); border-radius: 10px; overflow: hidden; }
@@ -520,13 +515,16 @@
   <span class="demo-flag">Try it</span>
   <div class="demo-body">
     <div class="demo-view on" data-view="search">
-      <p class="demo-h">Search</p>
-      <div class="demo-search">
-        <input type="search" placeholder="Search DuckDuckGo, or type a web address" aria-label="Example search box">
-        <span class="demo-go">→</span>
+      <div class="demo-stage">
+        <img src="img/mark.png" alt="" width="44" height="44">
+        <b>Sidemorphic</b>
+        <div class="demo-search">
+          <input type="search" placeholder="Search or type a web address" aria-label="Example search box">
+          <span class="demo-go">→</span>
+        </div>
+        <span class="demo-engine">DuckDuckGo ⌄</span>
       </div>
-      <div class="demo-engines"><b>DuckDuckGo</b><span>Startpage</span><span>Brave</span><span>Mojeek</span><span>Qwant</span><span>Ecosia</span></div>
-      <p class="demo-hint">In the extension the results open here in the panel. Your new tab page is left alone.</p>
+      <p class="demo-hint">Eight engines behind that line. Results open here in the panel; your new tab page is left alone.</p>
     </div>
 
     <div class="demo-view" data-view="scratchpad">
@@ -613,9 +611,10 @@ Sarah's new address
             page to do it. This one puts it in the panel, and the results appear
             in the panel too — nothing it does reaches outside that strip down
             the side.</p>
-          <p>Six engines to pick from, all of which say they do not build a
-            profile of you: DuckDuckGo, Startpage, Brave, Mojeek, Qwant and
-            Ecosia. Your choice sticks.</p>
+          <p>Eight engines behind one line of text: DuckDuckGo to begin with,
+            then Startpage, Brave, Mojeek and Qwant — and Google, Google Images
+            and Bing, because leaving them out would not stop anyone using
+            them. Your choice sticks.</p>
           <button class="try" data-show="search">Show me in the panel</button>
         </div>
       </section>
