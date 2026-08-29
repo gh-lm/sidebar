@@ -106,18 +106,18 @@ async function loadInFrame(frame, url) {
   frame.hidden = false;
 }
 
-// ---- Notepad ----
+// ---- Scratchpad ----
 const notepad = document.getElementById("notepad");
-let notepadSaveTimer = null;
+let scratchpadSaveTimer = null;
 
-async function loadNotepad() {
+async function loadScratchpad() {
   const { notepadText = "" } = await chrome.storage.local.get("notepadText");
   notepad.value = notepadText;
 }
 
 notepad.addEventListener("input", () => {
-  clearTimeout(notepadSaveTimer);
-  notepadSaveTimer = setTimeout(async () => {
+  clearTimeout(scratchpadSaveTimer);
+  scratchpadSaveTimer = setTimeout(async () => {
     await chrome.storage.local.set({ notepadText: notepad.value });
   }, 600);
 });
@@ -389,54 +389,6 @@ railAddSite.addEventListener("click", async () => {
   openSiteDialog({ url: prefill });
 });
 
-// ---- Bookmarks ----
-const bookmarkFrame = document.getElementById("bookmarkFrame");
-const bookmarkCurrentPageBtn = document.getElementById("bookmarkCurrentPageBtn");
-const bookmarkCurrentPageLabel = document.getElementById("bookmarkCurrentPageLabel");
-
-async function loadBookmarks() {
-  const tree = document.getElementById("bookmarkTree");
-  tree.innerHTML = "";
-  const [root] = await chrome.bookmarks.getTree();
-
-  function render(node, container) {
-    if (node.children) {
-      if (node.title) {
-        const heading = document.createElement("div");
-        heading.className = "bookmark-folder";
-        heading.textContent = node.title;
-        container.appendChild(heading);
-      }
-      node.children.forEach((child) => render(child, container));
-    } else if (node.url) {
-      // Opens inside the sidebar's own frame rather than a new tab --
-      // bookmarks behave the same way pinned panels do.
-      const link = document.createElement("a");
-      link.href = node.url;
-      link.textContent = node.title || node.url;
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-        loadInFrame(bookmarkFrame, node.url);
-      });
-      container.appendChild(link);
-    }
-  }
-
-  render(root, tree);
-}
-
-bookmarkCurrentPageBtn.addEventListener("click", async () => {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.url || !/^https?:\/\//.test(tab.url)) {
-    bookmarkCurrentPageLabel.textContent = "Can't bookmark this page";
-    setTimeout(() => { bookmarkCurrentPageLabel.textContent = "Bookmark this page"; }, 1500);
-    return;
-  }
-  await chrome.bookmarks.create({ title: tab.title || tab.url, url: tab.url });
-  bookmarkCurrentPageLabel.textContent = "Bookmarked";
-  setTimeout(() => { bookmarkCurrentPageLabel.textContent = "Bookmark this page"; }, 1500);
-});
-
 // ---- Snippets ----
 const snippetList = document.getElementById("snippetList");
 const addSnippetForm = document.getElementById("addSnippetForm");
@@ -504,14 +456,9 @@ addSnippetForm.addEventListener("submit", async (e) => {
 });
 
 // ---- Start ----
-loadNotepad();
+loadScratchpad();
 loadWebPanels();
-loadBookmarks();
 loadSnippets();
-
-chrome.bookmarks.onCreated.addListener(loadBookmarks);
-chrome.bookmarks.onRemoved.addListener(loadBookmarks);
-chrome.bookmarks.onChanged.addListener(loadBookmarks);
 
 // ---- About ----
 const aboutVersion = document.getElementById("aboutVersion");

@@ -2,9 +2,10 @@
 
 Sidemorphic collects nothing, sends nothing, and has no server.
 
-**What it stores, and where.** Your notes, snippets and pinned sites are
-saved by the browser on your own computer, using the extension
-storage area. They are never transmitted. There is no account and nothing to
+**What it stores, and where.** Your scratchpad, snippets and pinned
+sites are saved by the browser on your own computer, using the extension
+storage area. They stay on that computer — they are never transmitted, and
+they do not sync to your other machines. There is no account and nothing to
 sign in to.
 
 **Website access.** Sidemorphic installs with access to no websites. The first

@@ -8,7 +8,10 @@
 // dropped as too invasive for what this is.
 
 // ---- Pinned panels ----
-const DEFAULT_PIN = "https://sidemorphic.com";
+// One example pin on a fresh install, so the rail is not empty and the idea
+// is obvious: click the icon, the site opens in the panel. The user can
+// remove it like any other. Seeded once per profile, never re-added.
+const DEFAULT_PIN = "https://sidemorphic.lightmorphic.com";
 
 async function seedPins() {
   const { pinsSeeded } = await chrome.storage.local.get("pinsSeeded");

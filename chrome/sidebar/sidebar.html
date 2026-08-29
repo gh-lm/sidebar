@@ -14,15 +14,12 @@
       <button class="rail-btn rail-btn-min" id="railMinimize" type="button" data-tip="Minimise &mdash; Ctrl+Shift+S reopens" aria-label="Minimise sidebar (Ctrl+Shift+S reopens)">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>
       </button>
-      <button class="rail-btn active" data-panel="notes" role="tab" aria-selected="true" data-tip="Notes" aria-label="Notes">
+      <button class="rail-btn active" data-panel="scratchpad" role="tab" aria-selected="true" data-tip="Scratchpad" aria-label="Scratchpad">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h9l3 3v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v3h3"/><path d="M6.5 9.5h7M6.5 12.5h7M6.5 15.5h4"/></svg>
       </button>
       <!-- No separate "Panels" tab -- the pinned-site favicons further
            down the rail ARE the panels UI; a redundant tab just confused
            things. Clicking a favicon activates the panel view directly. -->
-      <button class="rail-btn" data-panel="bookmarks" role="tab" aria-selected="false" data-tip="Bookmarks" aria-label="Bookmarks">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5h10a.5.5 0 0 1 .5.5v13l-5.5-3.5L4.5 17V4a.5.5 0 0 1 .5-.5z"/></svg>
-      </button>
       <button class="rail-btn" data-panel="snippets" role="tab" aria-selected="false" data-tip="Snippets" aria-label="Snippets">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="10" height="13" rx="1.2"/><path d="M8 3.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H8a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M7.5 9h5M7.5 12h5"/></svg>
       </button>
@@ -39,8 +36,8 @@
     </nav>
 
     <div class="content">
-      <section id="panel-notes" class="panel-view active">
-        <textarea id="notepad" placeholder="Notes — kept on this device..."></textarea>
+      <section id="panel-scratchpad" class="panel-view active">
+        <textarea id="notepad" placeholder="Scratchpad — kept on this device..."></textarea>
       </section>
 
       <section id="panel-panels" class="panel-view">
@@ -55,15 +52,6 @@
           <span class="panel-nav-host" id="panelNavHost"></span>
         </div>
         <iframe id="webPanelFrame" class="web-frame" hidden></iframe>
-      </section>
-
-      <section id="panel-bookmarks" class="panel-view">
-        <div class="bookmark-tree" id="bookmarkTree"></div>
-        <button id="bookmarkCurrentPageBtn" class="add-current-btn" type="button" title="Bookmark the page you're on now">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4.5v11M4.5 10h11"/></svg>
-          <span id="bookmarkCurrentPageLabel">Bookmark this page</span>
-        </button>
-        <iframe id="bookmarkFrame" class="web-frame" hidden></iframe>
       </section>
 
       <section id="panel-snippets" class="panel-view">
