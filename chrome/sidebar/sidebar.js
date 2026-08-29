@@ -24,7 +24,7 @@ setTimeout(async () => {
 // Only tab buttons (data-panel) switch views. The "+" button and the
 // pinned-site favicons are .rail-btn too but have their own handlers --
 // binding them here used to deactivate every view when "+" was clicked.
-const HOME_PANEL = "scratchpad";
+const HOME_PANEL = "search";
 
 function showPanel(name) {
   document.querySelectorAll(".rail-btn[data-panel]").forEach((b) => {
@@ -124,6 +124,123 @@ async function loadInFrame(frame, url) {
   frame.src = url;
   frame.hidden = false;
 }
+
+// ---- Search ----
+// The new-tab page this replaced was a search box and nothing else, and a
+// replaceable page was the wrong home for it: taking over someone's new tab
+// is a big thing to do for one text field. It lives here instead, opens on
+// top when the panel opens, and shows its results here too — nothing about
+// this extension reaches outside the panel.
+const searchForm = document.getElementById("searchForm");
+const searchBox = document.getElementById("searchBox");
+const searchRecent = document.getElementById("searchRecent");
+
+// Six engines, all of which say they do not build a profile of you.
+// DuckDuckGo is the default because it is the one most people already know;
+// the rest are here so the default is a choice rather than an assumption.
+const ENGINES = [
+  { id: "ddg", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=" },
+  { id: "startpage", name: "Startpage", url: "https://www.startpage.com/sp/search?query=" },
+  { id: "brave", name: "Brave", url: "https://search.brave.com/search?q=" },
+  { id: "mojeek", name: "Mojeek", url: "https://www.mojeek.com/search?q=" },
+  { id: "qwant", name: "Qwant", url: "https://www.qwant.com/?q=" },
+  { id: "ecosia", name: "Ecosia", url: "https://www.ecosia.org/search?q=" },
+];
+
+let engine = ENGINES[0];
+
+async function loadEngine() {
+  const { searchEngine } = await chrome.storage.local.get("searchEngine");
+  engine = ENGINES.find((e) => e.id === searchEngine) || ENGINES[0];
+  renderEngines();
+}
+
+function renderEngines() {
+  const box = document.getElementById("searchEngines");
+  if (!box) return;
+  box.innerHTML = "";
+  for (const e of ENGINES) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "engine";
+    b.textContent = e.name;
+    const on = e.id === engine.id;
+    b.setAttribute("aria-pressed", String(on));
+    b.title = on ? `Searching with ${e.name}` : `Search with ${e.name} instead`;
+    b.addEventListener("click", async () => {
+      engine = e;
+      await chrome.storage.local.set({ searchEngine: e.id });
+      renderEngines();
+      searchBox.focus();
+    });
+    box.appendChild(b);
+  }
+}
+
+function searchUrlFor(q) {
+  // Bare domains and addresses go straight there; anything else searches.
+  const looksLikeUrl = /^(https?:\/\/|[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$))/i.test(q);
+  return looksLikeUrl
+    ? (q.startsWith("http") ? q : `https://${q}`)
+    : engine.url + encodeURIComponent(q);
+}
+
+async function runSearch(q) {
+  const query = (q || "").trim();
+  if (!query) return;
+  // Everything stays in the panel: the results load here, the same way a
+  // pinned site does, which means asking for that one host the first time.
+  // Only a refusal sends it to a tab, and that is the fallback in
+  // loadInFrame rather than a choice made here.
+  openPanelSite(searchUrlFor(query));
+  const { recentSearches = [] } = await chrome.storage.local.get("recentSearches");
+  const next = [query, ...recentSearches.filter((r) => r !== query)].slice(0, 6);
+  await chrome.storage.local.set({ recentSearches: next });
+  renderRecentSearches(next);
+}
+
+async function renderRecentSearches(list) {
+  const recent = list || (await chrome.storage.local.get("recentSearches")).recentSearches || [];
+  searchRecent.innerHTML = "";
+  if (!recent.length) return;
+  const head = document.createElement("p");
+  head.className = "hint recent-head";
+  head.textContent = "Recent";
+  searchRecent.appendChild(head);
+  for (const q of recent) {
+    const row = document.createElement("div");
+    row.className = "snippet-row";
+    const go = document.createElement("button");
+    go.className = "snippet-text";
+    const inner = document.createElement("span");
+    inner.className = "snippet-clamp";
+    inner.textContent = q;
+    go.appendChild(inner);
+    go.title = `Search again for ${q}`;
+    go.addEventListener("click", () => runSearch(q));
+    const drop = document.createElement("button");
+    drop.className = "snippet-delete";
+    drop.innerHTML =
+      '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6.5 6.5l7 7M13.5 6.5l-7 7"/></svg>';
+    drop.title = "Forget this search";
+    drop.setAttribute("aria-label", "Forget this search");
+    drop.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const { recentSearches = [] } = await chrome.storage.local.get("recentSearches");
+      const kept = recentSearches.filter((r) => r !== q);
+      await chrome.storage.local.set({ recentSearches: kept });
+      renderRecentSearches(kept);
+    });
+    row.append(go, drop);
+    searchRecent.appendChild(row);
+  }
+}
+
+searchForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  runSearch(searchBox.value);
+  searchBox.value = "";
+});
 
 // ---- Scratchpad ----
 const notepad = document.getElementById("notepad");
@@ -654,6 +771,10 @@ addSnippetText.addEventListener("blur", async () => {
 loadScratchpad();
 loadWebPanels();
 loadSnippets();
+renderRecentSearches();
+loadEngine();
+// The panel opens on the search box, ready to type.
+searchBox.focus();
 
 // ---- Sync, via bookmarks ----
 // Bookmarks are the one thing Brave and Vivaldi both sync, so that is

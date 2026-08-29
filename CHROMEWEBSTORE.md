@@ -25,7 +25,10 @@ asks permission for that one site, and nothing else. Nothing is sent anywhere:
 no accounts, no servers, no analytics, no remote code. Everything stays in your
 browser.
 
-Sidemorphic also replaces the new tab page with a plain search box.
+Search is in the panel too, with six engines that do not profile you —
+DuckDuckGo, Startpage, Brave, Mojeek, Qwant and Ecosia — and the results open
+in the panel. Sidemorphic does not touch your new tab page, or anything else
+in the browser.
 
 ## Category
 
@@ -55,7 +58,7 @@ Ready in `store/`:
 
 | File | Use |
 |---|---|
-| `01-panel.png` … `05-newtab.png` | Screenshots, 1280x800. Upload at least one; five is the maximum. |
+| `01-panel.png` … `04-light.png` | Screenshots, 1280x800. Upload at least one; five is the maximum. |
 | `promo-tile-440x280.png` | Small promotional tile. |
 
 Icons are generated from `brand/icon.svg` by `make-icons.sh`.

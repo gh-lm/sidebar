@@ -52,9 +52,9 @@ chrome.runtime.onInstalled.addListener(bootTasks);
 chrome.runtime.onStartup.addListener(bootTasks);
 
 chrome.runtime.onMessage.addListener((message) => {
-  // The sidebar and new-tab pages ping us on load; message delivery
-  // starts the worker, which is the reliable carrier for once-per-launch
-  // work (onStartup alone has proved unreliable in practice).
+  // The panel pings us when it opens; message delivery starts the worker,
+  // which is the reliable carrier for once-per-launch work (onStartup alone
+  // has proved unreliable in practice).
   if (message?.type === "sidemorphic-boot") {
     bootTasks();
     return false;

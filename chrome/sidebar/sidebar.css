@@ -768,3 +768,64 @@ dialog#siteDialog input {
 .info-link:hover { border-color: var(--accent); }
 .info-link span { font-weight: 600; font-size: 0.875rem; }
 .info-link small { color: var(--muted-fg); font-size: 0.75rem; }
+
+/* ---- Search ---- */
+.search-row { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+
+.search-row input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  color: inherit;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.625rem 0.75rem;
+}
+.search-row input:focus { border-color: var(--accent); outline: none; }
+.search-row input::-webkit-search-cancel-button { filter: grayscale(1); }
+
+.search-go {
+  flex: 0 0 auto;
+  width: 2.375rem;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 0;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.search-go:hover { background: var(--accent-hover); }
+.search-go svg { width: 1.125rem; height: 1.125rem; }
+
+.recent-head { margin: 1rem 0 0.5rem; }
+
+/* Engine chips: the choice is visible, so the default is a decision the
+   user can see rather than one made quietly on their behalf. */
+.engines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.625rem;
+}
+
+.engine {
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted-fg);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+
+.engine:hover { color: var(--fg); border-color: var(--muted-fg); }
+
+.engine[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}

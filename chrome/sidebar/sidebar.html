@@ -17,7 +17,10 @@
       <button class="rail-btn rail-logo" id="railLogo" type="button" data-tip="Sidemorphic &mdash; what it is and what is new" aria-label="Open the Sidemorphic website">
         <img src="../icons/icon-32.png" alt="" width="22" height="22">
       </button>
-      <button class="rail-btn active" data-panel="scratchpad" role="tab" aria-selected="true" data-tip="Scratchpad" aria-label="Scratchpad">
+      <button class="rail-btn active" data-panel="search" role="tab" aria-selected="true" data-tip="Search" aria-label="Search">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="9" r="5.25"/><path d="M12.9 12.9L16.5 16.5"/></svg>
+      </button>
+      <button class="rail-btn" data-panel="scratchpad" role="tab" aria-selected="false" data-tip="Scratchpad" aria-label="Scratchpad">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h9l3 3v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v3h3"/><path d="M6.5 9.5h7M6.5 12.5h7M6.5 15.5h4"/></svg>
       </button>
       <!-- No separate "Panels" tab -- the pinned-site favicons further
@@ -39,7 +42,19 @@
     </nav>
 
     <div class="content">
-      <section id="panel-scratchpad" class="panel-view active">
+      <section id="panel-search" class="panel-view active">
+        <form id="searchForm" class="search-row" role="search">
+          <input id="searchBox" type="search" placeholder="Search DuckDuckGo, or type a web address" autocomplete="off" spellcheck="false" aria-label="Search DuckDuckGo or type a web address">
+          <button type="submit" class="search-go" aria-label="Search">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h11"/><path d="M10.5 5.5L15 10l-4.5 4.5"/></svg>
+          </button>
+        </form>
+        <div class="engines" id="searchEngines" role="group" aria-label="Search engine"></div>
+        <p class="hint">Results open here in the panel. A web address goes straight there; anything else goes to the engine you have picked.</p>
+        <div class="panel-list" id="searchRecent"></div>
+      </section>
+
+      <section id="panel-scratchpad" class="panel-view">
         <textarea id="notepad" placeholder="Scratchpad — kept on this device..."></textarea>
       </section>
 
@@ -139,6 +154,12 @@
           <h3>It starts with access to nothing</h3>
           <p>Sidemorphic installs with permission for no websites at all. It asks about one site at a time, at the moment you first open it or paste into it, and you can take that back whenever you like from the browser's extension settings.</p>
           <p class="info-aside">Showing a site in a panel means dropping the headers that normally stop a site being framed &mdash; which is why it has to ask.</p>
+        </article>
+
+        <article class="info-card">
+          <h3>Search</h3>
+          <p>The panel opens on a search box. Type and press enter: a web address goes straight there, anything else goes to whichever engine you have picked, and the results appear here in the panel. Six engines are offered, all of which say they do not build a profile of you &mdash; DuckDuckGo to begin with, because it is the one most people know.</p>
+          <p class="info-aside">Sidemorphic does not replace your new tab page and does not change anything else in the browser. Everything it does happens in this panel.</p>
         </article>
 
         <article class="info-card">

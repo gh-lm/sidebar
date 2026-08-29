@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Sidemorphic",
   "version": "0.1.0",
-  "description": "Pin any website to a side panel and open it beside the page you're reading. Plus a scratchpad and snippets. Private by default.",
+  "description": "Pin any website to a side panel and read it beside the page you're on. Plus search, a scratchpad and snippets. Private by default.",
   "minimum_chrome_version": "114",
   "icons": {
     "16": "icons/icon-16.png",
@@ -31,9 +31,6 @@
       },
       "description": "Open the Sidemorphic panel"
     }
-  },
-  "chrome_url_overrides": {
-    "newtab": "newtab/newtab.html"
   },
   "permissions": [
     "sidePanel",

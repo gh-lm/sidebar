@@ -324,6 +324,39 @@
   .demo-snip:hover { border-color: var(--accent); }
   .demo-snip.copied { border-color: var(--accent); color: var(--accent); }
 
+  .demo-search { display: flex; gap: 0.4rem; }
+  .demo-search input {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    font-size: 0.8125rem;
+    color: #d7d8de;
+    background: #1c1f2b;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 9px;
+    padding: 0.5rem 0.6rem;
+  }
+  .demo-go {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #3f3204;
+    font-weight: 700;
+  }
+
+  .demo-engines { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.6rem; }
+  .demo-engines b, .demo-engines span {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid rgba(255,255,255,.14);
+    color: #9ea0ab;
+  }
+  .demo-engines b { background: var(--accent); border-color: var(--accent); color: #3f3204; }
+
   .demo-h { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: #8a8c96; margin: 0 0 0.75rem; }
   .demo-site { border: 1px solid rgba(255,255,255,.1); border-radius: 10px; overflow: hidden; }
   .demo-site img { width: 100%; display: block; }
@@ -419,7 +452,17 @@
 <aside class="demo-panel" aria-label="A working example of the Sidemorphic panel">
   <span class="demo-flag">Try it</span>
   <div class="demo-body">
-    <div class="demo-view on" data-view="scratchpad">
+    <div class="demo-view on" data-view="search">
+      <p class="demo-h">Search</p>
+      <div class="demo-search">
+        <input type="search" placeholder="Search DuckDuckGo, or type a web address" aria-label="Example search box">
+        <span class="demo-go">→</span>
+      </div>
+      <div class="demo-engines"><b>DuckDuckGo</b><span>Startpage</span><span>Brave</span><span>Mojeek</span><span>Qwant</span><span>Ecosia</span></div>
+      <p class="demo-hint">In the extension the results open here in the panel. Your new tab page is left alone.</p>
+    </div>
+
+    <div class="demo-view" data-view="scratchpad">
       <p class="demo-h">Scratchpad</p>
       <p class="demo-note">Wednesday
 
@@ -448,7 +491,10 @@ Sarah's new address
   <nav class="demo-rail">
     <img src="img/mark.png" alt="" width="22" height="22">
     <hr>
-    <button data-view="scratchpad" aria-selected="true" title="Scratchpad" aria-label="Scratchpad">
+    <button data-view="search" aria-selected="true" title="Search" aria-label="Search">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="9" r="5.25"/><path d="M12.9 12.9L16.5 16.5"/></svg>
+    </button>
+    <button data-view="scratchpad" aria-selected="false" title="Scratchpad" aria-label="Scratchpad">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h9l3 3v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v3h3"/><path d="M6.5 9.5h7M6.5 12.5h7M6.5 15.5h4"/></svg>
     </button>
     <button data-view="snippets" aria-selected="false" title="Snippets" aria-label="Snippets">
@@ -495,6 +541,23 @@ Sarah's new address
       <section class="col chapter">
         <div class="num">01</div>
         <div>
+          <h2>It opens on a search box, and leaves your new tab alone.</h2>
+          <p>Most extensions that offer you a search box take over your new tab
+            page to do it. This one puts it in the panel, and the results appear
+            in the panel too — nothing it does reaches outside that strip down
+            the side.</p>
+          <p>Six engines to pick from, all of which say they do not build a
+            profile of you: DuckDuckGo, Startpage, Brave, Mojeek, Qwant and
+            Ecosia. Your choice sticks.</p>
+          <button class="try" data-show="search">Show me in the panel</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="band">
+      <section class="col chapter">
+        <div class="num">02</div>
+        <div>
           <h2>Pin the site. It opens beside the page, not instead of it.</h2>
           <p>Press <b>+</b> on the rail and whatever you are looking at becomes an
             icon. Click the icon and the site loads in the panel — your mail, a
@@ -508,7 +571,7 @@ Sarah's new address
 
     <div class="band">
       <section class="col chapter">
-        <div class="num">02</div>
+        <div class="num">03</div>
         <div>
           <h2>A scratchpad that outlives the tab you were on.</h2>
           <p>The address someone read out. The half-written reply. The number you
@@ -521,7 +584,7 @@ Sarah's new address
 
     <div class="band">
       <section class="col chapter">
-        <div class="num">03</div>
+        <div class="num">04</div>
         <div>
           <h2>Snippets that land where the cursor is.</h2>
           <p>Click one and the text goes into the box you were typing in, at the
@@ -535,7 +598,7 @@ Sarah's new address
 
     <div class="band" id="private">
       <section class="col chapter">
-        <div class="num">04</div>
+        <div class="num">05</div>
         <div>
           <h2>It syncs through your bookmarks. That is the whole trick.</h2>
           <p>Everything you save is kept as ordinary bookmarks in one folder. Your

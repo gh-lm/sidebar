@@ -1,9 +1,8 @@
 # Sidemorphic
 
 A private side panel for Chrome. Pin any website to the rail and it opens
-beside the page you are reading, like a small window — plus
-a scratchpad, snippets and a clean new tab, in one panel that stays put while
-you browse.
+beside the page you are reading, like a small window — plus search, a
+scratchpad and snippets, in one panel that stays put while you browse.
 
 Sidemorphic is a plain MV3 extension for the Chrome Web Store. It grew out of
 Lightmorphic Browser, a Chromium AppImage; shipping a whole browser was more
@@ -15,6 +14,8 @@ extensions — Edge, Brave, Vivaldi, Opera. There is no Firefox version.
 ## What it does
 
 - **Panels** — pin any site to the rail and open it beside the page you're on.
+- **Search** — the panel opens on a search box, with six engines that do not
+  profile you. Results open in the panel.
 - **Scratchpad** — somewhere to put things, always one click away.
 - **Snippets** — text you retype often; click one to drop it into the box
   you were typing in, right-click to edit it.
