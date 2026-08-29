@@ -157,7 +157,11 @@ const searchRecent = document.getElementById("searchRecent");
 // a menu and takes one line: press the letter and it searches with that
 // engine there and then, rather than setting a preference and waiting.
 const ENGINES = [
-  { id: "ddg", letter: "D", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=" },
+  // DuckDuckGo's own lightweight endpoint. The full site does not fit a
+  // panel even at phone width — it still scrolls sideways — and it throws a
+  // bot challenge at a framed request. This one fits, loads instantly and
+  // just works.
+  { id: "ddg", letter: "D", name: "DuckDuckGo", url: "https://lite.duckduckgo.com/lite/?q=" },
   { id: "google", letter: "G", name: "Google", url: "https://www.google.com/search?q=" },
   { id: "gimages", letter: "I", name: "Google Images", url: "https://www.google.com/search?tbm=isch&q=" },
   { id: "bing", letter: "B", name: "Bing", url: "https://www.bing.com/search?q=" },
@@ -194,7 +198,8 @@ function renderEngines() {
       renderEngines();
       // Pressing a letter is the search, not a setting: if there is
       // something in the box, go.
-      if (searchBox.value.trim()) runSearch(searchBox.value);
+      const q = searchBox.value.trim() || lastQuery;
+      if (q) runSearch(q);
       else searchBox.focus();
     });
     box.appendChild(b);
@@ -213,7 +218,7 @@ function searchUrlFor(q) {
 // for each — seven interruptions to use a search box. Ask for all of them
 // once instead, at the first search, in a single prompt.
 const ENGINE_ORIGINS = [
-  "*://duckduckgo.com/*",
+  "*://lite.duckduckgo.com/*",
   "*://www.google.com/*",
   "*://www.bing.com/*",
   "*://www.startpage.com/*",
@@ -234,9 +239,12 @@ async function ensureEngineAccess() {
   }
 }
 
+let lastQuery = "";
+
 async function runSearch(q) {
   const query = (q || "").trim();
   if (!query) return;
+  lastQuery = query;
   // Everything stays in the panel: the results load here, the same way a
   // pinned site does, which means asking for that one host the first time.
   // Only a refusal sends it to a tab, and that is the fallback in
@@ -316,7 +324,6 @@ async function renderRecentSearches(list) {
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const q = searchBox.value;
-  searchBox.value = "";
   await ensureEngineAccess();
   runSearch(q);
 });
@@ -377,14 +384,24 @@ function reloadPanel() {
   if (currentPanelUrl) webPanelFrame.src = currentPanelUrl;
 }
 
+// Coming back to the search page, the words you searched for are still in
+// the box and selected — so a different engine is one key away, and typing
+// replaces it. Going back to an empty box would mean retyping it to try
+// somewhere else, which is the whole reason for going back.
+function returnToSearch() {
+  showPanel(HOME_PANEL);
+  if (lastQuery) searchBox.value = lastQuery;
+  searchBox.focus();
+  searchBox.select();
+}
+
 function panelBack() {
   if (panelIndex > 0) {
     panelIndex -= 1;
     openPanelSite(panelHistory[panelIndex], { record: false });
   } else {
     // Off the front of the list: back to where the search started.
-    showPanel(HOME_PANEL);
-    searchBox.focus();
+    returnToSearch();
   }
 }
 
@@ -397,10 +414,7 @@ function panelForward() {
 
 panelBackBtn.addEventListener("click", panelBack);
 panelForwardBtn.addEventListener("click", panelForward);
-document.getElementById("panelHome").addEventListener("click", () => {
-  showPanel(HOME_PANEL);
-  searchBox.focus();
-});
+document.getElementById("panelHome").addEventListener("click", returnToSearch);
 document.getElementById("panelReload").addEventListener("click", reloadPanel);
 
 // Some things want the whole window: a form to fill in, something to print,
