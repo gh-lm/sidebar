@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sidemorphic — privacy</title>
+<style>
+  @font-face { font-family: "Manrope"; src: url("Manrope.woff2") format("woff2");
+               font-weight: 200 800; font-display: swap; }
+  :root { color-scheme: light dark;
+    --bg:#ffffff; --fg:#09090b; --panel:#ffffff; --panel-border:rgba(24,24,40,.10);
+    --muted-fg:#71717a; --accent:#fbc711; --brand-navy:#111827;
+    --shadow-panel:0 1px 2px rgba(24,24,40,.05), 0 8px 24px -16px rgba(24,24,40,.18);
+    --panel-radius:1.375rem; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#09090b; --fg:#fafafa; --panel:#1b1d29;
+            --panel-border:rgba(255,255,255,.09); --muted-fg:#a1a1aa;
+            --shadow-panel:0 1px 2px rgba(0,0,0,.35), 0 8px 24px -16px rgba(0,0,0,.6); } }
+  body { margin:0; background:var(--bg); color:var(--fg);
+         font-family:"Manrope", system-ui, sans-serif; line-height:1.6;
+         display:flex; justify-content:center; padding:3rem 1.25rem; }
+  main { max-width:65ch; width:100%; background:var(--panel);
+         border:1px solid var(--panel-border); border-radius:var(--panel-radius);
+         box-shadow:var(--shadow-panel); padding:2.5rem; }
+  h1 { font-size:2rem; font-weight:700; letter-spacing:-0.02em; margin:0 0 .5rem; }
+  .mark { display:block; width:56px; height:56px; margin-bottom:1.25rem; }
+  p { margin:0 0 1.1rem; }
+  footer { margin-top:2rem; color:var(--muted-fg); font-size:.8125rem; }
+  a { color:#1b74bc; }
+  @media (prefers-color-scheme: dark) { a { color:#2295f1; } }
+</style>
+</head>
+<body>
+<main>
+<img class="mark" src="icon.png" alt="" width="56" height="56">
+<h1>Sidemorphic privacy statement</h1>
+<p>Sidemorphic collects nothing, sends nothing, and has no server.</p>
+<p><strong>What it stores, and where.</strong> Your notes, snippets, pinned sites and cookie rules are saved by the browser on your own computer, using the extension storage area. They are never transmitted. There is no account and nothing to sign in to.</p>
+<p><strong>Website access.</strong> Sidemorphic installs with access to no websites. The first time you open a pinned site in the panel, the browser asks whether to grant access to that one site — this is needed because showing a site in a panel means removing the headers that normally stop it being framed. You can decline, and the site opens in an ordinary tab instead. You can withdraw access at any time from the browser&#x27;s extension settings.</p>
+<p><strong>What it reads about your browsing.</strong> When the panel is open it reads the address of the tab you are on, so the cookie controls can show the right site and &quot;pin this page&quot; can pre-fill the address. That address is used on screen and nowhere else.</p>
+<p><strong>Cookies.</strong> Your cookie choices are applied through the browser&#x27;s own cookie settings. When you choose &quot;this session only&quot;, Sidemorphic clears cookies for those sites at the start of a session, because the browser keeps them after a crash.</p>
+<p><strong>No third parties.</strong> No analytics, no tracking, no remote code, no external fonts or images, no requests to any service — including ours. Site icons come from the browser&#x27;s own cache.</p>
+<p>Questions: github.com/lightmorphic/sidemorphic</p>
+<footer>Sidemorphic is a browser extension. Source:
+<a href="https://github.com/lightmorphic/sidemorphic">github.com/lightmorphic/sidemorphic</a></footer>
+</main>
+</body>
+</html>

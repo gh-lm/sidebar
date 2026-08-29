@@ -38,6 +38,7 @@
   "permissions": [
     "sidePanel",
     "storage",
+    "clipboardWrite",
     "contentSettings",
     "browsingData",
     "privacy",

@@ -13,7 +13,7 @@ Sidemorphic puts a private side panel beside whatever you are reading.
 Pin a site to the rail and open it in the panel — your mail, a chat, docs,
 anything you keep flicking tabs to reach. Keep a notepad one click away. Browse
 and add bookmarks without leaving the page. Save snippets of text you retype
-often. And set cookies to allow, session-only or blocked, either everywhere or
+often and copy one with a click. And set cookies to allow, session-only or blocked, either everywhere or
 for one site.
 
 It starts with access to no websites at all. When you open a pinned panel it
@@ -32,6 +32,7 @@ Productivity
 | Permission | Justification |
 |---|---|
 | `sidePanel` | The extension is a side panel. |
+| `clipboardWrite` | Copies a saved snippet to the clipboard when you click it. |
 | `storage` | Notes, snippets, pinned panels and cookie rules are saved in the browser. Nothing leaves it. |
 | `tabs` | The cookie controls and "pin this page" need the address of the page you are looking at. Only the URL is read. |
 | `bookmarks` | The bookmarks panel lists your bookmarks and adds new ones. |
@@ -46,9 +47,17 @@ Productivity
 
 Non-trader. Free, no payments, no business use.
 
-## Assets still needed
+## Assets
 
-- [ ] Screenshot, 1280x800 or 640x400
-- [ ] Promotional tile, 440x280
-- [ ] Sidemorphic icons — `chrome/icons/*` and `chrome/newtab/logo.png` are still the old browser's
-- [ ] PRIVACY.md published at a public URL
+Ready in `store/`:
+
+| File | Use |
+|---|---|
+| `01-panel.png` … `05-newtab.png` | Screenshots, 1280x800. Upload at least one; five is the maximum. |
+| `promo-tile-440x280.png` | Small promotional tile. |
+
+Icons are generated from `brand/icon.svg` by `make-icons.sh`.
+
+**Privacy policy URL:** `https://lightmorphic.github.io/sidemorphic/` — served
+from `site/` by the Pages workflow. GitHub Pages must be set to "GitHub
+Actions" once in the repository settings before the first deploy.

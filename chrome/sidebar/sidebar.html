@@ -23,7 +23,7 @@
       <button class="rail-btn" data-panel="bookmarks" role="tab" aria-selected="false" data-tip="Bookmarks" aria-label="Bookmarks">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5h10a.5.5 0 0 1 .5.5v13l-5.5-3.5L4.5 17V4a.5.5 0 0 1 .5-.5z"/></svg>
       </button>
-      <button class="rail-btn" data-panel="snippets" role="tab" aria-selected="false" data-tip="Quick paste snippets" aria-label="Quick paste snippets">
+      <button class="rail-btn" data-panel="snippets" role="tab" aria-selected="false" data-tip="Snippets" aria-label="Snippets">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="10" height="13" rx="1.2"/><path d="M8 3.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H8a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M7.5 9h5M7.5 12h5"/></svg>
       </button>
       <button class="rail-btn" data-panel="privacy" role="tab" aria-selected="false" data-tip="Cookies" aria-label="Cookie controls">
@@ -70,13 +70,12 @@
       </section>
 
       <section id="panel-snippets" class="panel-view">
-        <h2 class="settings-heading">Snippets &amp; text expander</h2>
-        <p class="hint">Right-click any text box &rarr; Quick paste to insert a snippet. Give one a <strong>shortcut</strong> and typing it anywhere expands instantly &mdash; e.g. <code>12#</code> &rarr; your phone number.</p>
+        <h2 class="settings-heading">Snippets</h2>
+        <p class="hint">Text you retype often, one click from anywhere. Click a snippet to copy it, then paste where you need it.</p>
         <div class="panel-list" id="snippetList"></div>
         <form id="addSnippetForm" class="add-row snippet-add-row">
           <input id="addSnippetLabel" type="text" placeholder="Label &mdash; e.g. Phone">
-          <input id="addSnippetAbbrev" type="text" placeholder="Shortcut (optional) &mdash; e.g. 12#" autocomplete="off" spellcheck="false">
-          <textarea id="addSnippetText" placeholder="Text to insert &mdash; e.g. 07700 900123" required></textarea>
+          <textarea id="addSnippetText" placeholder="Text to copy &mdash; e.g. 07700 900123" required></textarea>
           <button type="submit" class="btn-primary">Save</button>
         </form>
       </section>

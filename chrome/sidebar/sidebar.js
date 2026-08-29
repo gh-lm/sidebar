@@ -517,7 +517,6 @@ bookmarkCurrentPageBtn.addEventListener("click", async () => {
 const snippetList = document.getElementById("snippetList");
 const addSnippetForm = document.getElementById("addSnippetForm");
 const addSnippetLabel = document.getElementById("addSnippetLabel");
-const addSnippetAbbrev = document.getElementById("addSnippetAbbrev");
 const addSnippetText = document.getElementById("addSnippetText");
 
 async function loadSnippets() {
@@ -527,11 +526,25 @@ async function loadSnippets() {
     const item = document.createElement("div");
     item.className = "panel-item";
 
-    const label = document.createElement("span");
-    label.textContent =
-      (snippet.abbrev ? `${snippet.abbrev} → ` : "") +
-      (snippet.label || snippet.text.slice(0, 40));
-    label.title = snippet.text;
+    // Click to copy. The browser version inserted snippets through a
+    // context menu and expanded them as you typed; both needed a content
+    // script on every page, which this extension deliberately does not
+    // have. Copying is the honest equivalent — it works from the panel's
+    // own click, with no access to any site.
+    const label = document.createElement("button");
+    label.className = "snippet-copy";
+    label.textContent = snippet.label || snippet.text.slice(0, 40);
+    label.title = `Copy: ${snippet.text}`;
+    label.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(snippet.text);
+        const was = label.textContent;
+        label.textContent = "Copied";
+        setTimeout(() => { label.textContent = was; }, 1200);
+      } catch {
+        label.textContent = "Press Ctrl+C";
+      }
+    });
 
     const remove = document.createElement("button");
     remove.textContent = "×";
@@ -557,13 +570,11 @@ addSnippetForm.addEventListener("submit", async (e) => {
     {
       id: crypto.randomUUID(),
       label: addSnippetLabel.value.trim(),
-      abbrev: addSnippetAbbrev.value.trim(),
       text,
     },
   ];
   await chrome.storage.local.set({ snippets: next });
   addSnippetLabel.value = "";
-  addSnippetAbbrev.value = "";
   addSnippetText.value = "";
   loadSnippets();
 });

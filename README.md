@@ -16,7 +16,7 @@ extensions — Edge, Brave, Vivaldi, Opera. There is no Firefox version.
 - **Panels** — pin any site to the rail and open it beside the page you're on.
 - **Notes** — a scratchpad that's always one click away.
 - **Bookmarks** — browse and add without leaving the page.
-- **Snippets** — save text you retype often.
+- **Snippets** — text you retype often; click one to copy it.
 - **Cookies** — allow, session-only, or block, globally or per site.
 - **Privacy defaults** — password saving and autofill off on first run.
 

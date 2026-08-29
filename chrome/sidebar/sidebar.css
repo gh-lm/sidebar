@@ -613,3 +613,16 @@ dialog#siteDialog input {
 }
 .ctx-menu button:hover { background: var(--muted); }
 .ctx-menu button[data-act="delete"] { color: #f34236; }
+
+/* A snippet row is a button: click copies it. */
+.snippet-copy {
+  flex: 1;
+  text-align: left;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+.snippet-copy:hover { text-decoration: underline; }
