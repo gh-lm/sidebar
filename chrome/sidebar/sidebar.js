@@ -997,6 +997,7 @@ async function paintAllowAll() {
 }
 
 allowAllBtn?.addEventListener("click", async () => {
+  await chrome.storage.local.set({ accessChoice: "chosen" });
   let on = false;
   try {
     on = await chrome.permissions.contains({ origins: ALL_SITES });
@@ -1062,16 +1063,29 @@ prefersDark.addEventListener("change", () => {
 // Chrome gives an extension no install-time dialog, so the panel says it
 // the first time it is opened instead.
 const welcomeDialog = document.getElementById("welcomeDialog");
-chrome.storage.local.get("welcomeSeen").then(({ welcomeSeen }) => {
-  if (welcomeSeen || !welcomeDialog?.showModal) return;
+// Gated on its own key, not the old welcomeSeen: anyone who dismissed the
+// first version of this dialog had already been marked as seen, so they
+// never got asked the access question and went on being prompted per site —
+// which is exactly the thing the question exists to prevent.
+chrome.storage.local.get("accessChoice").then(async ({ accessChoice }) => {
+  if (accessChoice || !welcomeDialog?.showModal) return;
+  // Already allowed everything by hand? Then there is nothing to ask.
+  try {
+    if (await chrome.permissions.contains({ origins: ALL_SITES })) {
+      await chrome.storage.local.set({ accessChoice: "all" });
+      return;
+    }
+  } catch {
+    /* ask anyway */
+  }
   welcomeDialog.showModal();
 });
-async function dismissWelcome() {
+async function dismissWelcome(choice) {
   welcomeDialog.close();
-  await chrome.storage.local.set({ welcomeSeen: true });
+  await chrome.storage.local.set({ welcomeSeen: true, accessChoice: choice });
 }
 
-document.getElementById("welcomeAsk")?.addEventListener("click", dismissWelcome);
+document.getElementById("welcomeAsk")?.addEventListener("click", () => dismissWelcome("ask"));
 
 // One answer here saves being asked per site later — which is the thing
 // people find irritating. Asked from their click, so it is still their
@@ -1083,7 +1097,13 @@ document.getElementById("welcomeAllow")?.addEventListener("click", async () => {
     /* declined, or no gesture: the per-site ask still covers it */
   }
   paintAllowAll();
-  dismissWelcome();
+  let granted = false;
+  try {
+    granted = await chrome.permissions.contains({ origins: ALL_SITES });
+  } catch {
+    /* treat as not granted */
+  }
+  dismissWelcome(granted ? "all" : "ask");
 });
 
 // ---- About ----
