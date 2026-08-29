@@ -28,4 +28,5 @@ crash.
 fonts or images, no requests to any service — including ours. Site icons come
 from the browser's own cache.
 
-Questions: github.com/lightmorphic/sidemorphic
+Published at https://lightmorphic.github.io/sidemorphic/ — source at
+https://github.com/lightmorphic/sidemorphic

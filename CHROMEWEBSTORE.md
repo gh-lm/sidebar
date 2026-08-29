@@ -58,6 +58,16 @@ Ready in `store/`:
 
 Icons are generated from `brand/icon.svg` by `make-icons.sh`.
 
-**Privacy policy URL:** `https://lightmorphic.github.io/sidemorphic/` — served
-from `site/` by the Pages workflow. GitHub Pages must be set to "GitHub
-Actions" once in the repository settings before the first deploy.
+**Privacy policy URL:** https://lightmorphic.github.io/sidemorphic/ — live,
+served from `site/` by the Pages workflow. Paste this into the listing's
+privacy practices tab.
+
+## Submission checklist
+
+- [ ] Pay the one-off $5 developer fee if the account is new
+- [ ] Upload `dist/sidemorphic-0.1.0.zip`
+- [ ] Paste the description and single-purpose sentence above
+- [ ] Paste each permission justification
+- [ ] Privacy policy URL: https://lightmorphic.github.io/sidemorphic/
+- [ ] Upload screenshots from `store/` and the promo tile
+- [ ] Category: Productivity. Non-trader.
