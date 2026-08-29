@@ -60,7 +60,7 @@ Ready in `store/`:
 
 Icons are generated from `brand/icon.svg` by `make-icons.sh`.
 
-**Privacy policy URL:** https://lightmorphic.github.io/sidemorphic/privacy.html — live,
+**Privacy policy URL:** https://sidemorphic.lightmorphic.com/privacy.html — live,
 served from `site/` by the Pages workflow. Paste this into the listing's
 privacy practices tab.
 
@@ -70,6 +70,6 @@ privacy practices tab.
 - [ ] Upload `dist/sidemorphic-0.1.0.zip`
 - [ ] Paste the description and single-purpose sentence above
 - [ ] Paste each permission justification
-- [ ] Privacy policy URL: https://lightmorphic.github.io/sidemorphic/privacy.html
+- [ ] Privacy policy URL: https://sidemorphic.lightmorphic.com/privacy.html
 - [ ] Upload screenshots from `store/` and the promo tile
 - [ ] Category: Productivity. Non-trader.

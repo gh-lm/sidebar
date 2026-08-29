@@ -543,6 +543,14 @@ dialog#siteDialog input {
 }
 
 /* Right-click menu for pinned rail icons */
+/* An author `display` always beats the browser's own [hidden] rule, whatever
+   the specificity — so anything given a display here has to say what hidden
+   means too, or it can never be hidden again. That is why the pinned-site
+   menu stayed on screen after Remove. */
+.ctx-menu[hidden],
+.panel-nav[hidden],
+.web-frame[hidden] { display: none; }
+
 .ctx-menu {
   position: fixed;
   z-index: 100;
