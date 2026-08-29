@@ -89,7 +89,7 @@
           <button id="panelForward" type="button" title="Forward" aria-label="Forward">
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>
           </button>
-          <button id="panelHome" type="button" title="Back to the start of this panel" aria-label="Back to the start of this panel">
+          <button id="panelHome" type="button" title="Back to the search page" aria-label="Back to the search page">
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9.5 10 4l6.5 5.5"/><path d="M5.5 8.5V16h9V8.5"/></svg>
           </button>
           <button id="panelReload" type="button" title="Reload" aria-label="Reload">
@@ -199,7 +199,7 @@
           <h3>Search</h3>
           <p>The panel opens on a search box. Type and press enter: a web address goes straight there, anything else goes to whichever engine you have picked, and the results appear here in the panel.</p>
           <p>The row of letters under the box is the engines: <strong>D</strong> DuckDuckGo, <strong>G</strong> Google, <strong>I</strong> Google Images, <strong>B</strong> Bing, <strong>S</strong> Startpage, <strong>M</strong> Mojeek, <strong>Q</strong> Qwant. Press one and it searches with that engine straight away, and stays lit so you can see which the box is pointed at.</p>
-          <p class="info-aside">Pages open in the panel ask sites for their phone layout, because the panel is about a phone wide and a desktop page in it is unreadable. The bar at the top of a page gives you back, forward, home, reload &mdash; and a button to hand the page to the main window when it needs the room.</p>
+          <p class="info-aside">Pages open in the panel ask sites for their phone layout, because the panel is about a phone wide and a desktop page in it is unreadable. The bar at the top of a page gives you back, forward, reload, and a house that returns to the search page. Back walks the pages the panel has opened, and stepping back past the first one lands on the search page too. A link followed inside a page is invisible to the panel, so back may skip it.</p>
           <p class="info-aside">Sidemorphic does not replace your new tab page and does not change anything else in the browser. Everything it does happens in this panel.</p>
         </article>
 
@@ -240,10 +240,13 @@
     <p>That means if your browser syncs bookmarks, they follow you to your other
       machines &mdash; with no account to make and nothing sent to us. There is no
       server. Delete the folder and the data is gone.</p>
-    <p>Sidemorphic starts with access to no websites. It asks about one site at a
-      time, when you first open it in the panel.</p>
+    <p>Sidemorphic starts with access to no websites, so it has to ask before it
+      can show one in the panel. You can settle that now with one answer, or
+      leave it and be asked about each site as you go &mdash; either way it is
+      changeable later, under Information.</p>
     <div class="dialog-actions">
-      <button type="button" id="welcomeOk" class="btn-primary">Got it</button>
+      <button type="button" id="welcomeAsk" class="btn-secondary">Ask me each time</button>
+      <button type="button" id="welcomeAllow" class="btn-primary">Allow all sites</button>
     </div>
   </dialog>
 

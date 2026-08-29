@@ -360,21 +360,47 @@ let currentPanelUrl = null;
 // -- same-origin to the page -- runs it (see clipboard-watch.js). This
 // gives real back/forward AND a reload that keeps the user's in-frame
 // position (rather than jumping back to the pinned URL).
-// The frame is cross-origin, so its own history object is out of reach —
-// but an iframe's navigations go into the joint session history of the page
-// that holds it, so the panel's own back and forward step the frame. Home
-// returns to whatever the panel was opened with.
+// The frame is cross-origin, so its history is out of reach, and the panel's
+// own history() does not step it either — that was tried and does nothing.
+// So the panel keeps its own list of what it has opened. Back walks that
+// list, and stepping back off the front of it returns to the search page,
+// which is where the journey started.
+const panelBackBtn = document.getElementById("panelBack");
+const panelForwardBtn = document.getElementById("panelForward");
+
+function paintNavButtons() {
+  panelBackBtn.disabled = false; // back always does something: page, or search
+  panelForwardBtn.disabled = panelIndex >= panelHistory.length - 1;
+}
+
 function reloadPanel() {
   if (currentPanelUrl) webPanelFrame.src = currentPanelUrl;
 }
 
-function homePanel() {
-  if (currentPanelUrl) openPanelSite(currentPanelUrl);
+function panelBack() {
+  if (panelIndex > 0) {
+    panelIndex -= 1;
+    openPanelSite(panelHistory[panelIndex], { record: false });
+  } else {
+    // Off the front of the list: back to where the search started.
+    showPanel(HOME_PANEL);
+    searchBox.focus();
+  }
 }
 
-document.getElementById("panelBack").addEventListener("click", () => history.back());
-document.getElementById("panelForward").addEventListener("click", () => history.forward());
-document.getElementById("panelHome").addEventListener("click", homePanel);
+function panelForward() {
+  if (panelIndex < panelHistory.length - 1) {
+    panelIndex += 1;
+    openPanelSite(panelHistory[panelIndex], { record: false });
+  }
+}
+
+panelBackBtn.addEventListener("click", panelBack);
+panelForwardBtn.addEventListener("click", panelForward);
+document.getElementById("panelHome").addEventListener("click", () => {
+  showPanel(HOME_PANEL);
+  searchBox.focus();
+});
 document.getElementById("panelReload").addEventListener("click", reloadPanel);
 
 // Some things want the whole window: a form to fill in, something to print,
@@ -435,7 +461,18 @@ siteForm.addEventListener("submit", async (e) => {
   openPanelSite(url);
 });
 
-function openPanelSite(url) {
+// What the panel has opened, and where in that list we are. Only navigations
+// the panel makes are in here — a link followed inside the frame is
+// invisible to us, cross-origin.
+let panelHistory = [];
+let panelIndex = -1;
+
+function openPanelSite(url, { record = true } = {}) {
+  if (record) {
+    panelHistory = panelHistory.slice(0, panelIndex + 1);
+    panelHistory.push(url);
+    panelIndex = panelHistory.length - 1;
+  }
   // Deactivate the tab buttons and highlight the favicon of the site
   // being opened -- the favicons themselves are the "Panels" UI now.
   document.querySelectorAll(".rail-btn[data-panel]").forEach((b) => {
@@ -452,6 +489,7 @@ function openPanelSite(url) {
   panelsEmpty.hidden = true;
   panelNav.hidden = false;
   try { panelNavHost.textContent = new URL(url).hostname; } catch { panelNavHost.textContent = ""; }
+  paintNavButtons();
   loadInFrame(webPanelFrame, url);
 }
 
@@ -1014,9 +1052,24 @@ chrome.storage.local.get("welcomeSeen").then(({ welcomeSeen }) => {
   if (welcomeSeen || !welcomeDialog?.showModal) return;
   welcomeDialog.showModal();
 });
-document.getElementById("welcomeOk")?.addEventListener("click", async () => {
+async function dismissWelcome() {
   welcomeDialog.close();
   await chrome.storage.local.set({ welcomeSeen: true });
+}
+
+document.getElementById("welcomeAsk")?.addEventListener("click", dismissWelcome);
+
+// One answer here saves being asked per site later — which is the thing
+// people find irritating. Asked from their click, so it is still their
+// decision, and Information can hand it back.
+document.getElementById("welcomeAllow")?.addEventListener("click", async () => {
+  try {
+    await chrome.permissions.request({ origins: ALL_SITES });
+  } catch {
+    /* declined, or no gesture: the per-site ask still covers it */
+  }
+  paintAllowAll();
+  dismissWelcome();
 });
 
 // ---- About ----
