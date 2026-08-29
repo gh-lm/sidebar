@@ -56,12 +56,9 @@
 
       <section id="panel-snippets" class="panel-view">
         <h2 class="settings-heading">Snippets</h2>
-        <p class="hint">Click one to drop it into whatever box you were typing in. Right-click to open it up and edit it.</p>
+        <p class="hint">Click one to drop it into whatever box you were typing in. Right-click to edit &mdash; changes save when you click away.</p>
         <div class="panel-list" id="snippetList"></div>
-        <form id="addSnippetForm" class="add-row snippet-add-row">
-          <textarea id="addSnippetText" placeholder="Text you retype &mdash; e.g. 07700 900123" required></textarea>
-          <button type="submit" class="btn-primary">Save</button>
-        </form>
+        <textarea id="addSnippetText" class="snippet-add" rows="2" placeholder="Add a snippet &mdash; type it here, then click away"></textarea>
       </section>
 
       <section id="panel-information" class="panel-view">
@@ -76,7 +73,8 @@
         <p class="hint">Your pinned sites, scratchpad and snippets are kept in a bookmarks folder called <strong>Sidemorphic</strong>, in Other Bookmarks. If your browser syncs bookmarks, they travel with them &mdash; no account here, no server of ours. Brave and Vivaldi sync bookmarks but not extension data, which is why they live there. Don't rename the folder, but you can move it.</p>
 
         <h2 class="settings-heading">Snippets</h2>
-        <p class="hint">Click a snippet to drop it into the box you were typing in. The first time you do that on a site, your browser asks whether Sidemorphic may act there. Say no and the snippet is still copied, ready to paste yourself. Right-click a snippet to open it out and edit it.</p>
+        <p class="hint">Click a snippet to drop it into the box you were typing in. The first time you do that on a site, your browser asks whether Sidemorphic may act there &mdash; say yes once and it stops asking. Say no and the snippet is still copied, ready to paste yourself.</p>
+        <p class="hint">Right-click a snippet to edit it. There is nothing to press: clicking away saves, Escape leaves it alone, and emptying it deletes it. The small &times; on the right deletes, and asks twice.</p>
 
         <h2 class="settings-heading">Closing it</h2>
         <p class="hint">The chevron at the top of the rail closes the panel, which is what gives the page its full width back. Chrome fixes the panel's width and gives extensions no control over it, so there is no half-open state worth having &mdash; hiding what is inside would leave the page just as squeezed. The toolbar icon brings it back.</p>

@@ -566,12 +566,18 @@ dialog#siteDialog input {
    right-click opens it out to edit. There is no title to keep in step. */
 .snippet-row {
   position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 0.375rem;
   margin-bottom: 0.5rem;
 }
 
+.snippet-row-open { display: block; }
+
 .snippet-text {
   display: block;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   text-align: left;
   font: inherit;
   color: inherit;
@@ -625,19 +631,51 @@ dialog#siteDialog input {
   resize: vertical;
 }
 
-.snippet-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+/* Quiet until you go near it: a delete that shouts is a delete you press
+   by accident. Two clicks, and it says so before it does anything. */
+.snippet-delete {
+  flex: 0 0 auto;
+  width: 1.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--muted-fg);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease;
 }
 
-.snippet-actions button { flex: 0 0 auto; }
+.snippet-row:hover .snippet-delete,
+.snippet-delete:focus-visible { opacity: 1; }
+
+.snippet-delete:hover { color: var(--danger); }
 
 .snippet-delete.armed {
+  opacity: 1;
   background: var(--danger);
   border-color: var(--danger);
   color: #fff;
 }
+
+/* The add box is the same shape as a snippet, because that is what it
+   becomes. */
+.snippet-add {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.75rem;
+  font: inherit;
+  color: inherit;
+  background: var(--panel);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 0.625rem 0.75rem;
+  resize: vertical;
+}
+
+.snippet-add:focus { border-style: solid; border-color: var(--accent); }
 
 .version-line {
   margin-top: 1.5rem;

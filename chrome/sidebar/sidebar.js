@@ -389,9 +389,9 @@ railAddSite.addEventListener("click", async () => {
 // ---- Snippets ----
 // A snippet is just its text: no title to invent and keep in step with the
 // thing it labels. Collapsed it shows two lines; right-click opens it out
-// to edit. Left-click drops it into whatever box you were last typing in.
+// to edit, and clicking away saves. Left-click drops it into whatever box
+// you were last typing in.
 const snippetList = document.getElementById("snippetList");
-const addSnippetForm = document.getElementById("addSnippetForm");
 const addSnippetText = document.getElementById("addSnippetText");
 
 let expandedSnippetId = null;
@@ -407,54 +407,86 @@ async function saveSnippets(list) {
   loadSnippets();
 }
 
-// Put the text into the page the user was typing in. This needs access to
-// that one site, asked for at the moment they first paste there and
-// remembered afterwards. If they decline, the text is on the clipboard
-// anyway, so a refusal costs them one Ctrl+V rather than the feature.
-async function insertIntoPage(text) {
-  await navigator.clipboard.writeText(text).catch(() => {});
-  let tab;
-  try {
-    [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  } catch {
-    return "copied";
-  }
-  if (!tab?.id || !/^https?:/.test(tab.url || "")) return "copied";
+// The active tab's origin, kept current in the background. It has to be
+// known SYNCHRONOUSLY when a snippet is clicked: chrome.permissions.request
+// only counts as user-initiated if it is called before the click handler
+// awaits anything, and looking the tab up first would spend the gesture.
+// That was the bug behind "it copies but never pastes".
+let activeOrigin = null;
 
-  const origins = [`*://${new URL(tab.url).hostname}/*`];
-  let allowed = await chrome.permissions.contains({ origins }).catch(() => false);
-  if (!allowed) allowed = await chrome.permissions.request({ origins }).catch(() => false);
+async function refreshActiveOrigin() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    activeOrigin =
+      tab?.url && /^https?:/.test(tab.url) ? `*://${new URL(tab.url).hostname}/*` : null;
+  } catch {
+    activeOrigin = null;
+  }
+}
+refreshActiveOrigin();
+chrome.tabs.onActivated.addListener(refreshActiveOrigin);
+chrome.tabs.onUpdated.addListener((id, info) => {
+  if (info.url || info.status === "complete") refreshActiveOrigin();
+});
+
+// Runs in the page. Puts the text in at the cursor of whatever was last
+// focused, and tells the page about it the way frameworks expect.
+function insertAtCursor(value) {
+  const el = document.activeElement;
+  if (!el) return false;
+  if (el.isContentEditable) {
+    document.execCommand("insertText", false, value);
+    return true;
+  }
+  const editable =
+    (el.tagName === "TEXTAREA" || el.tagName === "INPUT") && !el.disabled && !el.readOnly;
+  if (!editable) return false;
+  const start = el.selectionStart ?? el.value.length;
+  const end = el.selectionEnd ?? el.value.length;
+  el.value = el.value.slice(0, start) + value + el.value.slice(end);
+  const caret = start + value.length;
+  try {
+    el.setSelectionRange(caret, caret);
+  } catch {
+    /* number and email inputs refuse a selection range */
+  }
+  el.dispatchEvent(new Event("input", { bubbles: true }));
+  el.dispatchEvent(new Event("change", { bubbles: true }));
+  return true;
+}
+
+async function pasteSnippet(text) {
+  // Ask FIRST, while the click still counts as a gesture. Already granted
+  // resolves straight through without a prompt.
+  let allowed = false;
+  if (activeOrigin) {
+    try {
+      allowed = await chrome.permissions.request({ origins: [activeOrigin] });
+    } catch {
+      allowed = false;
+    }
+  }
+  navigator.clipboard.writeText(text).catch(() => {});
   if (!allowed) return "copied";
 
   try {
-    const [res] = await chrome.scripting.executeScript({
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) return "copied";
+    const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id, allFrames: true },
       args: [text],
-      func: (value) => {
-        const el = document.activeElement;
-        if (!el) return false;
-        if (el.isContentEditable) {
-          document.execCommand("insertText", false, value);
-          return true;
-        }
-        const editable =
-          (el.tagName === "TEXTAREA" || el.tagName === "INPUT") && !el.disabled && !el.readOnly;
-        if (!editable) return false;
-        const start = el.selectionStart ?? el.value.length;
-        const end = el.selectionEnd ?? el.value.length;
-        el.value = el.value.slice(0, start) + value + el.value.slice(end);
-        const caret = start + value.length;
-        el.setSelectionRange(caret, caret);
-        // Frameworks listen for these rather than reading .value directly.
-        el.dispatchEvent(new Event("input", { bubbles: true }));
-        el.dispatchEvent(new Event("change", { bubbles: true }));
-        return true;
-      },
+      func: insertAtCursor,
     });
-    return res?.result ? "pasted" : "copied";
+    // The box may be in a frame, so any frame reporting success counts.
+    return results.some((r) => r?.result) ? "pasted" : "copied";
   } catch {
     return "copied";
   }
+}
+
+function flash(row, word) {
+  row.dataset.flash = word;
+  setTimeout(() => delete row.dataset.flash, 1200);
 }
 
 function renderCollapsed(snippet) {
@@ -464,17 +496,15 @@ function renderCollapsed(snippet) {
   const body = document.createElement("button");
   body.className = "snippet-text";
   // The text goes in a span: -webkit-line-clamp does not apply to a
-  // button's own anonymous inner box, so clamping the button directly
-  // let a third line peek out from under the padding.
+  // button's own anonymous inner box, so clamping the button directly let
+  // a third line peek out from under the padding.
   const clamped = document.createElement("span");
   clamped.className = "snippet-clamp";
   clamped.textContent = snippet.text;
   body.appendChild(clamped);
-  body.title = "Click to paste it where you were typing — right-click to edit";
+  body.title = "Click to put it where you were typing — right-click to edit";
   body.addEventListener("click", async () => {
-    const outcome = await insertIntoPage(snippet.text);
-    row.dataset.flash = outcome === "pasted" ? "Pasted" : "Copied";
-    setTimeout(() => delete row.dataset.flash, 1200);
+    flash(row, await pasteSnippet(snippet.text) === "pasted" ? "Pasted" : "Copied");
   });
   body.addEventListener("contextmenu", (e) => {
     e.preventDefault();
@@ -482,7 +512,32 @@ function renderCollapsed(snippet) {
     loadSnippets();
   });
 
-  row.appendChild(body);
+  // Small and quiet, on the right. Two clicks, no dialog.
+  const remove = document.createElement("button");
+  remove.className = "snippet-delete";
+  remove.textContent = "×";
+  remove.title = "Delete this snippet — click twice";
+  remove.setAttribute("aria-label", "Delete this snippet");
+  let armed = false;
+  let armedTimer = null;
+  remove.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    if (!armed) {
+      armed = true;
+      remove.classList.add("armed");
+      remove.title = "Click again to delete";
+      armedTimer = setTimeout(() => {
+        armed = false;
+        remove.classList.remove("armed");
+        remove.title = "Delete this snippet — click twice";
+      }, 4000);
+      return;
+    }
+    clearTimeout(armedTimer);
+    saveSnippets((await getSnippets()).filter((s) => s.id !== snippet.id));
+  });
+
+  row.append(body, remove);
   return row;
 }
 
@@ -498,55 +553,30 @@ function renderExpanded(snippet) {
   const lines = snippet.text.split("\n").length + Math.ceil(snippet.text.length / 38);
   edit.rows = Math.min(14, Math.max(3, lines));
 
-  const actions = document.createElement("div");
-  actions.className = "snippet-actions";
-
-  const save = document.createElement("button");
-  save.className = "btn-primary";
-  save.textContent = "Save";
-  save.addEventListener("click", async () => {
+  // No Save button. Clicking away saves; Escape leaves it as it was.
+  let cancelled = false;
+  edit.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      cancelled = true;
+      expandedSnippetId = null;
+      loadSnippets();
+    }
+  });
+  edit.addEventListener("blur", async () => {
+    if (cancelled) return;
     const text = edit.value.trim();
     const list = await getSnippets();
     expandedSnippetId = null;
+    if (text === snippet.text) return loadSnippets();
     if (!text) return saveSnippets(list.filter((s) => s.id !== snippet.id));
     saveSnippets(list.map((s) => (s.id === snippet.id ? { ...s, text } : s)));
   });
 
-  const cancel = document.createElement("button");
-  cancel.className = "btn-secondary";
-  cancel.textContent = "Cancel";
-  cancel.addEventListener("click", () => {
-    expandedSnippetId = null;
-    loadSnippets();
+  row.append(edit);
+  queueMicrotask(() => {
+    edit.focus();
+    edit.setSelectionRange(edit.value.length, edit.value.length);
   });
-
-  // Deleting turns the button red in place and waits for a second,
-  // deliberate click rather than throwing up a confirm dialog.
-  const remove = document.createElement("button");
-  remove.className = "btn-secondary snippet-delete";
-  remove.textContent = "Delete";
-  remove.title = "Delete this snippet — click twice";
-  let armed = false;
-  let armedTimer = null;
-  remove.addEventListener("click", async () => {
-    if (!armed) {
-      armed = true;
-      remove.classList.add("armed");
-      remove.textContent = "Really delete?";
-      armedTimer = setTimeout(() => {
-        armed = false;
-        remove.classList.remove("armed");
-        remove.textContent = "Delete";
-      }, 4000);
-      return;
-    }
-    clearTimeout(armedTimer);
-    expandedSnippetId = null;
-    saveSnippets((await getSnippets()).filter((s) => s.id !== snippet.id));
-  });
-
-  actions.append(save, cancel, remove);
-  row.append(edit, actions);
   return row;
 }
 
@@ -560,13 +590,13 @@ async function loadSnippets() {
   }
 }
 
-addSnippetForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+// Typing in the box at the bottom and clicking away saves it. Nothing to
+// press, and nothing lost by forgetting to.
+addSnippetText.addEventListener("blur", async () => {
   const text = addSnippetText.value.trim();
   if (!text) return;
-  const list = await getSnippets();
-  await saveSnippets([...list, { id: crypto.randomUUID(), text }]);
   addSnippetText.value = "";
+  await saveSnippets([...(await getSnippets()), { id: crypto.randomUUID(), text }]);
 });
 
 // ---- Start ----
