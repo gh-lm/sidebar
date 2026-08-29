@@ -10,6 +10,7 @@
   --panel: #ffffff; --panel-border: rgba(24, 24, 40, 0.10);
   --border: #e4e4e7; --muted: #f4f4f5; --muted-fg: #71717a;
   --accent: #fbc711; --accent-hover: #ddaf0f; --on-accent: #645007;
+  --danger: #cc372d; --danger-bg: #fef2f1;
   --radius: 0.875rem;
   --rail-width: 44px;
   /* Tooltip: dark bubble on light mode (contrasts with the page),
@@ -25,6 +26,7 @@
     --bg: #09090b; --fg: #fafafa;
     --panel: #1b1d29; --panel-border: rgba(255,255,255,.09);
     --border: #27272a; --muted: #1c1c1f; --muted-fg: #a1a1aa;
+    --danger: #f34236; --danger-bg: #350f0c;
     --tip-bg: #fafafa; --tip-fg: #111827;
   }
 }
@@ -635,28 +637,32 @@ dialog#siteDialog input {
    by accident. Two clicks, and it says so before it does anything. */
 .snippet-delete {
   flex: 0 0 auto;
-  width: 1.75rem;
+  display: grid;
+  place-items: center;
+  width: 1.875rem;
   border: 1px solid transparent;
   border-radius: var(--radius);
   background: none;
   color: var(--muted-fg);
-  font-size: 1rem;
-  line-height: 1;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.12s ease;
+  transition: opacity 0.12s ease, color 0.12s ease;
 }
+
+.snippet-delete svg { width: 1.125rem; height: 1.125rem; }
 
 .snippet-row:hover .snippet-delete,
 .snippet-delete:focus-visible { opacity: 1; }
 
 .snippet-delete:hover { color: var(--danger); }
 
+/* Asking, not done: the tick is red so it reads as a warning rather than
+   a confirmation that something has already happened. */
 .snippet-delete.armed {
   opacity: 1;
-  background: var(--danger);
+  background: var(--danger-bg);
   border-color: var(--danger);
-  color: #fff;
+  color: var(--danger);
 }
 
 /* The add box is the same shape as a snippet, because that is what it

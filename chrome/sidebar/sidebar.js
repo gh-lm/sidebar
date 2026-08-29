@@ -512,29 +512,63 @@ function renderCollapsed(snippet) {
     loadSnippets();
   });
 
-  // Small and quiet, on the right. Two clicks, no dialog.
+  // Small and quiet, on the right, and it says what it is about to do at
+  // every step: an x until you go near it, a bin when you do, a red tick
+  // once it is asking. Fixed icon strings, never anything typed.
+  const ICON_CROSS =
+    '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6.5 6.5l7 7M13.5 6.5l-7 7"/></svg>';
+  const ICON_BIN =
+    '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6h11"/><path d="M8 6V4.5h4V6"/><path d="M6 6l.7 9.2a1 1 0 0 0 1 .8h4.6a1 1 0 0 0 1-.8L14 6"/><path d="M8.75 9v4.5M11.25 9v4.5"/></svg>';
+  const ICON_TICK =
+    '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 10.5l3 3 6-6.5"/></svg>';
+
   const remove = document.createElement("button");
   remove.className = "snippet-delete";
-  remove.textContent = "×";
-  remove.title = "Delete this snippet — click twice";
+  remove.innerHTML = ICON_CROSS;
+  remove.title = "Delete this snippet";
   remove.setAttribute("aria-label", "Delete this snippet");
+
   let armed = false;
   let armedTimer = null;
+  let hovering = false;
+
+  function disarm() {
+    armed = false;
+    clearTimeout(armedTimer);
+    remove.classList.remove("armed");
+    remove.innerHTML = hovering ? ICON_BIN : ICON_CROSS;
+    remove.title = "Delete this snippet";
+    remove.setAttribute("aria-label", "Delete this snippet");
+  }
+
+  remove.addEventListener("mouseenter", () => {
+    hovering = true;
+    if (!armed) remove.innerHTML = ICON_BIN;
+  });
+  remove.addEventListener("mouseleave", () => {
+    hovering = false;
+    if (!armed) remove.innerHTML = ICON_CROSS;
+  });
+
   remove.addEventListener("click", async (e) => {
     e.stopPropagation();
     if (!armed) {
       armed = true;
       remove.classList.add("armed");
-      remove.title = "Click again to delete";
-      armedTimer = setTimeout(() => {
-        armed = false;
-        remove.classList.remove("armed");
-        remove.title = "Delete this snippet — click twice";
-      }, 4000);
+      remove.innerHTML = ICON_TICK;
+      remove.title = "Click again to delete this snippet";
+      remove.setAttribute("aria-label", "Confirm deleting this snippet");
+      armedTimer = setTimeout(disarm, 4000);
       return;
     }
     clearTimeout(armedTimer);
     saveSnippets((await getSnippets()).filter((s) => s.id !== snippet.id));
+  });
+
+  // Changing your mind should be as easy as doing nothing: moving off the
+  // row puts it back, without waiting out the timer.
+  row.addEventListener("mouseleave", () => {
+    if (armed) disarm();
   });
 
   row.append(body, remove);
