@@ -232,16 +232,22 @@ let currentPanelUrl = null;
 // -- same-origin to the page -- runs it (see clipboard-watch.js). This
 // gives real back/forward AND a reload that keeps the user's in-frame
 // position (rather than jumping back to the pinned URL).
-function navFrame(cmd) {
-  try {
-    webPanelFrame.contentWindow.postMessage({ __lmbNav: cmd }, "*");
-  } catch {
-    /* frame not ready */
-  }
+// Back and forward inside a pinned panel are NOT available. The frame is
+// cross-origin, so contentWindow.history throws; the browser version drove
+// it from a content script injected into every page, which this extension
+// deliberately no longer has. Reload works because re-setting src is
+// same-document-agnostic. Buttons that silently do nothing are worse than
+// buttons that aren't there, so only Reload and Home ship.
+function reloadPanel() {
+  if (currentPanelUrl) webPanelFrame.src = currentPanelUrl;
 }
-document.getElementById("panelBack").addEventListener("click", () => navFrame("back"));
-document.getElementById("panelForward").addEventListener("click", () => navFrame("forward"));
-document.getElementById("panelReload").addEventListener("click", () => navFrame("reload"));
+
+function homePanel() {
+  if (currentPanelUrl) openPanelSite(currentPanelUrl);
+}
+
+document.getElementById("panelHome").addEventListener("click", homePanel);
+document.getElementById("panelReload").addEventListener("click", reloadPanel);
 const siteDialog = document.getElementById("siteDialog");
 const siteForm = document.getElementById("siteForm");
 const siteUrlInput = document.getElementById("siteUrl");
