@@ -1,3 +1,5 @@
+import * as store from "../lib/store.js";
+
 
 // Wake the background worker and have it run its once-per-launch boot
 // work. This page reliably exists at every launch (the panel auto-opens),
@@ -119,6 +121,7 @@ notepad.addEventListener("input", () => {
   clearTimeout(scratchpadSaveTimer);
   scratchpadSaveTimer = setTimeout(async () => {
     await chrome.storage.local.set({ notepadText: notepad.value });
+    store.writeScratchpad(notepad.value).catch(() => {});
   }, 600);
 });
 
@@ -183,6 +186,7 @@ async function getWebPanels() {
 async function setWebPanels(list) {
   await chrome.storage.local.set({ webPanels: list });
   renderRailSites(list);
+  store.writePanels(list).catch(() => {});
 }
 
 function openSiteDialog({ url = "", editing = null } = {}) {
@@ -427,7 +431,9 @@ async function loadSnippets() {
     remove.title = "Delete";
     remove.addEventListener("click", async () => {
       const { snippets: current = [] } = await chrome.storage.local.get("snippets");
-      await chrome.storage.local.set({ snippets: current.filter((s) => s.id !== snippet.id) });
+      const kept = current.filter((s) => s.id !== snippet.id);
+      await chrome.storage.local.set({ snippets: kept });
+      store.writeSnippets(kept).catch(() => {});
       loadSnippets();
     });
 
@@ -450,6 +456,7 @@ addSnippetForm.addEventListener("submit", async (e) => {
     },
   ];
   await chrome.storage.local.set({ snippets: next });
+  store.writeSnippets(next).catch(() => {});
   addSnippetLabel.value = "";
   addSnippetText.value = "";
   loadSnippets();
@@ -459,6 +466,58 @@ addSnippetForm.addEventListener("submit", async (e) => {
 loadScratchpad();
 loadWebPanels();
 loadSnippets();
+
+// ---- Sync, via bookmarks ----
+// Bookmarks are the one thing Brave and Vivaldi both sync, so that is
+// where the real copy lives; extension storage is only a local mirror so
+// the panel has something to draw immediately. On load, whatever the
+// bookmarks say wins — that is what may have arrived from another
+// machine. First run seeds the folder from whatever is already here.
+async function syncFromBookmarks() {
+  if (!(await store.available())) return;
+  const remote = await store.readAll();
+
+  // Seed the folder only when it is genuinely empty. Deciding this from a
+  // local "have I seeded" flag would be a data-loss bug: a second machine
+  // with a fresh profile has no flag, and would overwrite the folder that
+  // just synced to it with its own empty state.
+  const remoteEmpty =
+    remote.webPanels.length === 0 && !remote.notepadText && remote.snippets.length === 0;
+  if (remoteEmpty) {
+    const local = await chrome.storage.local.get(["webPanels", "notepadText", "snippets"]);
+    const localEmpty =
+      !(local.webPanels || []).length && !local.notepadText && !(local.snippets || []).length;
+    if (localEmpty) return; // nothing anywhere yet
+    await store.writePanels(local.webPanels || []);
+    await store.writeScratchpad(local.notepadText || "");
+    await store.writeSnippets(local.snippets || []);
+    return;
+  }
+  await chrome.storage.local.set({
+    webPanels: remote.webPanels,
+    // Never let an empty remote wipe text that only exists here — a
+    // half-created folder would otherwise erase the scratchpad.
+    notepadText: remote.notepadText || (await chrome.storage.local.get("notepadText")).notepadText || "",
+    snippets: remote.snippets,
+  });
+  loadWebPanels();
+  loadSnippets();
+  const { notepadText = "" } = await chrome.storage.local.get("notepadText");
+  if (document.activeElement !== notepad) notepad.value = notepadText;
+}
+syncFromBookmarks().catch(() => {});
+
+// A change arriving from another machine lands as a bookmark event.
+if (chrome.bookmarks?.onChanged) {
+  const refresh = () => {
+    clearTimeout(refresh.t);
+    refresh.t = setTimeout(() => syncFromBookmarks().catch(() => {}), 400);
+  };
+  chrome.bookmarks.onChanged.addListener(refresh);
+  chrome.bookmarks.onCreated.addListener(refresh);
+  chrome.bookmarks.onRemoved.addListener(refresh);
+  chrome.bookmarks.onMoved.addListener(refresh);
+}
 
 // ---- About ----
 const aboutVersion = document.getElementById("aboutVersion");

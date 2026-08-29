@@ -17,6 +17,8 @@ extensions — Edge, Brave, Vivaldi, Opera. There is no Firefox version.
 - **Panels** — pin any site to the rail and open it beside the page you're on.
 - **Scratchpad** — somewhere to put things, always one click away.
 - **Snippets** — text you retype often; click one to copy it.
+- **Syncs itself** — everything is stored in one bookmarks folder, so the
+  browser's own bookmark sync carries it. No account, no server.
 
 ## Site access
 

@@ -2,11 +2,18 @@
 
 Sidemorphic collects nothing, sends nothing, and has no server.
 
-**What it stores, and where.** Your scratchpad, snippets and pinned
-sites are saved by the browser on your own computer, using the extension
-storage area. They stay on that computer — they are never transmitted, and
-they do not sync to your other machines. There is no account and nothing to
-sign in to.
+**What it stores, and where.** Your scratchpad, snippets and pinned sites are
+saved as ordinary bookmarks, in a folder called "Sidemorphic" in your Other
+Bookmarks, with a copy in the browser's extension storage. Sidemorphic itself
+sends nothing anywhere: there is no account, no server of ours, and no network
+request of any kind.
+
+**Syncing.** Because that data is bookmarks, your browser's own sync carries it
+to your other machines, exactly as it carries the rest of your bookmarks — under
+whatever settings and encryption your browser provides, between you and your
+browser maker. We are not involved and cannot see it. If you do not sync
+bookmarks, nothing leaves the machine. Deleting the folder deletes the data.
+There is no account and nothing to sign in to.
 
 **Website access.** Sidemorphic installs with access to no websites. The first
 time you open a pinned site in the panel, the browser asks whether to grant
