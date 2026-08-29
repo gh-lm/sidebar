@@ -25,10 +25,11 @@ asks permission for that one site, and nothing else. Nothing is sent anywhere:
 no accounts, no servers, no analytics, no remote code. Everything stays in your
 browser.
 
-Search is in the panel too: the mark, the name, one box — and eight engines
-behind a single line of text. DuckDuckGo to start with, plus Startpage, Brave,
-Mojeek, Qwant, Google, Google Images and Bing. Results open in the panel.
-Sidemorphic does not touch your new tab page, or anything else in the browser.
+Search is in the panel too: the mark, the name, one box, and a row of letters
+for the engines — DuckDuckGo, Google, Google Images, Bing, Startpage, Mojeek
+and Qwant. Press a letter and it searches there. Results open in the panel, in
+the site's phone layout so they fit. Sidemorphic does not touch your new tab
+page, or anything else in the browser.
 
 ## Category
 
@@ -43,9 +44,9 @@ Productivity
 | `storage` | A local copy of the same data, so the panel can draw instantly and still work if bookmarks are unavailable. |
 | `scripting` | Puts a snippet into the box you are typing in, when you click it. Only on a site you have granted access to, only on your click, and it inserts your own text — it reads nothing from the page. |
 | `bookmarks` | Everything you save — pinned sites, scratchpad, snippets — is kept in one bookmarks folder, so your browser's own bookmark sync carries it between machines. There is no account and no server. |
-| `tabs` | "Pin this page" needs the address of the tab you are on, to fill it into the dialog. Only the URL is read, never page content. |
+| `tabs` | "Pin this page" needs the address of the tab you are on, to fill it into the dialog, and the "open in the main window" button opens the panel's page in a tab. Only the URL is read, never page content. |
 | `favicon` | Draws the site icon on each pinned button, from the browser's own cache. No network request. |
-| `declarativeNetRequestWithHostAccess` | Removes the headers that stop a site being shown in a panel — for one site, only after you have granted permission for it. |
+| `declarativeNetRequestWithHostAccess` | Two things, for one site at a time and only after you have granted permission for it: removes the headers that stop a site being shown in a panel, and asks that site for its phone layout, because the panel is about a phone wide. |
 | Optional site access | Requested one site at a time, from your click, when you open a pinned panel. Never requested at install. |
 
 ## Trader status

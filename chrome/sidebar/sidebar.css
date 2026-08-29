@@ -516,7 +516,11 @@ body {
 .panel-nav button svg { width: 17px; height: 17px; }
 .panel-nav button:hover { background: var(--muted); }
 .panel-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#panelPopOut { margin-left: 0.25rem; }
+
 .panel-nav-host {
+  flex: 1;
+  min-width: 0;
   margin-left: 0.25rem;
   font-size: 0.8125rem;
   color: var(--muted-fg);
@@ -804,7 +808,7 @@ dialog#siteDialog input {
   letter-spacing: -0.02em;
 }
 
-.search-row { display: flex; gap: 0.5rem; width: 100%; }
+.search-row { display: flex; width: 100%; }
 
 .search-row input {
   flex: 1;
@@ -819,79 +823,116 @@ dialog#siteDialog input {
 .search-row input:focus { border-color: var(--accent); outline: none; }
 .search-row input::-webkit-search-cancel-button { filter: grayscale(1); }
 
-.search-go {
-  flex: 0 0 auto;
-  width: 2.5rem;
+/* Seven initials in a row: press one and it searches with that engine.
+   The one you used last stays lit, so the row doubles as the answer to
+   "which engine is this box pointed at". */
+.engines {
+  display: flex;
+  justify-content: center;
+  gap: 0.375rem;
+  margin-top: 0.875rem;
+}
+
+.engine {
+  width: 2rem;
+  height: 2rem;
   display: grid;
   place-items: center;
-  background: var(--accent);
-  color: var(--on-accent);
-  border: 0;
-  border-radius: 999px;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--muted-fg);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
   cursor: pointer;
+  padding: 0;
 }
-.search-go:hover { background: var(--accent-hover); }
-.search-go svg { width: 1.125rem; height: 1.125rem; }
+
+.engine:hover { color: var(--fg); border-color: var(--muted-fg); }
+
+.engine[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
 
 /* One line saying which engine, and a list when you want a different one.
    Eight of anything laid out as chips is a wall; a picker is one thing to
    read and one thing to press. */
-.engine-pick { position: relative; margin-top: 0.75rem; }
 
-.engine-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font: inherit;
-  font-size: 0.8125rem;
-  color: var(--muted-fg);
-  background: none;
-  border: 0;
-  padding: 0.25rem 0.375rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-.engine-button:hover { color: var(--fg); background: var(--muted); }
-.engine-button svg { width: 0.875rem; height: 0.875rem; }
 
-.engine-menu {
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* The clock sits in the corner and only appears once there is something to
+   remember; the middle of the panel stays the search and nothing else. */
+.recent-toggle {
   position: absolute;
-  top: calc(100% + 0.25rem);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 40;
-  min-width: 12rem;
-  padding: 0.25rem;
-  background: var(--panel);
-  border: 1px solid var(--panel-border);
-  border-radius: 0.75rem;
-  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.45);
-  display: flex;
-  flex-direction: column;
-}
-.engine-menu[hidden] { display: none; }
-
-.engine-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  font: inherit;
-  font-size: 0.8125rem;
-  color: var(--fg);
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 5;
+  width: 1.875rem;
+  height: 1.875rem;
+  display: grid;
+  place-items: center;
   background: none;
   border: 0;
-  border-radius: 0.5rem;
-  padding: 0.4rem 0.5rem;
+  border-radius: 50%;
+  color: var(--muted-fg);
   cursor: pointer;
-  text-align: left;
 }
-.engine-row:hover { background: var(--muted); }
-.engine-row span:not(.engine-tick) { flex: 1; }
-.engine-row[aria-selected="true"] span:not(.engine-tick) { font-weight: 600; }
-.engine-tick { color: var(--accent); font-weight: 700; }
+.recent-toggle:hover { color: var(--fg); background: var(--muted); }
+.recent-toggle svg { width: 1.0625rem; height: 1.0625rem; }
+.recent-toggle[hidden] { display: none; }
 
-.recent-head { margin: 1rem 0 0.5rem; }
+.recent-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(15rem, 78%);
+  z-index: 6;
+  padding: 0.75rem;
+  overflow-y: auto;
+  background: var(--panel);
+  border-left: 1px solid var(--panel-border);
+  box-shadow: -18px 0 34px -22px rgba(0, 0, 0, 0.55);
+  transform: translateX(100%);
+  transition: transform 0.2s ease;
+}
+.recent-drawer.open { transform: translateX(0); }
+.recent-drawer[hidden] { display: none; }
+
+.recent-head-row { display: flex; align-items: center; gap: 0.5rem; }
+.recent-head { margin: 0; flex: 1; }
+
+.recent-close {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  color: var(--muted-fg);
+  cursor: pointer;
+}
+.recent-close:hover { color: var(--fg); background: var(--muted); }
+.recent-close svg { width: 0.875rem; height: 0.875rem; }
+
+/* The drawer is positioned against this. */
+#panel-search { position: relative; overflow: hidden; }
 
 /* The panel is a column; this sits on the floor of it rather than under the
    search box, where it would be the second thing you read. */

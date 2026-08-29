@@ -64,6 +64,11 @@ document.getElementById("railLogo")?.addEventListener("click", () => {
 // the user explicitly chose to embed. (DNR can only remove a whole
 // header, not edit within CSP, so the site's entire CSP is dropped for
 // its framed load -- documented, and scoped to that one host.)
+// A current Chrome on Android. Kept close to the real thing so nothing
+// refuses to serve it.
+const MOBILE_UA =
+  "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36";
+
 function hostRuleId(host) {
   let h = 0;
   for (let i = 0; i < host.length; i++) h = (h * 31 + host.charCodeAt(i)) & 0x7fffffff;
@@ -101,13 +106,26 @@ async function allowFramingFor(url) {
         priority: 1,
         action: {
           type: "modifyHeaders",
+          // Ask for the phone layout. The panel is roughly a phone wide, and
+          // a desktop page in it is unreadable — Google in particular came
+          // back at full width and simply did not fit. Sites decide from the
+          // user-agent and the client hints, so both are set, and both for
+          // the page and everything it loads.
+          requestHeaders: [
+            { header: "user-agent", operation: "set", value: MOBILE_UA },
+            { header: "sec-ch-ua-mobile", operation: "set", value: "?1" },
+            { header: "sec-ch-ua-platform", operation: "set", value: '"Android"' },
+          ],
           responseHeaders: [
             { header: "x-frame-options", operation: "remove" },
             { header: "content-security-policy", operation: "remove" },
             { header: "content-security-policy-report-only", operation: "remove" },
           ],
         },
-        condition: { requestDomains: [host], resourceTypes: ["sub_frame"] },
+        condition: {
+          requestDomains: [host],
+          resourceTypes: ["sub_frame", "xmlhttprequest", "script", "stylesheet", "image", "font", "other"],
+        },
       },
     ],
   });
@@ -135,29 +153,21 @@ const searchForm = document.getElementById("searchForm");
 const searchBox = document.getElementById("searchBox");
 const searchRecent = document.getElementById("searchRecent");
 
-// Eight engines. The privacy ones lead because that is the point of the
-// thing, but Google and Bing are here because leaving them out would not
-// stop anyone using them — it would just mean doing it somewhere else.
+// Seven engines, one letter each. A row of initials is quicker to hit than
+// a menu and takes one line: press the letter and it searches with that
+// engine there and then, rather than setting a preference and waiting.
 const ENGINES = [
-  { id: "ddg", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=", site: "https://duckduckgo.com" },
-  { id: "google", name: "Google", url: "https://www.google.com/search?q=", site: "https://www.google.com" },
-  { id: "gimages", name: "Google Images", url: "https://www.google.com/search?tbm=isch&q=", site: "https://images.google.com" },
-  { id: "bing", name: "Bing", url: "https://www.bing.com/search?q=", site: "https://www.bing.com" },
-  { id: "startpage", name: "Startpage", url: "https://www.startpage.com/sp/search?query=", site: "https://www.startpage.com" },
-  { id: "brave", name: "Brave", url: "https://search.brave.com/search?q=", site: "https://search.brave.com" },
-  { id: "mojeek", name: "Mojeek", url: "https://www.mojeek.com/search?q=", site: "https://www.mojeek.com" },
-  { id: "qwant", name: "Qwant", url: "https://www.qwant.com/?q=", site: "https://www.qwant.com" },
+  { id: "ddg", letter: "D", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=" },
+  { id: "google", letter: "G", name: "Google", url: "https://www.google.com/search?q=" },
+  { id: "gimages", letter: "I", name: "Google Images", url: "https://www.google.com/search?tbm=isch&q=" },
+  { id: "bing", letter: "B", name: "Bing", url: "https://www.bing.com/search?q=" },
+  { id: "startpage", letter: "S", name: "Startpage", url: "https://www.startpage.com/sp/search?query=" },
+  { id: "mojeek", letter: "M", name: "Mojeek", url: "https://www.mojeek.com/search?q=" },
+  { id: "qwant", letter: "Q", name: "Qwant", url: "https://www.qwant.com/?q=" },
 ];
 
 let engine = ENGINES[0];
 
-const engineButton = document.getElementById("engineButton");
-const engineMenu = document.getElementById("engineMenu");
-const engineName = document.getElementById("engineName");
-
-// No icons in this list. Chrome only has a favicon for a site the profile
-// has actually visited, so a fresh install would show a column of grey
-// globes — worse than no icon at all. The names are the labels.
 async function loadEngine() {
   const { searchEngine } = await chrome.storage.local.get("searchEngine");
   engine = ENGINES.find((e) => e.id === searchEngine) || ENGINES[0];
@@ -165,54 +175,29 @@ async function loadEngine() {
 }
 
 function renderEngines() {
-  engineName.textContent = engine.name;
-  engineButton.title = `Searching with ${engine.name} — click to change`;
-  engineMenu.innerHTML = "";
+  const box = document.getElementById("searchEngines");
+  if (!box) return;
+  box.innerHTML = "";
   for (const e of ENGINES) {
-    const row = document.createElement("button");
-    row.type = "button";
-    row.className = "engine-row";
-    row.setAttribute("role", "option");
-    const on = e.id === engine.id;
-    row.setAttribute("aria-selected", String(on));
-    const label = document.createElement("span");
-    label.textContent = e.name;
-    row.append(label);
-    if (on) {
-      const tick = document.createElement("span");
-      tick.className = "engine-tick";
-      tick.textContent = "✓";
-      row.append(tick);
-    }
-    row.addEventListener("click", async () => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "engine";
+    b.textContent = e.letter;
+    b.title = `Search with ${e.name}`;
+    b.setAttribute("aria-label", `Search with ${e.name}`);
+    b.setAttribute("aria-pressed", String(e.id === engine.id));
+    b.addEventListener("click", async () => {
       engine = e;
       await chrome.storage.local.set({ searchEngine: e.id });
-      closeEngineMenu();
       renderEngines();
-      searchBox.focus();
+      // Pressing a letter is the search, not a setting: if there is
+      // something in the box, go.
+      if (searchBox.value.trim()) runSearch(searchBox.value);
+      else searchBox.focus();
     });
-    engineMenu.appendChild(row);
+    box.appendChild(b);
   }
 }
-
-function openEngineMenu() {
-  engineMenu.hidden = false;
-  engineButton.setAttribute("aria-expanded", "true");
-}
-
-function closeEngineMenu() {
-  engineMenu.hidden = true;
-  engineButton.setAttribute("aria-expanded", "false");
-}
-
-engineButton.addEventListener("click", (e) => {
-  e.stopPropagation();
-  engineMenu.hidden ? openEngineMenu() : closeEngineMenu();
-});
-document.addEventListener("click", closeEngineMenu);
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeEngineMenu();
-});
 
 function searchUrlFor(q) {
   // Bare domains and addresses go straight there; anything else searches.
@@ -236,14 +221,39 @@ async function runSearch(q) {
   renderRecentSearches(next);
 }
 
+const recentToggle = document.getElementById("recentToggle");
+const recentDrawer = document.getElementById("recentDrawer");
+
+function openRecent() {
+  recentDrawer.hidden = false;
+  // A frame between showing it and sliding it, or there is nothing to
+  // transition from.
+  requestAnimationFrame(() => recentDrawer.classList.add("open"));
+  recentToggle.setAttribute("aria-expanded", "true");
+}
+
+function closeRecent() {
+  recentDrawer.classList.remove("open");
+  recentToggle.setAttribute("aria-expanded", "false");
+  setTimeout(() => { if (!recentDrawer.classList.contains("open")) recentDrawer.hidden = true; }, 220);
+}
+
+recentToggle.addEventListener("click", () =>
+  recentDrawer.classList.contains("open") ? closeRecent() : openRecent()
+);
+document.getElementById("recentClose").addEventListener("click", closeRecent);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && recentDrawer.classList.contains("open")) closeRecent();
+});
+
 async function renderRecentSearches(list) {
   const recent = list || (await chrome.storage.local.get("recentSearches")).recentSearches || [];
   searchRecent.innerHTML = "";
-  if (!recent.length) return;
-  const head = document.createElement("p");
-  head.className = "hint recent-head";
-  head.textContent = "Recent";
-  searchRecent.appendChild(head);
+  recentToggle.hidden = recent.length === 0;
+  if (!recent.length) {
+    if (recentDrawer.classList.contains("open")) closeRecent();
+    return;
+  }
   for (const q of recent) {
     const row = document.createElement("div");
     row.className = "snippet-row";
@@ -254,7 +264,10 @@ async function renderRecentSearches(list) {
     inner.textContent = q;
     go.appendChild(inner);
     go.title = `Search again for ${q}`;
-    go.addEventListener("click", () => runSearch(q));
+    go.addEventListener("click", () => {
+      closeRecent();
+      runSearch(q);
+    });
     const drop = document.createElement("button");
     drop.className = "snippet-delete";
     drop.innerHTML =
@@ -318,12 +331,10 @@ let currentPanelUrl = null;
 // -- same-origin to the page -- runs it (see clipboard-watch.js). This
 // gives real back/forward AND a reload that keeps the user's in-frame
 // position (rather than jumping back to the pinned URL).
-// Back and forward inside a pinned panel are NOT available. The frame is
-// cross-origin, so contentWindow.history throws; the browser version drove
-// it from a content script injected into every page, which this extension
-// deliberately no longer has. Reload works because re-setting src is
-// same-document-agnostic. Buttons that silently do nothing are worse than
-// buttons that aren't there, so only Reload and Home ship.
+// The frame is cross-origin, so its own history object is out of reach —
+// but an iframe's navigations go into the joint session history of the page
+// that holds it, so the panel's own back and forward step the frame. Home
+// returns to whatever the panel was opened with.
 function reloadPanel() {
   if (currentPanelUrl) webPanelFrame.src = currentPanelUrl;
 }
@@ -332,8 +343,18 @@ function homePanel() {
   if (currentPanelUrl) openPanelSite(currentPanelUrl);
 }
 
+document.getElementById("panelBack").addEventListener("click", () => history.back());
+document.getElementById("panelForward").addEventListener("click", () => history.forward());
 document.getElementById("panelHome").addEventListener("click", homePanel);
 document.getElementById("panelReload").addEventListener("click", reloadPanel);
+
+// Some things want the whole window: a form to fill in, something to print,
+// a page to keep. This hands the panel's page to a real tab. It is the one
+// thing here that deliberately reaches outside the panel, and only when
+// asked.
+document.getElementById("panelPopOut").addEventListener("click", () => {
+  if (currentPanelUrl) chrome.tabs.create({ url: currentPanelUrl });
+});
 const siteDialog = document.getElementById("siteDialog");
 const siteForm = document.getElementById("siteForm");
 const siteUrlInput = document.getElementById("siteUrl");

@@ -46,29 +46,34 @@
 
     <div class="content">
       <section id="panel-search" class="panel-view active">
+        <button type="button" id="recentToggle" class="recent-toggle" hidden title="Recent searches" aria-label="Recent searches" aria-expanded="false">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 10a6.8 6.8 0 1 0 2-4.8"/><path d="M3 3.5V7h3.5"/><path d="M10 6.5V10l2.4 1.4"/></svg>
+        </button>
+
         <div class="search-stage">
           <img class="search-mark" src="../icons/icon-128.png" alt="" width="56" height="56">
           <p class="search-word">Sidemorphic</p>
 
           <form id="searchForm" class="search-row" role="search">
             <input id="searchBox" type="search" placeholder="Search or type a web address" autocomplete="off" spellcheck="false" aria-label="Search or type a web address">
-            <button type="submit" class="search-go" aria-label="Search">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h11"/><path d="M10.5 5.5L15 10l-4.5 4.5"/></svg>
-            </button>
           </form>
 
-          <div class="engine-pick">
-            <button type="button" id="engineButton" class="engine-button" aria-haspopup="listbox" aria-expanded="false">
-              <span id="engineName">DuckDuckGo</span>
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8.5l4 4 4-4"/></svg>
-            </button>
-            <div class="engine-menu" id="engineMenu" role="listbox" aria-label="Search engine" hidden></div>
-          </div>
+          <div class="engines" id="searchEngines" role="group" aria-label="Search with"></div>
         </div>
 
-        <div class="panel-list" id="searchRecent"></div>
-
         <p class="hint footnote">Results open here in the panel.</p>
+
+        <!-- Recent searches live off to the side, so the search itself is
+             the only thing in the middle. -->
+        <aside class="recent-drawer" id="recentDrawer" hidden aria-label="Recent searches">
+          <div class="recent-head-row">
+            <p class="hint recent-head">Recent</p>
+            <button type="button" id="recentClose" class="recent-close" aria-label="Close recent searches">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6.5 6.5l7 7M13.5 6.5l-7 7"/></svg>
+            </button>
+          </div>
+          <div class="panel-list" id="searchRecent"></div>
+        </aside>
       </section>
 
       <section id="panel-scratchpad" class="panel-view">
@@ -78,13 +83,22 @@
       <section id="panel-panels" class="panel-view">
         <p class="empty-state" id="panelsEmpty">Pinned sites open here. Add one with the &plus; on the rail &mdash; the site you're on is pre-filled and you can edit it before saving. Click a pinned icon to open it; right-click to edit or remove.</p>
         <div class="panel-nav" id="panelNav" hidden>
-          <button id="panelHome" type="button" title="Back to the pinned page" aria-label="Back to the pinned page">
+          <button id="panelBack" type="button" title="Back" aria-label="Back">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg>
+          </button>
+          <button id="panelForward" type="button" title="Forward" aria-label="Forward">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>
+          </button>
+          <button id="panelHome" type="button" title="Back to the start of this panel" aria-label="Back to the start of this panel">
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9.5 10 4l6.5 5.5"/><path d="M5.5 8.5V16h9V8.5"/></svg>
           </button>
           <button id="panelReload" type="button" title="Reload" aria-label="Reload">
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 6.5A6 6 0 1 0 16 10"/><path d="M15.5 3.5v3h-3"/></svg>
           </button>
           <span class="panel-nav-host" id="panelNavHost"></span>
+          <button id="panelPopOut" type="button" title="Open this in the main window" aria-label="Open this in the main window">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4h5v5"/><path d="M16 4l-7 7"/><path d="M15.5 12.5V16H4V4.5h3.5"/></svg>
+          </button>
         </div>
         <iframe id="webPanelFrame" class="web-frame" hidden></iframe>
       </section>
@@ -176,7 +190,8 @@
         <article class="info-card">
           <h3>Search</h3>
           <p>The panel opens on a search box. Type and press enter: a web address goes straight there, anything else goes to whichever engine you have picked, and the results appear here in the panel.</p>
-          <p>Eight engines sit behind the line under the box. DuckDuckGo to begin with, then Startpage, Brave, Mojeek and Qwant &mdash; and Google, Google Images and Bing, because leaving those out would not stop anyone using them, it would only mean doing it somewhere else.</p>
+          <p>The row of letters under the box is the engines: <strong>D</strong> DuckDuckGo, <strong>G</strong> Google, <strong>I</strong> Google Images, <strong>B</strong> Bing, <strong>S</strong> Startpage, <strong>M</strong> Mojeek, <strong>Q</strong> Qwant. Press one and it searches with that engine straight away, and stays lit so you can see which the box is pointed at.</p>
+          <p class="info-aside">Pages open in the panel ask sites for their phone layout, because the panel is about a phone wide and a desktop page in it is unreadable. The bar at the top of a page gives you back, forward, home, reload &mdash; and a button to hand the page to the main window when it needs the room.</p>
           <p class="info-aside">Sidemorphic does not replace your new tab page and does not change anything else in the browser. Everything it does happens in this panel.</p>
         </article>
 

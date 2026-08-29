@@ -415,7 +415,19 @@
   .demo-stage img { border-radius: 11px; }
   .demo-stage b { margin: 0.5rem 0 1rem; font-size: 1.0625rem; letter-spacing: -0.02em; }
   .demo-stage .demo-search { width: 100%; }
-  .demo-engine { margin-top: 0.6rem; font-size: 0.75rem; color: #8a8c96; }
+  .demo-letters { display: flex; gap: 0.3rem; margin-top: 0.75rem; }
+  .demo-letters b, .demo-letters span {
+    width: 1.6rem;
+    height: 1.6rem;
+    display: grid;
+    place-items: center;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.16);
+    color: #9ea0ab;
+  }
+  .demo-letters b { background: var(--accent); border-color: var(--accent); color: #3f3204; }
 
   .demo-h { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: #8a8c96; margin: 0 0 0.75rem; }
   .demo-site { border: 1px solid rgba(255,255,255,.1); border-radius: 10px; overflow: hidden; }
@@ -522,9 +534,9 @@
           <input type="search" placeholder="Search or type a web address" aria-label="Example search box">
           <span class="demo-go">→</span>
         </div>
-        <span class="demo-engine">DuckDuckGo ⌄</span>
+        <div class="demo-letters"><b>D</b><span>G</span><span>I</span><span>B</span><span>S</span><span>M</span><span>Q</span></div>
       </div>
-      <p class="demo-hint">Eight engines behind that line. Results open here in the panel; your new tab page is left alone.</p>
+      <p class="demo-hint">Press a letter and it searches with that engine. Results open here in the panel, in the site's phone layout; your new tab page is left alone.</p>
     </div>
 
     <div class="demo-view" data-view="scratchpad">
@@ -611,10 +623,12 @@ Sarah's new address
             page to do it. This one puts it in the panel, and the results appear
             in the panel too — nothing it does reaches outside that strip down
             the side.</p>
-          <p>Eight engines behind one line of text: DuckDuckGo to begin with,
-            then Startpage, Brave, Mojeek and Qwant — and Google, Google Images
-            and Bing, because leaving them out would not stop anyone using
-            them. Your choice sticks.</p>
+          <p>Seven engines as seven letters. D for DuckDuckGo, G for Google,
+            I for its images, then Bing, Startpage, Mojeek and Qwant. Press a
+            letter and it searches there — no menu, no second click — and the
+            letter stays lit so you can see where the box is pointed.</p>
+          <p>Results come back in the site's phone layout, because the panel is
+            about a phone wide and a desktop page in it is unreadable.</p>
           <button class="try" data-show="search">Show me in the panel</button>
         </div>
       </section>
