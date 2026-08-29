@@ -13,7 +13,8 @@ Sidemorphic puts a private side panel beside whatever you are reading.
 Pin a site to the rail and it opens right here in the panel, like a small
 window beside whatever you are reading — your mail, a chat, docs, anything you
 keep flicking tabs to reach. Keep a scratchpad one click away. Save snippets of
-text you retype often and copy one with a click.
+text you retype often and click one to drop it straight into whatever box you
+were typing in.
 
 Everything you save lives in a single bookmarks folder, so if your browser syncs
 bookmarks it all follows you to your other machines — with no account to make,
@@ -37,6 +38,7 @@ Productivity
 | `sidePanel` | The extension is a side panel. |
 | `clipboardWrite` | Copies a saved snippet to the clipboard when you click it. |
 | `storage` | A local copy of the same data, so the panel can draw instantly and still work if bookmarks are unavailable. |
+| `scripting` | Puts a snippet into the box you are typing in, when you click it. Only on a site you have granted access to, only on your click, and it inserts your own text — it reads nothing from the page. |
 | `bookmarks` | Everything you save — pinned sites, scratchpad, snippets — is kept in one bookmarks folder, so your browser's own bookmark sync carries it between machines. There is no account and no server. |
 | `tabs` | "Pin this page" needs the address of the tab you are on, to fill it into the dialog. Only the URL is read, never page content. |
 | `favicon` | Draws the site icon on each pinned button, from the browser's own cache. No network request. |

@@ -15,6 +15,11 @@ browser maker. We are not involved and cannot see it. If you do not sync
 bookmarks, nothing leaves the machine. Deleting the folder deletes the data.
 There is no account and nothing to sign in to.
 
+**Snippets and the page you are on.** Clicking a snippet copies it and, if you
+have granted access to that site, inserts it at your cursor. It writes your own
+text in and reads nothing out — no page content, no form values. Decline the
+permission and the snippet is still on your clipboard to paste yourself.
+
 **Website access.** Sidemorphic installs with access to no websites. The first
 time you open a pinned site in the panel, the browser asks whether to grant
 access to that one site — this is needed because showing a site in a panel

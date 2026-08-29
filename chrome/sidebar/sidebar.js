@@ -394,51 +394,176 @@ railAddSite.addEventListener("click", async () => {
 });
 
 // ---- Snippets ----
+// A snippet is just its text: no title to invent and keep in step with the
+// thing it labels. Collapsed it shows two lines; right-click opens it out
+// to edit. Left-click drops it into whatever box you were last typing in.
 const snippetList = document.getElementById("snippetList");
 const addSnippetForm = document.getElementById("addSnippetForm");
-const addSnippetLabel = document.getElementById("addSnippetLabel");
 const addSnippetText = document.getElementById("addSnippetText");
 
-async function loadSnippets() {
+let expandedSnippetId = null;
+
+async function getSnippets() {
   const { snippets = [] } = await chrome.storage.local.get("snippets");
+  return snippets;
+}
+
+async function saveSnippets(list) {
+  await chrome.storage.local.set({ snippets: list });
+  store.writeSnippets(list).catch(() => {});
+  loadSnippets();
+}
+
+// Put the text into the page the user was typing in. This needs access to
+// that one site, asked for at the moment they first paste there and
+// remembered afterwards. If they decline, the text is on the clipboard
+// anyway, so a refusal costs them one Ctrl+V rather than the feature.
+async function insertIntoPage(text) {
+  await navigator.clipboard.writeText(text).catch(() => {});
+  let tab;
+  try {
+    [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  } catch {
+    return "copied";
+  }
+  if (!tab?.id || !/^https?:/.test(tab.url || "")) return "copied";
+
+  const origins = [`*://${new URL(tab.url).hostname}/*`];
+  let allowed = await chrome.permissions.contains({ origins }).catch(() => false);
+  if (!allowed) allowed = await chrome.permissions.request({ origins }).catch(() => false);
+  if (!allowed) return "copied";
+
+  try {
+    const [res] = await chrome.scripting.executeScript({
+      target: { tabId: tab.id, allFrames: true },
+      args: [text],
+      func: (value) => {
+        const el = document.activeElement;
+        if (!el) return false;
+        if (el.isContentEditable) {
+          document.execCommand("insertText", false, value);
+          return true;
+        }
+        const editable =
+          (el.tagName === "TEXTAREA" || el.tagName === "INPUT") && !el.disabled && !el.readOnly;
+        if (!editable) return false;
+        const start = el.selectionStart ?? el.value.length;
+        const end = el.selectionEnd ?? el.value.length;
+        el.value = el.value.slice(0, start) + value + el.value.slice(end);
+        const caret = start + value.length;
+        el.setSelectionRange(caret, caret);
+        // Frameworks listen for these rather than reading .value directly.
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+        el.dispatchEvent(new Event("change", { bubbles: true }));
+        return true;
+      },
+    });
+    return res?.result ? "pasted" : "copied";
+  } catch {
+    return "copied";
+  }
+}
+
+function renderCollapsed(snippet) {
+  const row = document.createElement("div");
+  row.className = "snippet-row";
+
+  const body = document.createElement("button");
+  body.className = "snippet-text";
+  // The text goes in a span: -webkit-line-clamp does not apply to a
+  // button's own anonymous inner box, so clamping the button directly
+  // let a third line peek out from under the padding.
+  const clamped = document.createElement("span");
+  clamped.className = "snippet-clamp";
+  clamped.textContent = snippet.text;
+  body.appendChild(clamped);
+  body.title = "Click to paste it where you were typing — right-click to edit";
+  body.addEventListener("click", async () => {
+    const outcome = await insertIntoPage(snippet.text);
+    row.dataset.flash = outcome === "pasted" ? "Pasted" : "Copied";
+    setTimeout(() => delete row.dataset.flash, 1200);
+  });
+  body.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    expandedSnippetId = snippet.id;
+    loadSnippets();
+  });
+
+  row.appendChild(body);
+  return row;
+}
+
+function renderExpanded(snippet) {
+  const row = document.createElement("div");
+  row.className = "snippet-row snippet-row-open";
+
+  const edit = document.createElement("textarea");
+  edit.className = "snippet-edit";
+  edit.value = snippet.text;
+  // Open it out far enough to see the whole thing, within reason: wrapped
+  // lines count too, or a long single-line snippet opens as a slot.
+  const lines = snippet.text.split("\n").length + Math.ceil(snippet.text.length / 38);
+  edit.rows = Math.min(14, Math.max(3, lines));
+
+  const actions = document.createElement("div");
+  actions.className = "snippet-actions";
+
+  const save = document.createElement("button");
+  save.className = "btn-primary";
+  save.textContent = "Save";
+  save.addEventListener("click", async () => {
+    const text = edit.value.trim();
+    const list = await getSnippets();
+    expandedSnippetId = null;
+    if (!text) return saveSnippets(list.filter((s) => s.id !== snippet.id));
+    saveSnippets(list.map((s) => (s.id === snippet.id ? { ...s, text } : s)));
+  });
+
+  const cancel = document.createElement("button");
+  cancel.className = "btn-secondary";
+  cancel.textContent = "Cancel";
+  cancel.addEventListener("click", () => {
+    expandedSnippetId = null;
+    loadSnippets();
+  });
+
+  // Deleting turns the button red in place and waits for a second,
+  // deliberate click rather than throwing up a confirm dialog.
+  const remove = document.createElement("button");
+  remove.className = "btn-secondary snippet-delete";
+  remove.textContent = "Delete";
+  remove.title = "Delete this snippet — click twice";
+  let armed = false;
+  let armedTimer = null;
+  remove.addEventListener("click", async () => {
+    if (!armed) {
+      armed = true;
+      remove.classList.add("armed");
+      remove.textContent = "Really delete?";
+      armedTimer = setTimeout(() => {
+        armed = false;
+        remove.classList.remove("armed");
+        remove.textContent = "Delete";
+      }, 4000);
+      return;
+    }
+    clearTimeout(armedTimer);
+    expandedSnippetId = null;
+    saveSnippets((await getSnippets()).filter((s) => s.id !== snippet.id));
+  });
+
+  actions.append(save, cancel, remove);
+  row.append(edit, actions);
+  return row;
+}
+
+async function loadSnippets() {
+  const snippets = await getSnippets();
   snippetList.innerHTML = "";
   for (const snippet of snippets) {
-    const item = document.createElement("div");
-    item.className = "panel-item";
-
-    // Click to copy. The browser version inserted snippets through a
-    // context menu and expanded them as you typed; both needed a content
-    // script on every page, which this extension deliberately does not
-    // have. Copying is the honest equivalent — it works from the panel's
-    // own click, with no access to any site.
-    const label = document.createElement("button");
-    label.className = "snippet-copy";
-    label.textContent = snippet.label || snippet.text.slice(0, 40);
-    label.title = `Copy: ${snippet.text}`;
-    label.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(snippet.text);
-        const was = label.textContent;
-        label.textContent = "Copied";
-        setTimeout(() => { label.textContent = was; }, 1200);
-      } catch {
-        label.textContent = "Press Ctrl+C";
-      }
-    });
-
-    const remove = document.createElement("button");
-    remove.textContent = "×";
-    remove.title = "Delete";
-    remove.addEventListener("click", async () => {
-      const { snippets: current = [] } = await chrome.storage.local.get("snippets");
-      const kept = current.filter((s) => s.id !== snippet.id);
-      await chrome.storage.local.set({ snippets: kept });
-      store.writeSnippets(kept).catch(() => {});
-      loadSnippets();
-    });
-
-    item.append(label, remove);
-    snippetList.appendChild(item);
+    snippetList.appendChild(
+      snippet.id === expandedSnippetId ? renderExpanded(snippet) : renderCollapsed(snippet)
+    );
   }
 }
 
@@ -446,20 +571,9 @@ addSnippetForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const text = addSnippetText.value.trim();
   if (!text) return;
-  const { snippets = [] } = await chrome.storage.local.get("snippets");
-  const next = [
-    ...snippets,
-    {
-      id: crypto.randomUUID(),
-      label: addSnippetLabel.value.trim(),
-      text,
-    },
-  ];
-  await chrome.storage.local.set({ snippets: next });
-  store.writeSnippets(next).catch(() => {});
-  addSnippetLabel.value = "";
+  const list = await getSnippets();
+  await saveSnippets([...list, { id: crypto.randomUUID(), text }]);
   addSnippetText.value = "";
-  loadSnippets();
 });
 
 // ---- Start ----
@@ -518,6 +632,19 @@ if (chrome.bookmarks?.onChanged) {
   chrome.bookmarks.onRemoved.addListener(refresh);
   chrome.bookmarks.onMoved.addListener(refresh);
 }
+
+// ---- First run ----
+// Chrome gives an extension no install-time dialog, so the panel says it
+// the first time it is opened instead.
+const welcomeDialog = document.getElementById("welcomeDialog");
+chrome.storage.local.get("welcomeSeen").then(({ welcomeSeen }) => {
+  if (welcomeSeen || !welcomeDialog?.showModal) return;
+  welcomeDialog.showModal();
+});
+document.getElementById("welcomeOk")?.addEventListener("click", async () => {
+  welcomeDialog.close();
+  await chrome.storage.local.set({ welcomeSeen: true });
+});
 
 // ---- About ----
 const aboutVersion = document.getElementById("aboutVersion");

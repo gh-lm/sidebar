@@ -30,8 +30,8 @@
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4.5v11M4.5 10h11"/></svg>
       </button>
       <div class="rail-spacer"></div>
-      <button class="rail-btn rail-btn-settings" data-panel="settings" role="tab" aria-selected="false" data-tip="Settings" aria-label="Settings">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <button class="rail-btn rail-btn-information" data-panel="information" role="tab" aria-selected="false" data-tip="Information" aria-label="Information">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.25"/><path d="M10 9v4.5"/><path d="M10 6.4h.01"/></svg>
       </button>
     </nav>
 
@@ -56,16 +56,15 @@
 
       <section id="panel-snippets" class="panel-view">
         <h2 class="settings-heading">Snippets</h2>
-        <p class="hint">Text you retype often, one click from anywhere. Click a snippet to copy it, then paste where you need it.</p>
+        <p class="hint">Click one to drop it into whatever box you were typing in. Right-click to open it up and edit it.</p>
         <div class="panel-list" id="snippetList"></div>
         <form id="addSnippetForm" class="add-row snippet-add-row">
-          <input id="addSnippetLabel" type="text" placeholder="Label &mdash; e.g. Phone">
-          <textarea id="addSnippetText" placeholder="Text to copy &mdash; e.g. 07700 900123" required></textarea>
+          <textarea id="addSnippetText" placeholder="Text you retype &mdash; e.g. 07700 900123" required></textarea>
           <button type="submit" class="btn-primary">Save</button>
         </form>
       </section>
 
-      <section id="panel-settings" class="panel-view">
+      <section id="panel-information" class="panel-view">
         <h2 class="settings-heading">Pinned sites</h2>
         <p class="hint">Open a site, then press <strong>+</strong> on the rail. Its address is filled in for you and you can edit it before saving. It becomes an icon on the rail; click the icon to open that site here in the panel, like a small window beside the page you are reading.</p>
         <p class="hint">Right-click an icon to change its address or remove it. Drag icons to reorder them.</p>
@@ -76,18 +75,35 @@
         <h2 class="settings-heading">Syncing</h2>
         <p class="hint">Your pinned sites, scratchpad and snippets are kept in a bookmarks folder called <strong>Sidemorphic</strong>, in Other Bookmarks. If your browser syncs bookmarks, they travel with them &mdash; no account here, no server of ours. Brave and Vivaldi sync bookmarks but not extension data, which is why they live there. Don't rename the folder, but you can move it.</p>
 
+        <h2 class="settings-heading">Snippets</h2>
+        <p class="hint">Click a snippet to drop it into the box you were typing in. The first time you do that on a site, your browser asks whether Sidemorphic may act there. Say no and the snippet is still copied, ready to paste yourself. Right-click a snippet to open it out and edit it.</p>
+
         <h2 class="settings-heading">Keyboard</h2>
         <p class="hint" id="shortcutHint">Checking&hellip;</p>
 
-        <h2 class="settings-heading">About</h2>
-        <div class="status-row">
-          <span class="status-dot ok"></span>
-          <span>Sidemorphic <span id="aboutVersion">&hellip;</span> &mdash; no account, no server</span>
-        </div>
+        <p class="hint version-line">Sidemorphic <span id="aboutVersion">&hellip;</span></p>
       </section>
 
     </div>
   </div>
+
+  <!-- Shown once, the first time the panel is opened. Where things are
+       kept is the one thing someone should be told without going looking
+       for it. -->
+  <dialog id="welcomeDialog">
+    <h2>Everything stays in your browser</h2>
+    <p>Your scratchpad, snippets and pinned sites are saved as ordinary
+      <strong>bookmarks</strong>, in a folder called &ldquo;Sidemorphic&rdquo; in
+      Other Bookmarks.</p>
+    <p>That means if your browser syncs bookmarks, they follow you to your other
+      machines &mdash; with no account to make and nothing sent to us. There is no
+      server. Delete the folder and the data is gone.</p>
+    <p>Sidemorphic starts with access to no websites. It asks about one site at a
+      time, when you first open it in the panel.</p>
+    <div class="dialog-actions">
+      <button type="button" id="welcomeOk" class="btn-primary">Got it</button>
+    </div>
+  </dialog>
 
   <!-- Add / edit a pinned site. The URL is pre-filled (current tab when
        adding) and editable before saving. -->
