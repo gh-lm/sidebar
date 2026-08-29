@@ -360,16 +360,27 @@ body {
 }
 .frame-clip[hidden] { display: none; }
 
-/* Full width, nothing hidden. Widening this to crop the page's scrollbar
-   looked tidier on a page that had one and quietly cut 15px off the right of
-   every page that did not — content, not chrome. A gutter is not worth
-   hiding anything for. */
+/* The page is laid out at a wider size and drawn smaller, so a site built
+   for a phone-and-a-half fits the panel with both its margins intact. The
+   frame is scaled up in size by the same amount it is scaled down visually,
+   so it still fills the box exactly and nothing is cropped. */
 .web-frame {
   display: block;
   border: 0;
-  height: 100%;
-  width: 100%;
+  width: calc(100% / var(--zoom, 0.9));
+  height: calc(100% / var(--zoom, 0.9));
+  transform: scale(var(--zoom, 0.9));
+  transform-origin: 0 0;
 }
+
+.panel-zoom {
+  width: auto !important;
+  padding: 0 0.35rem;
+  font-size: 0.6875rem !important;
+  font-weight: 600;
+  color: var(--muted-fg);
+}
+.panel-zoom:hover { color: var(--fg); }
 
 .app-footer {
   flex-shrink: 0;

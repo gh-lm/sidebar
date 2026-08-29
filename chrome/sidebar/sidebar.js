@@ -53,6 +53,27 @@ document.getElementById("railLogo")?.addEventListener("click", () => {
   openPanelSite("https://sidemorphic.lightmorphic.com");
 });
 
+// ---- Page size ----
+// Sites built for a phone are often wider than this panel, and the part that
+// falls off the edge is content, not decoration. Rather than crop it, the
+// page is laid out wider and drawn smaller.
+const ZOOMS = [1, 0.9, 0.8, 0.7];
+const panelZoomBtn = document.getElementById("panelZoom");
+
+function paintZoom(z) {
+  document.documentElement.style.setProperty("--zoom", String(z));
+  if (panelZoomBtn) panelZoomBtn.textContent = `${Math.round(z * 100)}%`;
+}
+
+chrome.storage.local.get("panelZoom").then(({ panelZoom = 0.9 }) => paintZoom(panelZoom));
+
+panelZoomBtn?.addEventListener("click", async () => {
+  const now = Number(getComputedStyle(document.documentElement).getPropertyValue("--zoom")) || 0.9;
+  const next = ZOOMS[(ZOOMS.findIndex((z) => Math.abs(z - now) < 0.01) + 1) % ZOOMS.length];
+  await chrome.storage.local.set({ panelZoom: next });
+  paintZoom(next);
+});
+
 // ---- Framing pinned sites ----
 // Most big sites (BBC, Google, etc.) send X-Frame-Options or a CSP
 // frame-ancestors directive that forbids being loaded in an iframe --
