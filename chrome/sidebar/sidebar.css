@@ -792,11 +792,19 @@ dialog#siteDialog input {
    The panel opens on this: the mark, the name, one box. It is the new-tab
    page that used to ship with the extension, moved somewhere that does not
    require taking over anyone's browser. */
+/* Sits in the middle of the panel rather than at the top of it: with the
+   footnote on the floor, the space above and below the box is the same. */
 .search-stage {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2.25rem 0 1.25rem;
+  justify-content: center;
+  padding: 1rem 0;
+  /* The mark, the name and the box move up a touch from dead centre —
+     optically centred rather than measured, which is where the eye
+     expects it. */
+  padding-bottom: 3rem;
 }
 
 .search-mark { border-radius: 14px; }
