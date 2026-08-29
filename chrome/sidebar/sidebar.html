@@ -11,7 +11,7 @@
       <!-- Chromium's own panel header (the pin and X up top) can't be
            altered by an extension; this is OUR minimise -- collapses the
            whole panel, Ctrl+Shift+L or the toolbar icon brings it back. -->
-      <button class="rail-btn rail-btn-min" id="railMinimize" type="button" data-tip="Minimise &mdash; Ctrl+Shift+S reopens" aria-label="Minimise sidebar (Ctrl+Shift+S reopens)">
+      <button class="rail-btn rail-btn-min" id="railMinimize" type="button" data-tip="Close &mdash; the toolbar icon reopens it" aria-label="Close the panel (the toolbar icon reopens it)">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>
       </button>
       <button class="rail-btn active" data-panel="scratchpad" role="tab" aria-selected="true" data-tip="Scratchpad" aria-label="Scratchpad">
@@ -77,6 +77,9 @@
 
         <h2 class="settings-heading">Snippets</h2>
         <p class="hint">Click a snippet to drop it into the box you were typing in. The first time you do that on a site, your browser asks whether Sidemorphic may act there. Say no and the snippet is still copied, ready to paste yourself. Right-click a snippet to open it out and edit it.</p>
+
+        <h2 class="settings-heading">Closing it</h2>
+        <p class="hint">The chevron at the top of the rail closes the panel, which is what gives the page its full width back. Chrome fixes the panel's width and gives extensions no control over it, so there is no half-open state worth having &mdash; hiding what is inside would leave the page just as squeezed. The toolbar icon brings it back.</p>
 
         <h2 class="settings-heading">Keyboard</h2>
         <p class="hint" id="shortcutHint">Checking&hellip;</p>

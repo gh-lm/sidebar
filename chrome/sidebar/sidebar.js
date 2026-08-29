@@ -356,36 +356,29 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-// Minimise: collapse to the icon rail only -- the vertical menu stays,
-// the content column hides, and clicking ANY rail icon (or the chevron
-// again) expands it back. (Chromium fixes the panel's width, so the
-// collapsed state can't physically narrow the panel itself; the content
-// area is simply blank until reopened.)
-const shellEl = document.querySelector(".shell");
+// ---- Close ----
 const railMinimize = document.getElementById("railMinimize");
 
-function setCollapsed(collapsed) {
-  shellEl.classList.toggle("collapsed", collapsed);
-  railMinimize.classList.toggle("flipped", collapsed);
-  railMinimize.dataset.tip = collapsed ? "Expand sidebar" : "Minimise sidebar";
+// Collapsing the panel's CONTENTS does nothing useful: Chromium owns the
+// side panel's width, so hiding what is inside leaves the page squeezed
+// exactly as before — it still looks open, because it is. The only way to
+// give the page its width back is to close the panel. Chrome 132 added
+// sidePanel.close(); older versions get window.close(), which a side panel
+// page is allowed to call on itself.
+async function closePanel() {
+  try {
+    if (chrome.sidePanel?.close) {
+      const win = await chrome.windows.getCurrent();
+      await chrome.sidePanel.close({ windowId: win.id });
+      return;
+    }
+  } catch {
+    /* fall through */
+  }
+  window.close();
 }
 
-railMinimize.addEventListener("click", () => {
-  setCollapsed(!shellEl.classList.contains("collapsed"));
-});
-
-// Any click on a rail tab, pinned favicon, or the "+" while collapsed
-// expands the sidebar again (capture phase so it runs before the
-// button's own handler switches views).
-document.querySelector(".rail").addEventListener(
-  "click",
-  (e) => {
-    if (!shellEl.classList.contains("collapsed")) return;
-    if (e.target.closest("#railMinimize")) return; // chevron handles itself
-    if (e.target.closest(".rail-btn")) setCollapsed(false);
-  },
-  true
-);
+railMinimize.addEventListener("click", closePanel);
 
 railAddSite.addEventListener("click", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

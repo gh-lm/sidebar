@@ -145,15 +145,10 @@ body {
 
 .rail-spacer { flex: 1; }
 
-/* Minimise chevron: quieter than the tab icons, and pointing off the
-   right edge (where the panel collapses to). Flips when collapsed. */
+/* Close chevron: quieter than the tab icons, and pointing off the right
+   edge, the way the panel leaves. */
 .rail-btn-min { color: var(--muted-fg); }
 .rail-btn-min:hover { color: var(--fg); }
-.rail-btn-min.flipped svg { transform: rotate(180deg); }
-
-/* Collapsed: only the icon rail remains visible; the content column is
-   hidden until any rail icon is clicked. */
-.shell.collapsed .content { display: none; }
 
 /* Drag-and-drop reorder target for pinned-site icons */
 .rail-sites .rail-btn.drop-target { outline: 2px solid var(--accent); outline-offset: 2px; }
