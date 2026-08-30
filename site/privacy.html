@@ -31,9 +31,12 @@
   body { margin:0; background:var(--bg); color:var(--fg);
          font-family:"Manrope", system-ui, sans-serif; line-height:1.6;
          display:flex; justify-content:center; padding:3rem 1.25rem; }
+  /* Without border-box the padding was added OUTSIDE the 100% width, so on
+     a phone the panel hung off both edges of the screen. */
+  * { box-sizing: border-box; }
   main { max-width:65ch; width:100%; background:var(--panel);
          border:1px solid var(--panel-border); border-radius:var(--panel-radius);
-         box-shadow:var(--shadow-panel); padding:2.5rem; }
+         box-shadow:var(--shadow-panel); padding:clamp(1.25rem, 5vw, 2.5rem); }
   h1 { font-size:2rem; font-weight:700; letter-spacing:-0.02em; margin:0 0 .5rem; }
   .mark { display:block; width:56px; height:56px; margin-bottom:1.25rem; }
   p { margin:0 0 1.1rem; }
