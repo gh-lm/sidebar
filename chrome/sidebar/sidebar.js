@@ -6,7 +6,7 @@ import * as store from "../lib/store.js";
 // which makes it the dependable boot trigger -- the worker itself is NOT
 // started by Chromium at launch on existing profiles, and onStartup
 // doesn't fire for --load-extension extensions.
-chrome.runtime.sendMessage({ type: "sidemorphic-boot" }).catch(() => {});
+chrome.runtime.sendMessage({ type: "sidebar-boot" }).catch(() => {});
 
 // Health probe: a few seconds after the ping, check whether the worker
 // actually produced a fresh boot report. Written to storage so a
@@ -47,10 +47,10 @@ for (const btn of document.querySelectorAll(".rail-btn[data-panel]")) {
   });
 }
 
-// The mark under the chevron opens the Sidemorphic site in the panel,
+// The mark under the chevron opens the Lightmorphic Sidebar site in the panel,
 // like any pinned site.
 document.getElementById("railLogo")?.addEventListener("click", () => {
-  openPanelSite("https://sidemorphic.lightmorphic.com");
+  openPanelSite("https://sidebar.lightmorphic.com");
 });
 
 // ---- Page size ----
@@ -157,7 +157,7 @@ function hostRuleId(host) {
 }
 
 // Host permission is OPTIONAL and asked for at the moment the user opens
-// a panel, from their own click -- Sidemorphic ships with no access to any
+// a panel, from their own click -- Lightmorphic Sidebar ships with no access to any
 // site until they pin one. Returns false if they decline, so the caller can
 // fall back to opening the site in a tab instead of showing a dead frame.
 async function ensureHostAccess(host) {
@@ -1091,7 +1091,7 @@ async function paintAllowAll() {
   allowAllBtn.textContent = on ? "Take it back" : "Allow all";
   allowAllState.textContent = on
     ? "Allowed. Panels and snippets work everywhere without asking."
-    : "Sidemorphic will ask once for each site you open in the panel.";
+    : "Lightmorphic Sidebar will ask once for each site you open in the panel.";
 }
 
 allowAllBtn?.addEventListener("click", async () => {

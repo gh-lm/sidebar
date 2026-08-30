@@ -14,7 +14,7 @@ if grep -rn "src=[\"']http\|url([\"']\?http\|@import.*http" chrome/ ; then
 fi
 
 mkdir -p dist
-rm -f "dist/sidemorphic-$VERSION.zip"
-( cd chrome && zip -qr "../dist/sidemorphic-$VERSION.zip" . -x '.*' )
-echo "dist/sidemorphic-$VERSION.zip"
-unzip -l "dist/sidemorphic-$VERSION.zip" | tail -1
+rm -f "dist/lightmorphic-sidebar-$VERSION.zip"
+( cd chrome && zip -qr "../dist/lightmorphic-sidebar-$VERSION.zip" . -x '.*' )
+echo "dist/lightmorphic-sidebar-$VERSION.zip"
+unzip -l "dist/lightmorphic-sidebar-$VERSION.zip" | tail -1

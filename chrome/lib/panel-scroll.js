@@ -1,4 +1,4 @@
-/* Runs in a page opened in the Sidemorphic panel.
+/* Runs in a page opened in the Lightmorphic Sidebar panel.
 
    Deliberately in the ISOLATED world, unlike the identity script: this only
    needs the DOM, and the isolated world is the one browsers are least fussy
@@ -18,7 +18,7 @@
     return;
   }
 
-  if (document.getElementById("sidemorphic-scroll")) return;
+  if (document.getElementById("lightmorphic-sidebar-scroll")) return;
 
   // Dark blob on a light page, light blob on a dark one. Read once the page
   // has painted, because the background is often set by a stylesheet.
@@ -41,7 +41,7 @@
 
   const style = document.createElement("style");
   const blob = document.createElement("div");
-  blob.id = "sidemorphic-scroll";
+  blob.id = "lightmorphic-sidebar-scroll";
 
   function paint() {
     const ink = inkFor();
@@ -49,14 +49,14 @@
       html { scrollbar-width: none !important; -ms-overflow-style: none !important; }
       html::-webkit-scrollbar, body::-webkit-scrollbar,
       :root::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
-      #sidemorphic-scroll {
+      #lightmorphic-sidebar-scroll {
         position: fixed !important; right: 3px !important; width: 6px !important;
         z-index: 2147483647 !important; border-radius: 999px !important;
         background: ${ink.rest} !important; opacity: 0; transition: opacity .25s ease;
         cursor: grab; touch-action: none; margin: 0 !important; padding: 0 !important;
       }
-      #sidemorphic-scroll.on { opacity: 1; }
-      #sidemorphic-scroll:hover, #sidemorphic-scroll:active {
+      #lightmorphic-sidebar-scroll.on { opacity: 1; }
+      #lightmorphic-sidebar-scroll:hover, #lightmorphic-sidebar-scroll:active {
         background: ${ink.hot} !important; width: 8px !important; right: 2px !important;
       }
     `;

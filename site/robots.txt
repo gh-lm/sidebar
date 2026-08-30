@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sidemorphic.lightmorphic.com/sitemap.xml
+Sitemap: https://sidebar.lightmorphic.com/sitemap.xml
 
 # AI crawlers are welcome here, deliberately and not by oversight.
 User-agent: GPTBot

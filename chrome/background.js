@@ -1,4 +1,4 @@
-// Sidemorphic — service worker.
+// Lightmorphic Sidebar — service worker.
 //
 // Scope is deliberately small: open the side panel, and seed a first pinned
 // site. Everything else the panel does, it does itself and saves to storage,
@@ -11,7 +11,7 @@
 // One pin ships with the install, so the rail is not empty and the idea is
 // obvious the moment the panel opens: click the icon, the site opens here.
 // It is an ordinary pin — editable, removable, and never re-added once the
-// profile has been seeded. Sidemorphic's own site is on the rail already, as
+// profile has been seeded. Lightmorphic Sidebar's own site is on the rail already, as
 // the mark under the close chevron.
 const DEFAULT_PIN = "https://lightmorphic.com";
 
@@ -55,7 +55,7 @@ chrome.runtime.onMessage.addListener((message) => {
   // The panel pings us when it opens; message delivery starts the worker,
   // which is the reliable carrier for once-per-launch work (onStartup alone
   // has proved unreliable in practice).
-  if (message?.type === "sidemorphic-boot") {
+  if (message?.type === "sidebar-boot") {
     bootTasks();
     return false;
   }

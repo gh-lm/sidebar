@@ -1,29 +1,38 @@
-/* Sidemorphic storage.
+/* Lightmorphic Sidebar storage.
    Everything lives in bookmarks, so the browser's own sync carries it —
    no account, no server, and it works in Brave and Vivaldi, which sync
    bookmarks but not extension storage.
 
    Bookmarks/Other bookmarks/
-     Sidemorphic/
+     Lightmorphic Sidebar/
        <pinned site>          one ordinary bookmark per pinned panel,
                               in rail order — clickable, readable, and
                               useful even without the extension
-       Sidemorphic scratchpad url holds the scratchpad text
-       Sidemorphic snippets   url holds the snippets, as JSON
+       Lightmorphic Sidebar scratchpad url holds the scratchpad text
+       Lightmorphic Sidebar snippets   url holds the snippets, as JSON
 
    Extension storage is still written as a local mirror, so the panel has
    something to draw before the bookmark read finishes and something to
    fall back on if the bookmarks API is unavailable.
 */
 
-const ROOT_TITLE = "Sidemorphic";
-const SCRATCH_TITLE = "Sidemorphic scratchpad";
-const SNIPPETS_TITLE = "Sidemorphic snippets";
+const ROOT_TITLE = "Lightmorphic Sidebar";
+// What the folder and its contents were called before the rename. Anything
+// found under the old names is renamed in place rather than left behind,
+// which would silently lose everything already saved.
+const OLD_ROOT_TITLES = ["Sidemorphic"];
+const OLD_HEAD = "https://sidemorphic.invalid/#sm1:";
+const OLD_TITLES = {
+  "Sidemorphic scratchpad": "Lightmorphic Sidebar scratchpad",
+  "Sidemorphic snippets": "Lightmorphic Sidebar snippets",
+};
+const SCRATCH_TITLE = "Lightmorphic Sidebar scratchpad";
+const SNIPPETS_TITLE = "Lightmorphic Sidebar snippets";
 
 // Data is parked in the bookmark's url. A reserved .invalid host means a
 // stray click goes nowhere, and no browser treats it as code — unlike a
 // javascript: url, which some browsers strip outright.
-const HEAD = "https://sidemorphic.invalid/#sm1:";
+const HEAD = "https://lightmorphic.invalid/#sb1:";
 
 const bm = chrome.bookmarks;
 
@@ -32,9 +41,13 @@ function encode(value) {
 }
 
 function decode(url) {
-  if (typeof url !== "string" || !url.startsWith(HEAD)) return null;
+  if (typeof url !== "string") return null;
+  // Read the old prefix too, so nothing saved before the rename is lost if
+  // the rename has not run yet on this machine.
+  const head = url.startsWith(HEAD) ? HEAD : url.startsWith(OLD_HEAD) ? OLD_HEAD : null;
+  if (!head) return null;
   try {
-    return JSON.parse(decodeURIComponent(url.slice(HEAD.length)));
+    return JSON.parse(decodeURIComponent(url.slice(head.length)));
   } catch {
     return null;
   }
@@ -70,10 +83,33 @@ async function rootId() {
   }
   const parentId = await otherBookmarksId();
   const kids = await bm.getChildren(parentId);
-  const found = kids.find((k) => !k.url && k.title === ROOT_TITLE);
+  let found = kids.find((k) => !k.url && k.title === ROOT_TITLE);
+  if (!found) {
+    const old = kids.find((k) => !k.url && OLD_ROOT_TITLES.includes(k.title));
+    if (old) {
+      await bm.update(old.id, { title: ROOT_TITLE });
+      found = old;
+      await renameOldEntries(old.id);
+    }
+  }
   const node = found || (await bm.create({ parentId, title: ROOT_TITLE }));
   rootIdCache = node.id;
   return node.id;
+}
+
+// The two data bookmarks carried the old name in their title and in the
+// reserved host inside their url. Both are brought forward.
+async function renameOldEntries(folderId) {
+  const kids = await bm.getChildren(folderId);
+  for (const kid of kids) {
+    const wanted = OLD_TITLES[kid.title];
+    if (!wanted) continue;
+    const url =
+      typeof kid.url === "string" && kid.url.startsWith(OLD_HEAD)
+        ? HEAD + kid.url.slice(OLD_HEAD.length)
+        : kid.url;
+    await bm.update(kid.id, { title: wanted, url }).catch(() => {});
+  }
 }
 
 async function childByTitle(title) {
@@ -103,7 +139,7 @@ async function getBlob(title, fallback) {
 export async function readAll() {
   const kids = await bm.getChildren(await rootId());
   const webPanels = kids
-    .filter((k) => k.url && !k.url.startsWith(HEAD))
+    .filter((k) => k.url && !k.url.startsWith(HEAD) && !k.url.startsWith(OLD_HEAD))
     .map((k) => k.url);
   return {
     webPanels,

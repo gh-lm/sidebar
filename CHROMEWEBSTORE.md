@@ -2,13 +2,13 @@
 
 ## Single purpose
 
-Sidemorphic gives you one side panel that holds the things you keep reaching
+Lightmorphic Sidebar gives you one side panel that holds the things you keep reaching
 for while browsing: pinned websites that open beside the page you are on, a
 scratchpad, and saved snippets.
 
 ## Description
 
-Sidemorphic puts a private side panel beside whatever you are reading.
+Lightmorphic Sidebar puts a private side panel beside whatever you are reading.
 
 Pin a site to the rail and it opens right here in the panel, like a small
 window beside whatever you are reading — your mail, a chat, docs, anything you
@@ -28,7 +28,7 @@ browser.
 Search is in the panel too: the mark, the name, one box, and a row of letters
 for the engines — DuckDuckGo, Google, Google Images, Bing, Startpage, Mojeek
 and Qwant. Press a letter and it searches there. Results open in the panel, in
-the site's phone layout so they fit. Sidemorphic does not touch your new tab
+the site's phone layout so they fit. Lightmorphic Sidebar does not touch your new tab
 page, or anything else in the browser.
 
 ## Category
@@ -64,16 +64,16 @@ Ready in `store/`:
 
 Icons are generated from `brand/icon.svg` by `make-icons.sh`.
 
-**Privacy policy URL:** https://sidemorphic.lightmorphic.com/privacy.html — live,
+**Privacy policy URL:** https://sidebar.lightmorphic.com/privacy.html — live,
 served from `site/` by the Pages workflow. Paste this into the listing's
 privacy practices tab.
 
 ## Submission checklist
 
 - [ ] Pay the one-off $5 developer fee if the account is new
-- [ ] Upload `dist/sidemorphic-0.1.0.zip`
+- [ ] Upload `dist/lightmorphic-sidebar-1.0.0.zip`
 - [ ] Paste the description and single-purpose sentence above
 - [ ] Paste each permission justification
-- [ ] Privacy policy URL: https://sidemorphic.lightmorphic.com/privacy.html
+- [ ] Privacy policy URL: https://sidebar.lightmorphic.com/privacy.html
 - [ ] Upload screenshots from `store/` and the promo tile
 - [ ] Category: Productivity. Non-trader.

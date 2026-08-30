@@ -1,4 +1,4 @@
-# Sidemorphic
+# Lightmorphic Sidebar
 
 > A side panel for Chrome. Pin any website to the edge of the browser and read
 > it beside the page you are on, with search, a scratchpad and snippets in the
@@ -27,13 +27,13 @@ panel API.
 
 ## Where data lives
 
-In one bookmarks folder called Sidemorphic, in Other Bookmarks. Because that is
+In one bookmarks folder called Lightmorphic Sidebar, in Other Bookmarks. Because that is
 bookmarks, the browser's own bookmark sync carries it between machines. Nothing
 is transmitted to Lightmorphic. Deleting the folder deletes the data.
 
 ## Pages
 
-- Home: https://sidemorphic.lightmorphic.com/
-- Privacy policy: https://sidemorphic.lightmorphic.com/privacy.html
-- Source code: https://github.com/lightmorphic/sidemorphic
+- Home: https://sidebar.lightmorphic.com/
+- Privacy policy: https://sidebar.lightmorphic.com/privacy.html
+- Source code: https://github.com/lightmorphic/sidebar
 - Lightmorphic: https://lightmorphic.com

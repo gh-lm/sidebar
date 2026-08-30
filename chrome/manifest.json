@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Sidemorphic",
-  "version": "0.1.0",
+  "name": "Lightmorphic Sidebar",
+  "version": "1.0.0",
   "description": "Pin any website to a side panel and read it beside the page you're on. Plus search, a scratchpad and snippets. Private by default.",
   "minimum_chrome_version": "114",
   "icons": {
@@ -15,7 +15,7 @@
       "16": "icons/icon-16.png",
       "32": "icons/icon-32.png"
     },
-    "default_title": "Sidemorphic"
+    "default_title": "Lightmorphic Sidebar"
   },
   "background": {
     "service_worker": "background.js",
@@ -29,7 +29,7 @@
       "suggested_key": {
         "default": "Ctrl+Shift+S"
       },
-      "description": "Open the Sidemorphic panel"
+      "description": "Open the Lightmorphic Sidebar panel"
     }
   },
   "permissions": [

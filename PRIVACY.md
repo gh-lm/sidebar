@@ -1,10 +1,10 @@
-# Sidemorphic privacy statement
+# Lightmorphic Sidebar privacy statement
 
-Sidemorphic collects nothing, sends nothing, and has no server.
+Lightmorphic Sidebar collects nothing, sends nothing, and has no server.
 
 **What it stores, and where.** Your scratchpad, snippets and pinned sites are
-saved as ordinary bookmarks, in a folder called "Sidemorphic" in your Other
-Bookmarks, with a copy in the browser's extension storage. Sidemorphic itself
+saved as ordinary bookmarks, in a folder called "Lightmorphic Sidebar" in your Other
+Bookmarks, with a copy in the browser's extension storage. Lightmorphic Sidebar itself
 sends nothing anywhere: there is no account, no server of ours, and no network
 request of any kind.
 
@@ -20,7 +20,7 @@ have granted access to that site, inserts it at your cursor. It writes your own
 text in and reads nothing out — no page content, no form values. Decline the
 permission and the snippet is still on your clipboard to paste yourself.
 
-**Website access.** Sidemorphic installs with access to no websites. The first
+**Website access.** Lightmorphic Sidebar installs with access to no websites. The first
 time you open a pinned site in the panel, the browser asks whether to grant
 access to that one site — this is needed because showing a site in a panel
 means removing the headers that normally stop it being framed. You can decline,
@@ -30,12 +30,12 @@ time from the browser's extension settings.
 **What it reads about your browsing.** When you press "+" to pin a site, it
 reads the address of the tab you are on so it can fill that address in for
 you. It is shown on screen, saved only if you press Save, and used nowhere
-else. Sidemorphic does not read page content, and does not keep any history of
+else. Lightmorphic Sidebar does not read page content, and does not keep any history of
 where you go.
 
 **No third parties.** No analytics, no tracking, no remote code, no external
 fonts or images, no requests to any service — including ours. Site icons come
 from the browser's own cache.
 
-Published at https://sidemorphic.lightmorphic.com/privacy.html — source at
-https://github.com/lightmorphic/sidemorphic
+Published at https://sidebar.lightmorphic.com/privacy.html — source at
+https://github.com/lightmorphic/sidebar

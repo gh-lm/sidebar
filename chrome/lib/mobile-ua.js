@@ -1,4 +1,4 @@
-/* Runs inside a page opened in the Sidemorphic panel, before the page's own
+/* Runs inside a page opened in the Lightmorphic Sidebar panel, before the page's own
    scripts, in the page's world.
 
    The panel already asks for the phone layout in the request headers, which
