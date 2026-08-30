@@ -106,6 +106,27 @@
   .page { padding-right: var(--panel-w); position: relative; z-index: 2; }
   .col { padding-left: var(--gutter); padding-right: var(--gutter); max-width: 62rem; }
 
+  /* Reachable by keyboard, out of sight otherwise. It had no styling at all
+     until now, so it simply rendered as the first line of the page. */
+  .skip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 60;
+    transform: translateY(-200%);
+    background: var(--ink);
+    color: var(--bg-contrast);
+    padding: 0.75rem 1rem;
+    border-radius: 0 0 0.75rem 0;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .skip:focus { transform: translateY(0); }
+
+  /* No 300ms wait for a double tap that is not coming. */
+  a, button, input, .demo-snip { touch-action: manipulation; }
+  :root { -webkit-tap-highlight-color: rgba(251, 199, 17, 0.3); }
+
   /* ---------- masthead ---------- */
   .mast {
     display: flex;
@@ -415,19 +436,37 @@
     margin: 0;
   }
 
+  /* Two lines, a soft edge, and the text itself as the label: the same
+     row the extension draws. */
   .demo-snip {
     background: #1c1f2b;
     border: 1px solid rgba(255,255,255,.08);
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 0.55rem 0.7rem;
     margin-bottom: 0.5rem;
     font-size: 0.8125rem;
+    line-height: 1.45;
     cursor: pointer;
+  }
+
+  .demo-snip span {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    white-space: pre-wrap;
   }
+
+  .demo-add {
+    margin: 0 0 0.5rem;
+    padding: 0.55rem 0.7rem;
+    font-size: 0.8125rem;
+    color: #6f717c;
+    border: 1px dashed rgba(255,255,255,.16);
+    border-radius: 12px;
+  }
+
+  .demo-hint-top { margin: 0 0 0.75rem; }
   .demo-snip:hover { border-color: var(--accent); }
   .demo-snip.copied { border-color: var(--accent); color: var(--accent); }
 
@@ -453,7 +492,11 @@
     font-weight: 700;
   }
 
+  /* The real panel centres this block in the space it has, so the demo
+     does too. */
   .demo-stage { display: flex; flex-direction: column; align-items: center; padding: 1.5rem 0 0.5rem; }
+  .demo-stage-centred { flex: 1; justify-content: center; padding-bottom: 3rem; }
+  .demo-view[data-view="search"].on { display: flex; flex-direction: column; height: 100%; }
   .demo-stage img { border-radius: 11px; }
   .demo-stage b { margin: 0.5rem 0 1rem; font-size: 1.0625rem; letter-spacing: -0.02em; }
   .demo-stage .demo-search { width: 100%; }
@@ -472,8 +515,9 @@
   .demo-letters b { background: var(--accent); border-color: var(--accent); color: #3f3204; }
 
   .demo-h { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: #8a8c96; margin: 0 0 0.75rem; }
-  .demo-site { border: 1px solid rgba(255,255,255,.1); border-radius: 10px; overflow: hidden; }
-  .demo-site img { width: 100%; display: block; }
+  /* Held at its own proportions, so it is never stretched to fit. */
+  .demo-site { border: 1px solid rgba(255,255,255,.1); border-radius: 12px; overflow: hidden; }
+  .demo-site img { width: 100%; height: auto; display: block; aspect-ratio: 332 / 736; object-fit: cover; object-position: top; }
   .demo-hint { font-size: 0.75rem; color: #8a8c96; margin: 0.75rem 0 0; }
 
   .demo-flag {
@@ -677,7 +721,7 @@
   <span class="demo-flag">Try it</span>
   <div class="demo-body">
     <div class="demo-view on" data-view="search">
-      <div class="demo-stage">
+      <div class="demo-stage demo-stage-centred">
         <img src="images/lightmorphic-sidebar-mark.png" alt="" width="44" height="44">
         <b translate="no">Lightmorphic Sidebar</b>
         <div class="demo-search">
@@ -702,16 +746,18 @@ Sarah's new address
     </div>
 
     <div class="demo-view" data-view="snippets">
-      <p class="demo-h">Snippets, click one</p>
-      <div class="demo-snip">07700 900123</div>
-      <div class="demo-snip">1 Example Street, London SW1A 1AA</div>
-      <div class="demo-snip">Thanks for getting in touch. I will come back to you properly in the next day or two, once I have had a proper look.</div>
-      <p class="demo-hint">In the extension these go straight into the box you were typing in.</p>
+      <p class="demo-add">Add a snippet, type it here, then click away</p>
+      <p class="demo-hint demo-hint-top">Click one to drop it into whatever box you were typing in. Right-click to edit.</p>
+      <div class="demo-snip"><span>07700 900123</span></div>
+      <div class="demo-snip"><span>1 Example Street, London SW1A 1AA</span></div>
+      <div class="demo-snip"><span>Best wishes,
+Charlie</span></div>
+      <div class="demo-snip"><span>Thanks for getting in touch. I will come back to you properly in the next day or two, once I have had a proper look.</span></div>
     </div>
 
     <div class="demo-view" data-view="pinned">
-      <p class="demo-h">A pinned site, open here</p>
-      <div class="demo-site"><img src="images/lightmorphic-sidebar-panel.png" alt="A site open inside the Lightmorphic Sidebar panel" width="400" height="780" loading="lazy"></div>
+      <p class="demo-hint demo-hint-top">This is a site open in the panel: this one, in fact.</p>
+      <div class="demo-site"><img src="images/lightmorphic-sidebar-in-panel.png" alt="The Lightmorphic Sidebar website open inside the panel" width="332" height="736" loading="lazy"></div>
     </div>
   </div>
 
