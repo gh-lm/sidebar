@@ -44,5 +44,15 @@
   ],
   "optional_host_permissions": [
     "*://*/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "lib/mobile-ua.js"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
+    }
   ]
 }

@@ -42,7 +42,7 @@ Productivity
 | `sidePanel` | The extension is a side panel. |
 | `clipboardWrite` | Copies a saved snippet to the clipboard when you click it. |
 | `storage` | A local copy of the same data, so the panel can draw instantly and still work if bookmarks are unavailable. |
-| `scripting` | Puts a snippet into the box you are typing in, when you click it. Only on a site you have granted access to, only on your click, and it inserts your own text — it reads nothing from the page. |
+| `scripting` | Two things, both only on a site you have allowed: putting a snippet into the box you are typing in when you click it, and telling a page opened in the panel that it is on a phone, so it serves its phone layout instead of a desktop one that cannot fit. The second runs only inside the panel — a tab you open yourself is untouched. |
 | `bookmarks` | Everything you save — pinned sites, scratchpad, snippets — is kept in one bookmarks folder, so your browser's own bookmark sync carries it between machines. There is no account and no server. |
 | `tabs` | "Pin this page" needs the address of the tab you are on, to fill it into the dialog, and the "open in the main window" button opens the panel's page in a tab. Only the URL is read, never page content. |
 | `favicon` | Draws the site icon on each pinned button, from the browser's own cache. No network request. |

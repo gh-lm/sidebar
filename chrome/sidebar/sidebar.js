@@ -85,6 +85,29 @@ panelZoomBtn?.addEventListener("click", async () => {
 // the user explicitly chose to embed. (DNR can only remove a whole
 // header, not edit within CSP, so the site's entire CSP is dropped for
 // its framed load -- documented, and scoped to that one host.)
+// Registered once per host, and only for a host the user has allowed. The
+// script itself refuses to run anywhere except inside this panel, so a tab
+// the user opens on the same site behaves exactly as it always did.
+async function ensureMobileScript(host) {
+  const id = `mobile-${host}`;
+  try {
+    const existing = await chrome.scripting.getRegisteredContentScripts({ ids: [id] });
+    if (existing.length) return;
+    await chrome.scripting.registerContentScripts([
+      {
+        id,
+        matches: [`*://${host}/*`],
+        allFrames: true,
+        runAt: "document_start",
+        world: "MAIN",
+        js: ["lib/mobile-ua.js"],
+      },
+    ]);
+  } catch {
+    /* already there, or the browser will not have it: headers still apply */
+  }
+}
+
 // A current Chrome on Android. Kept close to the real thing so nothing
 // refuses to serve it.
 const MOBILE_UA =
@@ -118,6 +141,7 @@ async function allowFramingFor(url) {
     return false;
   }
   if (!(await ensureHostAccess(host))) return false;
+  await ensureMobileScript(host);
   const id = hostRuleId(host);
   await chrome.declarativeNetRequest.updateSessionRules({
     removeRuleIds: [id],
@@ -188,7 +212,7 @@ const ENGINES = [
   { id: "bing", letter: "B", name: "Bing", url: "https://www.bing.com/search?q=" },
   { id: "startpage", letter: "S", name: "Startpage", url: "https://www.startpage.com/sp/search?query=" },
   { id: "mojeek", letter: "M", name: "Mojeek", url: "https://www.mojeek.com/search?q=" },
-  { id: "qwant", letter: "Q", name: "Qwant", url: "https://www.qwant.com/?q=" },
+  { id: "qwant", letter: "Q", name: "Qwant", url: "https://lite.qwant.com/?q=" },
 ];
 
 let engine = ENGINES[0];
@@ -244,7 +268,7 @@ const ENGINE_ORIGINS = [
   "*://www.bing.com/*",
   "*://www.startpage.com/*",
   "*://www.mojeek.com/*",
-  "*://www.qwant.com/*",
+  "*://lite.qwant.com/*",
 ];
 
 let engineAccessAsked = false;
