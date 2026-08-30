@@ -3,20 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sidemorphic — the tab that stays</title>
-<meta name="description" content="A side panel for Chrome that keeps the site you always go back to right beside the page you're reading. Plus a scratchpad and snippets. Syncs through your bookmarks — no account, no server.">
+<title>Sidemorphic: the tab that stays</title>
+<meta name="description" content="A side panel for Chrome holding the site you always go back to, plus search, a scratchpad and snippets. Syncs through your bookmarks: no account, no server.">
+<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101013" media="(prefers-color-scheme: dark)">
 <link rel="canonical" href="https://sidemorphic.lightmorphic.com/">
-<link rel="icon" href="img/mark.png">
-<meta property="og:title" content="Sidemorphic — the tab that stays">
+<link rel="icon" href="images/sidemorphic-mark.png">
+<meta property="og:title" content="Sidemorphic: the tab that stays">
 <meta property="og:description" content="Pin a site to the edge of your browser and read it beside everything else. No account. No server. Nothing sent anywhere.">
-<meta property="og:image" content="https://sidemorphic.lightmorphic.com/img/mark.png">
+<meta property="og:image" content="https://sidemorphic.lightmorphic.com/images/sidemorphic-mark.png">
 <meta property="og:url" content="https://sidemorphic.lightmorphic.com/">
 <meta property="og:type" content="website">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sidemorphic: the tab that stays">
+<meta name="twitter:description" content="Pin a site to the edge of your browser and read it beside everything else. No account, no server.">
+<meta name="twitter:image" content="https://sidemorphic.lightmorphic.com/images/sidemorphic-share.png">
 <style>
   @font-face {
     font-family: "Manrope";
-    src: url("Manrope.woff2") format("woff2");
+    src: url("fonts/Manrope.woff2") format("woff2");
     font-weight: 200 800;
     font-display: swap;
   }
@@ -31,6 +36,8 @@
     --rule: rgba(10, 10, 12, 0.14);
     --dim: #5d5c57;
     --quiet-ink: #3a3935;
+    --numeral: #8f6c03;
+    --bg-contrast: #f6f5f1;
     --grain: 0.5;
     --panel-w: 336px;
     --gutter: clamp(1.25rem, 4vw, 4rem);
@@ -48,6 +55,8 @@
       --rule: rgba(242, 241, 236, 0.16);
       --dim: #9b9a94;
       --quiet-ink: #b9b7b0;
+      --numeral: #ffc006;
+      --bg-contrast: #101013;
       --grain: 0.22;
     }
   }
@@ -61,6 +70,8 @@
     --rule: rgba(242, 241, 236, 0.16);
     --dim: #9b9a94;
     --quiet-ink: #b9b7b0;
+    --numeral: #ffc006;
+    --bg-contrast: #101013;
     --grain: 0.22;
   }
 
@@ -112,10 +123,14 @@
   .mast nav { margin-left: auto; display: flex; align-items: center; gap: 1.5rem; font-size: 0.875rem; }
   .mast nav a { color: var(--dim); text-decoration: none; }
   .mast nav a:hover { color: var(--ink); }
+  /* The pill is not a nav link: without this the rule above wins on
+     specificity and paints its text grey on near-black, 2.95:1. */
+  .mast nav a.get { color: var(--bg-contrast); }
+  .mast nav a.get:hover { color: #fff; }
 
   .get {
     background: var(--ink);
-    color: var(--paper);
+    color: var(--bg-contrast);
     text-decoration: none;
     font-weight: 700;
     font-size: 0.875rem;
@@ -126,7 +141,7 @@
   .get:hover { background: var(--navy); color: #fff; }
 
   /* A circle holding a sun or a moon. In automatic it shows whichever is
-     actually on screen, with a dot to say the browser is choosing — a third
+     actually on screen, with a dot to say the browser is choosing. A third
      neutral icon would tell you nothing about what you are looking at. */
   .theme {
     position: relative;
@@ -198,7 +213,7 @@
 
   .cta-main {
     background: var(--ink);
-    color: var(--paper);
+    color: var(--bg-contrast);
     text-decoration: none;
     font-weight: 700;
     padding: 0.8rem 1.5rem;
@@ -237,11 +252,12 @@
     font-weight: 800;
     letter-spacing: -0.04em;
     line-height: 0.8;
-    color: var(--accent);
+    color: var(--numeral);
     -webkit-text-stroke: 1px var(--ink);
   }
 
   .chapter h2 {
+    text-wrap: balance;
     font-size: clamp(1.75rem, 3.6vw, 2.75rem);
     line-height: 1.05;
     letter-spacing: -0.03em;
@@ -274,13 +290,17 @@
   figure svg { width: 100%; height: auto; display: block; }
 
   /* ---------- inverted block ---------- */
+  /* This band is dark whichever theme is on, so its text is set outright
+     rather than with a token that swaps: --paper is near-black in dark mode,
+     which put dark text on a dark band. */
   .invert {
     background: var(--navy);
-    color: var(--paper);
+    color: #f2f1ec;
     margin-top: clamp(3rem, 7vw, 5rem);
   }
   .invert .col { padding-block: clamp(3rem, 7vw, 5rem); }
   .invert h2 {
+    text-wrap: balance;
     font-size: clamp(1.75rem, 4vw, 3rem);
     letter-spacing: -0.03em;
     line-height: 1.05;
@@ -495,13 +515,44 @@
 
   :where(a, button):focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Sidemorphic",
+  "url": "https://sidemorphic.lightmorphic.com/",
+  "description": "A side panel for Chrome holding pinned websites, search, a scratchpad and snippets. Everything is stored as bookmarks, so it syncs with no account and no server.",
+  "applicationCategory": "BrowserApplication",
+  "operatingSystem": "Chrome 114 or newer, Edge, Brave, Vivaldi, Opera",
+  "browserRequirements": "Requires Chrome 114 or newer",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" },
+  "softwareVersion": "0.1.0",
+  "image": "https://sidemorphic.lightmorphic.com/images/sidemorphic-mark.png",
+  "featureList": [
+    "Pin any website to a side panel and read it beside the page you are on",
+    "Search from the panel with seven engines",
+    "A scratchpad kept in the panel",
+    "Snippets that paste into the box you are typing in",
+    "Stored as bookmarks, so it syncs without an account"
+  ],
+  "publisher": {
+    "@type": "Organization",
+    "name": "Lightmorphic",
+    "url": "https://lightmorphic.com",
+    "logo": "https://sidemorphic.lightmorphic.com/images/sidemorphic-mark.png"
+  }
+}
+</script>
 </head>
 <body>
 
 <div class="page">
+  <a class="skip" href="#how">Skip to what it does</a>
   <header class="mast">
-    <img src="img/mark.png" alt="" width="26" height="26">
-    <b>Sidemorphic</b>
+    <img src="images/sidemorphic-mark.png" alt="" width="26" height="26">
+    <b translate="no">Sidemorphic</b>
     <nav>
       <a href="#how">How it works</a>
       <a href="#private">Privacy</a>
@@ -516,8 +567,8 @@
       <p class="kicker">A side panel for Chrome</p>
       <h1>Seventeen tabs open.<span class="quietly">One of them you actually keep going back to.</span></h1>
       <p class="lede">Put that one down the side instead, where it stays while you
-        read everything else. There is a working one on this page &mdash; have a go
-        at it.</p>
+        read everything else. There is a working one on this page, have a go at
+        it.</p>
       <div class="actions">
         <a class="cta-main" href="https://github.com/lightmorphic/sidemorphic">Get Sidemorphic</a>
         <a class="cta-side" href="#how">See what it does</a>
@@ -532,8 +583,8 @@
   <div class="demo-body">
     <div class="demo-view on" data-view="search">
       <div class="demo-stage">
-        <img src="img/mark.png" alt="" width="44" height="44">
-        <b>Sidemorphic</b>
+        <img src="images/sidemorphic-mark.png" alt="" width="44" height="44">
+        <b translate="no">Sidemorphic</b>
         <div class="demo-search">
           <input type="search" placeholder="Search or type a web address" aria-label="Example search box">
           <span class="demo-go">→</span>
@@ -547,7 +598,7 @@
       <p class="demo-h">Scratchpad</p>
       <p class="demo-note">Wednesday
 
-  ring the framer back — 3pm
+  ring the framer back, 3pm
   invoice 214 still unpaid
   book the ferry before the price goes up
 
@@ -556,33 +607,33 @@ Sarah's new address
     </div>
 
     <div class="demo-view" data-view="snippets">
-      <p class="demo-h">Snippets — click one</p>
+      <p class="demo-h">Snippets, click one</p>
       <div class="demo-snip">07700 900123</div>
       <div class="demo-snip">1 Example Street, London SW1A 1AA</div>
-      <div class="demo-snip">Thanks for getting in touch — I will come back to you properly in the next day or two, once I have had a proper look.</div>
+      <div class="demo-snip">Thanks for getting in touch. I will come back to you properly in the next day or two, once I have had a proper look.</div>
       <p class="demo-hint">In the extension these go straight into the box you were typing in.</p>
     </div>
 
     <div class="demo-view" data-view="pinned">
       <p class="demo-h">A pinned site, open here</p>
-      <div class="demo-site"><img src="img/web-info.png" alt="A site open inside the Sidemorphic panel" width="400" height="780" loading="lazy"></div>
+      <div class="demo-site"><img src="images/sidemorphic-panel-information.png" alt="A site open inside the Sidemorphic panel" width="400" height="780" loading="lazy"></div>
     </div>
   </div>
 
   <nav class="demo-rail">
-    <img src="img/mark.png" alt="" width="22" height="22">
+    <img src="images/sidemorphic-mark.png" alt="" width="22" height="22">
     <hr>
     <button data-view="search" aria-selected="true" title="Search" aria-label="Search">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="9" r="5.25"/><path d="M12.9 12.9L16.5 16.5"/></svg>
+      <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="9" r="5.25"/><path d="M12.9 12.9L16.5 16.5"/></svg>
     </button>
     <button data-view="scratchpad" aria-selected="false" title="Scratchpad" aria-label="Scratchpad">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h9l3 3v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v3h3"/><path d="M6.5 9.5h7M6.5 12.5h7M6.5 15.5h4"/></svg>
+      <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h9l3 3v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v3h3"/><path d="M6.5 9.5h7M6.5 12.5h7M6.5 15.5h4"/></svg>
     </button>
     <button data-view="snippets" aria-selected="false" title="Snippets" aria-label="Snippets">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="10" height="13" rx="1.2"/><path d="M8 3.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H8a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M7.5 9h5M7.5 12h5"/></svg>
+      <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="10" height="13" rx="1.2"/><path d="M8 3.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H8a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M7.5 9h5M7.5 12h5"/></svg>
     </button>
     <button data-view="pinned" aria-selected="false" title="A pinned site" aria-label="A pinned site">
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3c4 4.5 4 9.5 0 14C6 12.5 6 7.5 10 3z"/></svg>
+      <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><path d="M3 10h14M10 3c4 4.5 4 9.5 0 14C6 12.5 6 7.5 10 3z"/></svg>
     </button>
     <div class="demo-spacer"></div>
   </nav>
@@ -625,15 +676,15 @@ Sarah's new address
           <h2>It opens on a search box, and leaves your new tab alone.</h2>
           <p>Most extensions that offer you a search box take over your new tab
             page to do it. This one puts it in the panel, and the results appear
-            in the panel too — nothing it does reaches outside that strip down
+            in the panel too. Nothing it does reaches outside that strip down
             the side.</p>
           <p>Seven engines as seven letters. D for DuckDuckGo, G for Google,
             I for its images, then Bing, Startpage, Mojeek and Qwant. Press a
-            letter and it searches there — no menu, no second click — and the
+            letter and it searches there. No menu, no second click, and the
             letter stays lit so you can see where the box is pointed.</p>
           <p>Results come back in the site's phone layout, because the panel is
             about a phone wide and a desktop page in it is unreadable. Come back
-            from a result and your words are still in the box, selected — so
+            from a result and your words are still in the box, selected, so
             trying the same search somewhere else is one key.</p>
           <button class="try" data-show="search">Show me in the panel</button>
         </div>
@@ -646,8 +697,8 @@ Sarah's new address
         <div>
           <h2>Pin the site. It opens beside the page, not instead of it.</h2>
           <p>Press <b>+</b> on the rail and whatever you are looking at becomes an
-            icon. Click the icon and the site loads in the panel — your mail, a
-            chat, the docs you keep checking — while the page you were reading
+            icon. Click the icon and the site loads in the panel: your mail, a
+            chat, the docs you keep checking, while the page you were reading
             stays exactly where it was.</p>
           <p class="quiet">Right-click an icon to change or remove it. Drag to reorder.</p>
           <button class="try" data-show="pinned">Show me in the panel</button>
@@ -674,7 +725,7 @@ Sarah's new address
         <div>
           <h2>Snippets that land where the cursor is.</h2>
           <p>Click one and the text goes into the box you were typing in, at the
-            cursor. Not onto the clipboard to be pasted later — into the field,
+            cursor. Not onto the clipboard to be pasted later, into the field,
             where you wanted it.</p>
           <p class="quiet">Right-click to edit. Click away and it saves. Nothing to press.</p>
           <button class="try" data-show="snippets">Show me in the panel</button>
@@ -688,8 +739,8 @@ Sarah's new address
         <div>
           <h2>It syncs through your bookmarks. That is the whole trick.</h2>
           <p>Everything you save is kept as ordinary bookmarks in one folder. Your
-            browser already syncs those — Brave and Vivaldi sync bookmarks even
-            though they sync nothing else about extensions — so your panel arrives
+            browser already syncs those. Brave and Vivaldi sync bookmarks even
+            though they sync nothing else about extensions, so your panel arrives
             on your other machine with nothing to sign into.</p>
           <figure>
             <svg viewBox="0 0 760 200" role="img">
@@ -730,7 +781,7 @@ Sarah's new address
       <h2>It installs with permission for no websites at all.</h2>
       <p>Most extensions ask to read and change your data on every site you visit,
         on the day you install them. This one asks about a single site, at the
-        moment you first open it in the panel — and you can take that back
+        moment you first open it in the panel, and you can take that back
         whenever you like.</p>
       <div class="tally">
         <div><b>0</b><span>sites it can touch at install</span></div>
@@ -750,8 +801,8 @@ Sarah's new address
           <circle cx="37" cy="20" r="4.5" fill="var(--accent)"/>
         </svg>
         <div>
-          <h3>Built by Lightmorphic</h3>
-          <p>Sidemorphic is one of a family of small, private tools — desktop apps,
+          <h3><span translate="no">Built by Lightmorphic</span></h3>
+          <p>Sidemorphic is one of a family of small, private tools: desktop apps,
             browser extensions and websites, made without accounts, tracking or
             anything phoning home. See the rest of them.</p>
         </div>
