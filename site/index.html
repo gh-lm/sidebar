@@ -343,14 +343,23 @@
     margin: 0 0 2rem;
     padding-top: clamp(3rem, 6vw, 4.5rem);
   }
-  .faq-list { margin: 0 0 clamp(3rem, 6vw, 4.5rem); max-width: 60ch; }
+  /* Two columns where there is room: the answers are short, and one long
+     ribbon down the left of a wide page wastes the whole right half. Pairs
+     are wrapped so a break can never land between a question and its
+     answer. */
+  .faq-list {
+    margin: 0 0 clamp(3rem, 6vw, 4.5rem);
+    display: grid;
+    gap: 1.75rem 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+    align-items: start;
+  }
   .faq-list dt {
     font-size: 1.125rem;
     font-weight: 700;
     letter-spacing: -0.01em;
-    margin-top: 1.75rem;
+    margin-top: 0;
   }
-  .faq-list dt:first-child { margin-top: 0; }
   .faq-list dd { margin: 0.5rem 0 0; color: var(--quiet-ink); }
 
   /* ---------- lightmorphic promo ---------- */
@@ -994,35 +1003,30 @@ Charlie</span></button>
   <section class="col faq" id="questions">
     <h2 class="faq-title">Questions</h2>
     <dl class="faq-list">
-      <dt>What does Lightmorphic Sidebar cost?</dt>
+      <div><dt>What does Lightmorphic Sidebar cost?</dt>
       <dd>Nothing. It is free and open source, there is no paid tier, and there
-        is nothing to sign up to.</dd>
-
-      <dt>Which browsers does it work in?</dt>
+        is nothing to sign up to.</dd></div>
+      <div><dt>Which browsers does it work in?</dt>
       <dd>Chrome 114 or newer, and the Chromium browsers that install Web Store
         extensions: Edge, Brave, Vivaldi and Opera. There is no Firefox version,
-        because Firefox has no side panel API of the kind this is built on.</dd>
-
-      <dt>Where is my data kept?</dt>
+        because Firefox has no side panel API of the kind this is built on.</dd></div>
+      <div><dt>Where is my data kept?</dt>
       <dd>In your own browser, as ordinary bookmarks in a folder called
         Lightmorphic Sidebar. Nothing is sent to us, because there is no server and no
         account. Delete the folder and the data is gone. The
         <a href="privacy.html">privacy policy</a> sets out exactly what is kept
-        and what is not.</dd>
-
-      <dt>Does it sync between my computers?</dt>
+        and what is not.</dd></div>
+      <div><dt>Does it sync between my computers?</dt>
       <dd>Yes, if your browser syncs bookmarks, because that is what it stores.
         This works in Brave and Vivaldi too, which sync bookmarks but sync
-        nothing else belonging to an extension.</dd>
-
-      <dt>What websites can it read?</dt>
+        nothing else belonging to an extension.</dd></div>
+      <div><dt>What websites can it read?</dt>
       <dd>None when you install it. It asks about one site at a time, when you
         first open that site in the panel, and you can take permission back at
-        any time from the browser's extension settings.</dd>
-
-      <dt>Does it replace my new tab page?</dt>
+        any time from the browser's extension settings.</dd></div>
+      <div><dt>Does it replace my new tab page?</dt>
       <dd>No. Search lives in the panel instead. Lightmorphic Sidebar changes nothing
-        outside that strip down the side of the window.</dd>
+        outside that strip down the side of the window.</dd></div>
     </dl>
   </section>
 
