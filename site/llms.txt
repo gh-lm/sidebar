@@ -1,0 +1,39 @@
+# Sidemorphic
+
+> A side panel for Chrome. Pin any website to the edge of the browser and read
+> it beside the page you are on, with search, a scratchpad and snippets in the
+> same panel. Everything is stored as ordinary bookmarks, so it follows you
+> between machines with no account and no server.
+
+Free and open source, made by Lightmorphic. Works in Chrome 114 or newer and
+the Chromium browsers that install Web Store extensions: Edge, Brave, Vivaldi
+and Opera. There is no Firefox version, because Firefox has no equivalent side
+panel API.
+
+## What it does
+
+- Pinned panels: any site opens in the panel beside the page you are reading.
+- Search: seven engines, results open in the panel, and it does not touch your
+  new tab page.
+- Scratchpad: a notepad that is always one click away.
+- Snippets: saved text that goes into the box you are typing in when clicked.
+
+## What it does not do
+
+- No account, no sign-in, no server of ours, no analytics, no tracking.
+- No access to any website when installed. It asks for one site at a time, at
+  the moment you first open that site in the panel.
+- No new tab page takeover and no other changes to the browser.
+
+## Where data lives
+
+In one bookmarks folder called Sidemorphic, in Other Bookmarks. Because that is
+bookmarks, the browser's own bookmark sync carries it between machines. Nothing
+is transmitted to Lightmorphic. Deleting the folder deletes the data.
+
+## Pages
+
+- Home: https://sidemorphic.lightmorphic.com/
+- Privacy policy: https://sidemorphic.lightmorphic.com/privacy.html
+- Source code: https://github.com/lightmorphic/sidemorphic
+- Lightmorphic: https://lightmorphic.com

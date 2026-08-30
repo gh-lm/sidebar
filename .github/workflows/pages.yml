@@ -19,6 +19,17 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # The date the CONTENT last changed, taken from the last commit that
+      # touched site/. Not the build time: a deploy that changed nothing
+      # should not claim the page is newer than it is.
+      # The date the CONTENT last changed, from the last commit touching
+      # site/. Not the build time: a deploy that changed nothing should not
+      # claim the page is newer than it is.
+      - name: Stamp the last-updated date
+        run: python3 tools/stamp-date.py
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

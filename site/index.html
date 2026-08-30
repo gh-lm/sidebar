@@ -311,8 +311,26 @@
   .invert p { color: #b9bcc6; max-width: 46ch; font-size: 1.0625rem; }
 
   .tally { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1.5rem; margin-top: 2.5rem; }
-  .tally b { display: block; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.04em; color: var(--accent); line-height: 1; }
-  .tally span { font-size: 0.875rem; color: #9a9ca6; display: block; margin-top: 0.375rem; }
+  .tally dt { display: block; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.04em; color: var(--accent); line-height: 1; font-weight: 800; }
+  .tally dd { font-size: 0.875rem; color: #9a9ca6; display: block; margin: 0.375rem 0 0; }
+
+  /* ---------- questions ---------- */
+  .faq { border-top: 1px solid var(--rule); }
+  .faq .faq-title {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    letter-spacing: -0.03em;
+    margin: 0 0 2rem;
+    padding-top: clamp(3rem, 6vw, 4.5rem);
+  }
+  .faq-list { margin: 0 0 clamp(3rem, 6vw, 4.5rem); max-width: 60ch; }
+  .faq-list dt {
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-top: 1.75rem;
+  }
+  .faq-list dt:first-child { margin-top: 0; }
+  .faq-list dd { margin: 0.5rem 0 0; color: var(--quiet-ink); }
 
   /* ---------- lightmorphic promo ---------- */
   .promo { border-top: 1px solid var(--rule); }
@@ -527,7 +545,11 @@
   "operatingSystem": "Chrome 114 or newer, Edge, Brave, Vivaldi, Opera",
   "browserRequirements": "Requires Chrome 114 or newer",
   "isAccessibleForFree": true,
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "GBP"
+  },
   "softwareVersion": "0.1.0",
   "image": "https://sidemorphic.lightmorphic.com/images/sidemorphic-mark.png",
   "featureList": [
@@ -542,7 +564,79 @@
     "name": "Lightmorphic",
     "url": "https://lightmorphic.com",
     "logo": "https://sidemorphic.lightmorphic.com/images/sidemorphic-mark.png"
-  }
+  },
+  "dateModified": "2026-08-30"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Sidemorphic",
+  "url": "https://sidemorphic.lightmorphic.com/",
+  "inLanguage": "en-GB",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Lightmorphic",
+    "url": "https://lightmorphic.com"
+  },
+  "dateModified": "2026-08-30"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What does Sidemorphic cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nothing. It is free and open source, there is no paid tier, and there is nothing to sign up to."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which browsers does it work in?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chrome 114 or newer, and the Chromium browsers that install Web Store extensions: Edge, Brave, Vivaldi and Opera. There is no Firefox version, because Firefox has no side panel API of the kind this is built on."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where is my data kept?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In your own browser, as ordinary bookmarks in a folder called Sidemorphic. Nothing is sent to us, because there is no server and no account. Delete the folder and the data is gone."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it sync between my computers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, if your browser syncs bookmarks, because that is what it stores. This works in Brave and Vivaldi too, which sync bookmarks but sync nothing else belonging to an extension."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What websites can it read?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "None when you install it. It asks about one site at a time, when you first open that site in the panel, and you can take permission back at any time from the browser's extension settings."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it replace my new tab page?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Search lives in the panel instead. Sidemorphic changes nothing outside that strip down the side of the window."
+      }
+    }
+  ]
 }
 </script>
 </head>
@@ -555,6 +649,7 @@
     <b translate="no">Sidemorphic</b>
     <nav>
       <a href="#how">How it works</a>
+      <a href="#questions">Questions</a>
       <a href="#private">Privacy</a>
       <a href="https://github.com/lightmorphic/sidemorphic">Source</a>
       <a class="get" href="https://github.com/lightmorphic/sidemorphic">Get it</a>
@@ -783,13 +878,47 @@ Sarah's new address
         on the day you install them. This one asks about a single site, at the
         moment you first open it in the panel, and you can take that back
         whenever you like.</p>
-      <div class="tally">
-        <div><b>0</b><span>sites it can touch at install</span></div>
-        <div><b>0</b><span>accounts or servers</span></div>
-        <div><b>1</b><span>bookmarks folder holding all of it</span></div>
-        <div><b>~100&nbsp;KB</b><span>the entire extension</span></div>
-      </div>
+      <dl class="tally">
+        <div><dt>0</dt><dd>sites it can touch at install</dd></div>
+        <div><dt>0</dt><dd>accounts or servers</dd></div>
+        <div><dt>1</dt><dd>bookmarks folder holding all of it</dd></div>
+        <div><dt>~100&nbsp;KB</dt><dd>the entire extension</dd></div>
+      </dl>
     </div>
+  </section>
+
+
+  <section class="wrap faq" id="questions">
+    <h2 class="faq-title">Questions</h2>
+    <dl class="faq-list">
+      <dt>What does Sidemorphic cost?</dt>
+      <dd>Nothing. It is free and open source, there is no paid tier, and there
+        is nothing to sign up to.</dd>
+
+      <dt>Which browsers does it work in?</dt>
+      <dd>Chrome 114 or newer, and the Chromium browsers that install Web Store
+        extensions: Edge, Brave, Vivaldi and Opera. There is no Firefox version,
+        because Firefox has no side panel API of the kind this is built on.</dd>
+
+      <dt>Where is my data kept?</dt>
+      <dd>In your own browser, as ordinary bookmarks in a folder called
+        Sidemorphic. Nothing is sent to us, because there is no server and no
+        account. Delete the folder and the data is gone.</dd>
+
+      <dt>Does it sync between my computers?</dt>
+      <dd>Yes, if your browser syncs bookmarks, because that is what it stores.
+        This works in Brave and Vivaldi too, which sync bookmarks but sync
+        nothing else belonging to an extension.</dd>
+
+      <dt>What websites can it read?</dt>
+      <dd>None when you install it. It asks about one site at a time, when you
+        first open that site in the panel, and you can take permission back at
+        any time from the browser's extension settings.</dd>
+
+      <dt>Does it replace my new tab page?</dt>
+      <dd>No. Search lives in the panel instead. Sidemorphic changes nothing
+        outside that strip down the side of the window.</dd>
+    </dl>
   </section>
 
   <section class="promo">
@@ -814,10 +943,14 @@ Sarah's new address
   <footer>
     <div class="col">
       <span>© Lightmorphic. Sidemorphic is free and open source.</span>
+      <span>Last updated <time datetime="2026-08-30" id="updated">30 August 2026</time></span>
       <nav>
-        <a href="privacy.html">Privacy</a>
-        <a href="https://github.com/lightmorphic/sidemorphic">Source</a>
-        <a href="https://lightmorphic.com" target="_blank" rel="noopener">Lightmorphic ↗</a>
+        <a href="#how">How it works</a>
+        <a href="#questions">Questions</a>
+        <a href="#private">Site access</a>
+        <a href="privacy.html">Privacy policy</a>
+        <a href="https://github.com/lightmorphic/sidemorphic">Source on GitHub</a>
+        <a href="https://lightmorphic.com" target="_blank" rel="noopener">Lightmorphic</a>
       </nav>
     </div>
   </footer>
