@@ -502,8 +502,10 @@
   .demo-stage img { border-radius: 11px; }
   .demo-stage b { margin: 0.5rem 0 1rem; font-size: 1.0625rem; letter-spacing: -0.02em; }
   .demo-stage .demo-search { width: 100%; }
-  .demo-letters { display: flex; gap: 0.3rem; margin-top: 0.75rem; }
-  .demo-letters b, .demo-letters span {
+  .demo-letters { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.75rem; }
+  /* All one element type: the active letter used to be a <b>, which
+     inherited the wordmark's margin and sat 8px lower than the rest. */
+  .demo-letters span {
     width: 1.6rem;
     height: 1.6rem;
     display: grid;
@@ -514,7 +516,7 @@
     border: 1px solid rgba(255,255,255,.16);
     color: #9ea0ab;
   }
-  .demo-letters b { background: var(--accent); border-color: var(--accent); color: #3f3204; }
+  .demo-letters span.on { background: var(--accent); border-color: var(--accent); color: #3f3204; }
 
   .demo-h { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: #8a8c96; margin: 0 0 0.75rem; }
   /* Held at its own proportions, so it is never stretched to fit. */
@@ -730,7 +732,7 @@
           <input type="search" placeholder="Search or type a web address" aria-label="Example search box">
           <span class="demo-go">→</span>
         </div>
-        <div class="demo-letters"><b>D</b><span>G</span><span>I</span><span>B</span><span>S</span><span>M</span><span>Q</span></div>
+        <div class="demo-letters"><span class="on">D</span><span>G</span><span>I</span><span>B</span><span>S</span><span>M</span><span>Q</span></div>
       </div>
       <p class="demo-hint">Press a letter and it searches with that engine. Results open here in the panel, in the site's phone layout; your new tab page is left alone.</p>
     </div>
