@@ -65,7 +65,10 @@ function paintZoom(z) {
   if (panelZoomBtn) panelZoomBtn.textContent = `${Math.round(z * 100)}%`;
 }
 
-chrome.storage.local.get("panelZoom").then(({ panelZoom = 0.9 }) => paintZoom(panelZoom));
+// Full size by default now: pages fit themselves from the inside, which
+// works on pages that scaling the frame never could. This is left as a
+// preference for anyone who wants everything smaller anyway.
+chrome.storage.local.get("panelZoom").then(({ panelZoom = 1 }) => paintZoom(panelZoom));
 
 panelZoomBtn?.addEventListener("click", async () => {
   const now = Number(getComputedStyle(document.documentElement).getPropertyValue("--zoom")) || 0.9;
@@ -88,24 +91,58 @@ panelZoomBtn?.addEventListener("click", async () => {
 // Registered once per host, and only for a host the user has allowed. The
 // script itself refuses to run anywhere except inside this panel, so a tab
 // the user opens on the same site behaves exactly as it always did.
-async function ensureMobileScript(host) {
-  const id = `mobile-${host}`;
+// When every site is allowed, register once for everything rather than
+// waiting to meet each host. Charlie's own install is in exactly that state,
+// and per-host registration meant the first visit to a site still got the
+// old scrollbar.
+async function ensureMobileScriptEverywhere() {
   try {
-    const existing = await chrome.scripting.getRegisteredContentScripts({ ids: [id] });
-    if (existing.length) return;
-    await chrome.scripting.registerContentScripts([
-      {
-        id,
-        matches: [`*://${host}/*`],
-        allFrames: true,
-        runAt: "document_start",
-        world: "MAIN",
-        js: ["lib/mobile-ua.js"],
-      },
-    ]);
+    if (!(await chrome.permissions.contains({ origins: ["*://*/*"] }))) return false;
   } catch {
-    /* already there, or the browser will not have it: headers still apply */
+    return false;
   }
+  await registerPair("all", "*://*/*");
+  return true;
+}
+
+async function registerPair(key, match) {
+  const wanted = [
+    {
+      id: `scroll-${key}`,
+      matches: [match],
+      allFrames: true,
+      runAt: "document_start",
+      js: ["lib/panel-scroll.js"],
+    },
+    {
+      id: `mobile-${key}`,
+      matches: [match],
+      allFrames: true,
+      runAt: "document_start",
+      world: "MAIN",
+      js: ["lib/mobile-ua.js"],
+    },
+  ];
+  let existing = [];
+  try {
+    existing = await chrome.scripting.getRegisteredContentScripts();
+  } catch {
+    return;
+  }
+  const have = new Set(existing.map((e) => e.id));
+  for (const script of wanted) {
+    if (have.has(script.id)) continue;
+    try {
+      await chrome.scripting.registerContentScripts([script]);
+    } catch {
+      /* this one is not allowed here; the other still stands */
+    }
+  }
+}
+
+async function ensureMobileScript(host) {
+  if (await ensureMobileScriptEverywhere()) return;
+  await registerPair(host, `*://${host}/*`);
 }
 
 // A current Chrome on Android. Kept close to the real thing so nothing
@@ -958,6 +995,9 @@ loadWebPanels();
 loadSnippets();
 renderRecentSearches();
 loadEngine();
+// If every site is already allowed, get the scripts in place when the panel
+// opens rather than waiting for the first page to be opened in it.
+ensureMobileScriptEverywhere().catch(() => {});
 // The panel opens on the search box, ready to type.
 searchBox.focus();
 

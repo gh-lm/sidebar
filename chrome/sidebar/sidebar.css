@@ -367,9 +367,9 @@ body {
 .web-frame {
   display: block;
   border: 0;
-  width: calc(100% / var(--zoom, 0.9));
-  height: calc(100% / var(--zoom, 0.9));
-  transform: scale(var(--zoom, 0.9));
+  width: calc(100% / var(--zoom, 1));
+  height: calc(100% / var(--zoom, 1));
+  transform: scale(var(--zoom, 1));
   transform-origin: 0 0;
 }
 

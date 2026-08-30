@@ -48,7 +48,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "lib/mobile-ua.js"
+        "lib/mobile-ua.js",
+        "lib/panel-scroll.js"
       ],
       "matches": [
         "*://*/*"
