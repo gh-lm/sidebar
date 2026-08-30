@@ -78,7 +78,20 @@
     }
   }
 
+  // Match the panel: this makes the browser's own colours inside the page —
+  // form fields, default backgrounds — follow it, and any site written with
+  // light-dark() follows too.
+  function matchScheme() {
+    try {
+      const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.style.colorScheme = dark ? "dark" : "light";
+    } catch {
+      /* nothing to do */
+    }
+  }
+
   function start() {
+    matchScheme();
     paint();
     (document.head || document.documentElement).appendChild(style);
     document.documentElement.appendChild(blob);

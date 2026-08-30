@@ -243,7 +243,9 @@ const ENGINES = [
   // panel even at phone width — it still scrolls sideways — and it throws a
   // bot challenge at a framed request. This one fits, loads instantly and
   // just works.
-  { id: "ddg", letter: "D", name: "DuckDuckGo", url: "https://lite.duckduckgo.com/lite/?q=" },
+  // kae=d is DuckDuckGo's own dark theme, and the light pages have no other
+  // way of knowing: they do not follow the browser's setting.
+  { id: "ddg", letter: "D", name: "DuckDuckGo", url: "https://lite.duckduckgo.com/lite/?q=", dark: "&kae=d" },
   { id: "google", letter: "G", name: "Google", url: "https://www.google.com/search?q=" },
   { id: "gimages", letter: "I", name: "Google Images", url: "https://www.google.com/search?tbm=isch&q=" },
   { id: "bing", letter: "B", name: "Bing", url: "https://www.bing.com/search?q=" },
@@ -288,12 +290,22 @@ function renderEngines() {
   }
 }
 
+// Is the panel dark at this moment — whether that came from the browser or
+// from the button on the rail.
+function panelIsDark() {
+  const forced = document.documentElement.getAttribute("data-theme");
+  if (forced) return forced === "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
 function searchUrlFor(q) {
   // Bare domains and addresses go straight there; anything else searches.
   const looksLikeUrl = /^(https?:\/\/|[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$))/i.test(q);
-  return looksLikeUrl
-    ? (q.startsWith("http") ? q : `https://${q}`)
-    : engine.url + encodeURIComponent(q);
+  if (looksLikeUrl) return q.startsWith("http") ? q : `https://${q}`;
+  // Engines that follow the browser need nothing; the ones that do not are
+  // told, so results match the panel they are sitting in.
+  const dark = panelIsDark() && engine.dark ? engine.dark : "";
+  return engine.url + encodeURIComponent(q) + dark;
 }
 
 // Every engine is a different site, so asking one at a time meant a prompt

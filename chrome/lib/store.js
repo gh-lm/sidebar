@@ -40,16 +40,23 @@ function decode(url) {
   }
 }
 
-// Chrome numbers its roots 1/2/3; other browsers name them. Ask the tree
-// rather than assuming either.
+// Chrome numbers its roots 1/2/3; other browsers name them, and not all of
+// them are somewhere you would want to put anything. Vivaldi, checked
+// directly: "1 Bookmarks", "2 Other bookmarks", "4 Deleted" — so the old
+// last-resort of "take the last root" would have filed everything in the
+// bin. Ask the tree, and never pick a bin.
+const BIN = /^(deleted|trash|bin|recycle)/i;
+
 async function otherBookmarksId() {
   const tree = await bm.getTree();
-  const roots = (tree[0] && tree[0].children) || [];
-  const other =
+  const roots = ((tree[0] && tree[0].children) || []).filter((r) => !BIN.test(r.title || ""));
+  const pick =
     roots.find((r) => r.id === "unfiled_____") ||
     roots.find((r) => r.id === "2") ||
-    roots.find((r) => /other/i.test(r.title || ""));
-  const pick = other || roots[roots.length - 1] || roots[0];
+    roots.find((r) => /other/i.test(r.title || "")) ||
+    roots.find((r) => r.id === "1") ||
+    roots.find((r) => /bookmark/i.test(r.title || "")) ||
+    roots[0];
   return pick ? pick.id : "2";
 }
 
