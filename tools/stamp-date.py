@@ -12,6 +12,7 @@ import sys
 from datetime import date
 
 PAGE = "site/index.html"
+SITEMAP = "site/sitemap.xml"
 
 
 def content_date() -> str:
@@ -49,6 +50,13 @@ def main() -> None:
 
     page = re.sub(r'<script type="application/ld\+json">(.*?)</script>', stamp, page, flags=re.S)
     open(PAGE, "w").write(page)
+
+    # The sitemap carries the same date, for the same reason: a hard-coded
+    # one is wrong the moment anything changes.
+    sitemap = open(SITEMAP).read()
+    sitemap = re.sub(r"<lastmod>[^<]*</lastmod>", f"<lastmod>{iso}</lastmod>", sitemap)
+    open(SITEMAP, "w").write(sitemap)
+
     print(f"stamped {iso}")
 
 

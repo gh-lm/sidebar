@@ -438,7 +438,14 @@
 
   /* Two lines, a soft edge, and the text itself as the label: the same
      row the extension draws. */
+  /* A button, not a div with a click handler: it copies when pressed, so
+     the keyboard should reach it too. */
   .demo-snip {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    color: inherit;
     background: #1c1f2b;
     border: 1px solid rgba(255,255,255,.08);
     border-radius: 12px;
@@ -752,16 +759,16 @@ Sarah's new address
     <div class="demo-view" data-view="snippets">
       <p class="demo-add">Add a snippet, type it here, then click away</p>
       <p class="demo-hint demo-hint-top">Click one to drop it into whatever box you were typing in. Right-click to edit.</p>
-      <div class="demo-snip"><span>07700 900123</span></div>
-      <div class="demo-snip"><span>1 Example Street, London SW1A 1AA</span></div>
-      <div class="demo-snip"><span>Best wishes,
-Charlie</span></div>
-      <div class="demo-snip"><span>Thanks for getting in touch. I will come back to you properly in the next day or two, once I have had a proper look.</span></div>
+      <button type="button" class="demo-snip"><span>07700 900123</span></button>
+      <button type="button" class="demo-snip"><span>1 Example Street, London SW1A 1AA</span></button>
+      <button type="button" class="demo-snip"><span>Best wishes,
+Charlie</span></button>
+      <button type="button" class="demo-snip"><span>Thanks for getting in touch. I will come back to you properly in the next day or two, once I have had a proper look.</span></button>
     </div>
 
     <div class="demo-view" data-view="pinned">
       <p class="demo-hint demo-hint-top">This is a site open in the panel: this one, in fact.</p>
-      <div class="demo-site"><img src="images/lightmorphic-sidebar-in-panel.png" alt="The Lightmorphic Sidebar website open inside the panel" width="356" height="788" loading="lazy"></div>
+      <div class="demo-site"><img src="images/lightmorphic-sidebar-in-panel.webp" alt="The Lightmorphic Sidebar website open inside the panel" width="356" height="788" loading="lazy"></div>
     </div>
   </div>
 
