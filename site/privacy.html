@@ -37,7 +37,11 @@
   h1 { font-size:2rem; font-weight:700; letter-spacing:-0.02em; margin:0 0 .5rem; }
   .mark { display:block; width:56px; height:56px; margin-bottom:1.25rem; }
   p { margin:0 0 1.1rem; }
-  footer { margin-top:2rem; color:var(--muted-fg); font-size:.8125rem; }
+  footer { margin-top:1rem; color:var(--muted-fg); font-size:.8125rem; }
+  .updated { margin-top:2rem; color:var(--muted-fg); font-size:.8125rem; }
+  nav.back-links { margin-top:1rem; display:flex; gap:1.25rem; font-size:.8125rem; }
+  nav.back-links a { color:var(--muted-fg); text-decoration:none; }
+  nav.back-links a:hover { color:var(--fg); }
   .back { display:inline-block; text-decoration:none; }
   a { color:#1b74bc; }
   @media (prefers-color-scheme: dark) { a { color:#2295f1; } }
@@ -55,8 +59,15 @@
 <p><strong>What it reads about your browsing.</strong> When you press &quot;+&quot; to pin a site, it reads the address of the tab you are on so it can fill that address in for you. It is shown on screen, saved only if you press Save, and used nowhere else. Lightmorphic Sidebar does not read page content, and does not keep any history of where you go.</p>
 <p><strong>No third parties.</strong> No analytics, no tracking, no remote code, no external fonts or images, no requests to any service, including ours. Site icons come from the browser&#x27;s own cache.</p>
 <p>Published at <a href="https://sidebar.lightmorphic.com/privacy.html">https://sidebar.lightmorphic.com/privacy.html</a>. Source at <a href="https://github.com/lightmorphic/sidebar">github.com/lightmorphic/sidebar</a></p>
+<p class="updated">Last updated <time datetime="2026-08-30" id="updated">30 August 2026</time></p>
 <footer>Lightmorphic Sidebar is a browser extension. Source:
 <a href="https://github.com/lightmorphic/sidebar">github.com/lightmorphic/sidebar</a></footer>
+<nav class="back-links">
+  <a href="index.html">Home</a>
+  <a href="index.html#questions">Questions</a>
+  <a href="index.html#private">Site access</a>
+  <a href="https://github.com/lightmorphic/sidebar">Source</a>
+</nav>
 </main>
 </body>
 </html>
