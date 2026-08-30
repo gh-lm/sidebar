@@ -37,7 +37,7 @@ def main() -> None:
 
     def stamp(match: "re.Match[str]") -> str:
         data = json.loads(match.group(1))
-        if data.get("@type") in ("SoftwareApplication", "WebSite"):
+        if data.get("@type") in ("SoftwareApplication", "WebSite", "WebPage"):
             data["dateModified"] = iso
         return '<script type="application/ld+json">\n' + json.dumps(data, indent=2) + "\n</script>"
 
@@ -49,6 +49,7 @@ def main() -> None:
             page,
         )
         page = re.sub(r'<script type="application/ld\+json">(.*?)</script>', stamp, page, flags=re.S)
+        page = re.sub(r'<span id="year">[^<]*</span>', f'<span id="year">{iso[:4]}</span>', page)
         open(path, "w").write(page)
 
     # The sitemap carries the same date, for the same reason: a hard-coded
