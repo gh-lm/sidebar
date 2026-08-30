@@ -993,3 +993,51 @@ dialog#siteDialog input {
 .allow-all .btn-secondary { flex: 0 0 auto; white-space: nowrap; }
 
 .panel-nav button:disabled { opacity: 0.3; cursor: default; }
+
+/* ---- Scrollbars ----
+   The platform scrollbar is a wide grey trough with a raised block in it,
+   which is the oldest-looking thing in the panel. These are the width of a
+   pencil line, sit on no track at all, and are almost invisible until the
+   pointer is over the thing they belong to. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+*:hover,
+*:focus-within {
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+
+:root {
+  --scroll-thumb: rgba(24, 24, 40, 0.22);
+  --scroll-thumb-strong: rgba(24, 24, 40, 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --scroll-thumb: rgba(255, 255, 255, 0.18);
+    --scroll-thumb-strong: rgba(255, 255, 255, 0.34);
+  }
+}
+
+:root[data-theme="dark"] {
+  --scroll-thumb: rgba(255, 255, 255, 0.18);
+  --scroll-thumb-strong: rgba(255, 255, 255, 0.34);
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+  /* Border rather than width, so the thumb is 4px of colour floating in an
+     8px lane instead of filling it. */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+:hover::-webkit-scrollbar-thumb { background: var(--scroll-thumb); background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-strong); background-clip: content-box; }

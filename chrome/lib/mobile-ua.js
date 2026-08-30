@@ -37,6 +37,28 @@
   fix(navigator, "maxTouchPoints", 5);
   fix(navigator, "vendor", "Google Inc.");
 
+  // The page's own scrollbar is the last old-fashioned thing in the panel:
+  // a wide grey trough with a raised block in it. Phones do not have one,
+  // and this frame is claiming to be a phone. Only inside the panel — the
+  // guard above has already established that.
+  const thin = document.createElement("style");
+  thin.textContent = `
+    ::-webkit-scrollbar { width: 8px !important; height: 8px !important; }
+    ::-webkit-scrollbar-track { background: transparent !important; }
+    ::-webkit-scrollbar-corner { background: transparent !important; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(128,128,128,.32) !important;
+      border: 2px solid transparent !important;
+      background-clip: content-box !important;
+      border-radius: 999px !important;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,.55) !important; background-clip: content-box !important; }
+    html { scrollbar-width: thin !important; scrollbar-color: rgba(128,128,128,.32) transparent !important; }
+  `;
+  const attach = () => (document.head || document.documentElement).appendChild(thin);
+  if (document.documentElement) attach();
+  else document.addEventListener("DOMContentLoaded", attach, { once: true });
+
   if (navigator.userAgentData) {
     const uad = navigator.userAgentData;
     fix(navigator, "userAgentData", {
