@@ -31,9 +31,16 @@ In one bookmarks folder called Lightmorphic Sidebar, in Other Bookmarks. Because
 bookmarks, the browser's own bookmark sync carries it between machines. Nothing
 is transmitted to Lightmorphic. Deleting the folder deletes the data.
 
+## Who makes it
+
+Lightmorphic Ltd, registered in England and Wales, company number 17423646.
+Registered office: 82A James Carter Road, Mildenhall, IP28 7DE, United
+Kingdom. Contact: sidebar@lightmorphic.com
+
 ## Pages
 
 - Home: https://sidebar.lightmorphic.com/
 - Privacy policy: https://sidebar.lightmorphic.com/privacy.html
 - Source code: https://github.com/lightmorphic/sidebar
 - Lightmorphic: https://lightmorphic.com
+- Companies House record: https://find-and-update.company-information.service.gov.uk/company/17423646

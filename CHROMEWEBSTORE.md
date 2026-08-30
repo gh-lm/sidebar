@@ -49,6 +49,12 @@ Productivity
 | `declarativeNetRequestWithHostAccess` | Two things, for one site at a time and only after you have granted permission for it: removes the headers that stop a site being shown in a panel, and asks that site for its phone layout, because the panel is about a phone wide. |
 | Optional site access | Never requested at install. Asked one site at a time, from your click, when you open that site in the panel — plus all seven search engines together on the first search, rather than seven separate prompts. Information also offers a single "allow every site" for anyone who would rather not be asked again; it is off by default and revocable from the same button. |
 
+## Contact
+
+Support email for the listing: sidebar@lightmorphic.com
+Publisher: Lightmorphic Ltd, company number 17423646, 82A James Carter Road,
+Mildenhall, IP28 7DE.
+
 ## Trader status
 
 Non-trader. Free, no payments, no business use.

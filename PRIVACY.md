@@ -37,5 +37,9 @@ where you go.
 fonts or images, no requests to any service — including ours. Site icons come
 from the browser's own cache.
 
+**Who is responsible.** Lightmorphic Ltd, registered in England and Wales,
+company number 17423646. Registered office: 82A James Carter Road, Mildenhall,
+IP28 7DE. Questions go to sidebar@lightmorphic.com
+
 Published at https://sidebar.lightmorphic.com/privacy.html — source at
 https://github.com/lightmorphic/sidebar

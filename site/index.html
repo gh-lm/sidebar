@@ -373,6 +373,11 @@
 
   /* ---------- footer ---------- */
   footer { border-top: 1px solid var(--rule); font-size: 0.875rem; color: var(--dim); }
+  .who { width: 100%; margin-bottom: 1.25rem; }
+  .who p { margin: 0 0 0.25rem; }
+  .who a { color: inherit; }
+  .who a:hover { color: var(--ink); }
+
   footer .col { padding-block: 2rem 3rem; display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; }
   footer nav { margin-left: auto; display: flex; gap: 1.5rem; flex-wrap: wrap; }
   footer a { text-decoration: none; }
@@ -617,8 +622,28 @@
   "publisher": {
     "@type": "Organization",
     "name": "Lightmorphic",
+    "legalName": "Lightmorphic Ltd",
     "url": "https://lightmorphic.com",
-    "logo": "https://sidebar.lightmorphic.com/images/lightmorphic-sidebar-mark.png"
+    "logo": "https://sidebar.lightmorphic.com/images/lightmorphic-sidebar-mark.png",
+    "email": "sidebar@lightmorphic.com",
+    "identifier": "17423646",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "82A James Carter Road",
+      "addressLocality": "Mildenhall",
+      "postalCode": "IP28 7DE",
+      "addressCountry": "GB"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "sidebar@lightmorphic.com",
+      "availableLanguage": "English"
+    },
+    "sameAs": [
+      "https://find-and-update.company-information.service.gov.uk/company/17423646",
+      "https://github.com/lightmorphic"
+    ]
   },
   "dateModified": "2026-08-30"
 }
@@ -633,7 +658,28 @@
   "publisher": {
     "@type": "Organization",
     "name": "Lightmorphic",
-    "url": "https://lightmorphic.com"
+    "legalName": "Lightmorphic Ltd",
+    "url": "https://lightmorphic.com",
+    "logo": "https://sidebar.lightmorphic.com/images/lightmorphic-sidebar-mark.png",
+    "email": "sidebar@lightmorphic.com",
+    "identifier": "17423646",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "82A James Carter Road",
+      "addressLocality": "Mildenhall",
+      "postalCode": "IP28 7DE",
+      "addressCountry": "GB"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "sidebar@lightmorphic.com",
+      "availableLanguage": "English"
+    },
+    "sameAs": [
+      "https://find-and-update.company-information.service.gov.uk/company/17423646",
+      "https://github.com/lightmorphic"
+    ]
   },
   "dateModified": "2026-08-30"
 }
@@ -1001,7 +1047,14 @@ Charlie</span></button>
 
   <footer>
     <div class="col">
-      <span>© <span id="year">2026</span> Lightmorphic. Lightmorphic Sidebar is free and open source.</span>
+      <div class="who">
+        <p><strong>Lightmorphic Ltd</strong>, registered in England and Wales,
+          company number
+          <a href="https://find-and-update.company-information.service.gov.uk/company/17423646">17423646</a>.</p>
+        <p>Registered office: 82A James Carter Road, Mildenhall, IP28 7DE.</p>
+        <p><a href="mailto:sidebar@lightmorphic.com">sidebar@lightmorphic.com</a></p>
+      </div>
+      <span>© <span id="year">2026</span> Lightmorphic Ltd. Lightmorphic Sidebar is free and open source.</span>
       <span>Last updated <time datetime="2026-08-30" id="updated">30 August 2026</time></span>
       <nav>
         <a href="#how">How it works</a>
