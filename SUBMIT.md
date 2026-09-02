@@ -1,0 +1,216 @@
+# Submitting Lightmorphic Sidebar 1.0.0 to the Chrome Web Store
+
+Everything on this page is ready to copy straight into the form at
+<https://chrome.google.com/webstore/devconsole>. Nothing else needs writing.
+
+Upload: `dist/lightmorphic-sidebar-1.0.0.zip`
+
+---
+
+## 1. Store listing tab
+
+**Name**
+
+```
+Lightmorphic Sidebar
+```
+
+**Short description** (this is the manifest description, already in the zip; the
+form fills it in for you)
+
+```
+Pin any website to a side panel and read it beside the page you're on. Plus search, a scratchpad and snippets. Private by default.
+```
+
+**Detailed description**
+
+```
+Lightmorphic Sidebar puts a private side panel beside whatever you are reading.
+
+Pin a site to the rail and it opens right here in the panel, like a small
+window beside the page you are on: your mail, a chat, docs, anything you keep
+flicking tabs to reach.
+
+Keep a scratchpad one click away. Save the lines of text you retype every week
+and click one to drop it straight into whatever box you were typing in. No
+titles to fill in, no filing.
+
+Search is in the panel too. The mark, the name, one box, and a row of letters
+for the engines: DuckDuckGo, Google, Google Images, Bing, Startpage, Mojeek and
+Qwant. Press a letter and it searches there. Results open in the panel, in the
+site's phone layout so they fit the width.
+
+Everything you save lives in one bookmarks folder, so if your browser syncs
+bookmarks it all follows you to your other machines. There is no account to
+make and no server to sign in to. It works in browsers that sync bookmarks but
+not extension data, which is why it was built this way.
+
+It installs with access to no websites at all. When you open a pinned panel it
+asks for that one site, and nothing else. Nothing is sent anywhere: no
+accounts, no servers, no analytics, no remote code. Everything stays in your
+browser.
+
+Light, dark, or following the browser, on one button.
+
+Lightmorphic Sidebar does not touch your new tab page or anything else in the
+browser. It is a side panel and nothing more.
+
+Chrome, Edge, Brave, Vivaldi and Opera, from version 114.
+```
+
+**Category:** Productivity
+**Language:** English (United Kingdom)
+
+**Graphics** — all in `store/`, all at the exact required sizes:
+
+| File | Where it goes |
+|---|---|
+| `01-panel.png` | Screenshot 1, 1280x800 |
+| `02-search.png` | Screenshot 2, 1280x800 |
+| `03-scratchpad.png` | Screenshot 3, 1280x800 |
+| `04-snippets.png` | Screenshot 4, 1280x800 |
+| `05-light.png` | Screenshot 5, 1280x800 |
+| `promo-tile-440x280.png` | Small promo tile, 440x280 |
+
+Marquee (1400x560) is optional and is not supplied.
+
+**Support and homepage URLs**
+
+```
+https://sidebar.lightmorphic.com/
+```
+
+**Support email**
+
+```
+sidebar@lightmorphic.com
+```
+
+---
+
+## 2. Privacy tab
+
+**Single purpose** — paste into "Single purpose description":
+
+```
+Lightmorphic Sidebar gives you one side panel that holds the things you keep
+reaching for while browsing: pinned websites that open beside the page you are
+on, a search box, a scratchpad, and saved snippets of text.
+```
+
+**Permission justifications** — one box each, paste as written:
+
+`sidePanel`
+```
+The extension is a side panel. This is the API that opens it.
+```
+
+`storage`
+```
+Keeps a local copy of the same data that is saved in bookmarks, so the panel
+can draw instantly and still works if the bookmarks API is unavailable.
+```
+
+`clipboardWrite`
+```
+Copies a saved snippet to the clipboard when the user clicks it.
+```
+
+`tabs`
+```
+"Pin this page" reads the address of the tab the user is on, to fill it into
+the dialog, and the "open in the main window" button opens the panel's page in
+a tab. Only the URL is read, never page content.
+```
+
+`scripting`
+```
+Two things, both only on a site the user has already allowed. First, putting a
+saved snippet into the box the user was typing in when they click it. Second,
+telling a page opened inside the panel that it is on a phone, so the site
+serves its phone layout instead of a desktop one that cannot fit in a panel.
+The second script runs only inside the panel; a tab the user opens themselves
+is untouched.
+```
+
+`bookmarks`
+```
+Everything the user saves - pinned sites, scratchpad, snippets - is kept in one
+bookmarks folder, so the browser's own bookmark sync carries it between their
+machines. There is no account and no server. Pinned sites are stored as
+ordinary bookmarks, so they stay useful even without the extension.
+```
+
+`declarativeNetRequestWithHostAccess`
+```
+Two things, for one site at a time and only after the user has granted
+permission for that site: removing the headers that stop a site being displayed
+inside a panel, and requesting that site's phone layout, because the panel is
+about as wide as a phone.
+```
+
+`favicon`
+```
+Draws the site icon on each pinned button, from the browser's own cache. It
+makes no network request.
+```
+
+Host permissions (`*://*/*`, optional)
+```
+Never requested at install; the extension starts with access to no websites at
+all. It is asked one site at a time, from the user's click, when they open that
+site in the panel. The seven search engines are asked for together on the first
+search rather than as seven separate prompts. The Information tab also offers a
+single "allow every site" for anyone who would rather not be asked again; it is
+off by default and revocable from the same button.
+```
+
+**Remote code:** No, I am not using remote code. Everything is in the package.
+
+**Data usage** — tick nothing. Do not tick any of the data categories: the
+extension collects and transmits none of them. Then tick all three
+certifications:
+
+- I do not sell or transfer user data to third parties, outside of the approved use cases
+- I do not use or transfer user data for purposes that are unrelated to my item's single purpose
+- I do not use or transfer user data to determine creditworthiness or for lending purposes
+
+**Privacy policy URL**
+
+```
+https://sidebar.lightmorphic.com/privacy.html
+```
+
+---
+
+## 3. Distribution tab
+
+- Visibility: Public
+- Regions: all
+- Pricing: Free
+- **Trader status: Non-trader.** Free, no payments taken, not a business
+  offering. (Publisher details are on file as Lightmorphic Ltd, company number
+  17423646, 82A James Carter Road, Mildenhall, Suffolk IP28 7DE.)
+
+---
+
+## 4. Before you press Submit
+
+- [ ] Developer account fee of $5 paid
+- [ ] Publisher email verified in the account settings
+- [ ] `dist/lightmorphic-sidebar-1.0.0.zip` uploaded (142 KB, 17 files)
+- [ ] Detailed description pasted
+- [ ] All five screenshots and the promo tile uploaded
+- [ ] Every permission justification pasted
+- [ ] Privacy policy URL pasted and the three certifications ticked
+- [ ] Category Productivity, non-trader
+
+Review usually takes a few days. A first submission that asks for host
+permissions is sometimes queued longer.
+
+## After it is published
+
+- Add the store link to `site/index.html` where it currently points at the
+  store search
+- Submit `https://sidebar.lightmorphic.com/sitemap.xml` to Google Search
+  Console and Bing Webmaster Tools

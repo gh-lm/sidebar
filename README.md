@@ -40,7 +40,9 @@ from the same button.
 | Path | What it is |
 |---|---|
 | `chrome/` | The extension itself — load this unpacked; `package.sh` zips it for the store |
-| `CHROMEWEBSTORE.md` | Listing copy, single purpose, permission justifications |
+| `SUBMIT.md` | Everything to paste into the Web Store form, ready to copy |
+| `store/` | The listing images; `tools/store-shots/build.sh` regenerates them |
+| `site/` | sidebar.lightmorphic.com, published by the Pages workflow |
 
 ## Developing
 

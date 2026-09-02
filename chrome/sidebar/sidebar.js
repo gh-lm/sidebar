@@ -456,12 +456,7 @@ const railAddSite = document.getElementById("railAddSite");
 
 let currentPanelUrl = null;
 
-// Back / forward / reload for the open pinned site. The sidebar can't
-// touch a cross-origin iframe's history from outside (same-origin policy),
-// so it postMessages the command to the frame, where our content script
-// -- same-origin to the page -- runs it (see clipboard-watch.js). This
-// gives real back/forward AND a reload that keeps the user's in-frame
-// position (rather than jumping back to the pinned URL).
+// Back / forward / reload for the open pinned site.
 // The frame is cross-origin, so its history is out of reach, and the panel's
 // own history() does not step it either — that was tried and does nothing.
 // So the panel keeps its own list of what it has opened. Back walks that
