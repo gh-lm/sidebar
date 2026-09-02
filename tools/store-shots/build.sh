@@ -39,16 +39,28 @@ PY
 python3 "$HERE/compose.py" "$WORK/out" "$REPO/store" "$FONT"
 python3 "$HERE/promo.py" "$WORK/out" "$REPO/store" "$FONT" "$REPO/chrome/icons/icon-128.png"
 
-# The store rejects transparency on the tiles, and says so unclearly.
+# Two different rules, and neither failure gives a clear error: the tiles and
+# screenshots must have no alpha, while the store icon must keep its, and must
+# be 96x96 of artwork inside 16px of transparent padding.
 python3 - "$REPO/store" <<'PY'
 import pathlib, sys
 from struct import unpack
+from PIL import Image
+
 bad = []
 for f in sorted(pathlib.Path(sys.argv[1]).glob("*.png")):
     d = f.open("rb").read(33)
     w, h = unpack(">II", d[16:24])
-    ok = d[25] == 2 and (w, h) in {(1280, 800), (440, 280), (1400, 560)}
-    print("%-30s %dx%d  %d-bit  colour type %d  %s" % (f.name, w, h, d[24], d[25], "ok" if ok else "WRONG"))
-    if not ok: bad.append(f.name)
+    if f.name == "store-icon-128.png":
+        box = Image.open(f).convert("RGBA").getbbox()
+        pad = (box[0], box[1], w - box[2], h - box[3])
+        ok = (w, h) == (128, 128) and d[25] == 6 and set(pad) == {16}
+        note = "artwork %dx%d, padding %d" % (box[2] - box[0], box[3] - box[1], pad[0])
+    else:
+        ok = d[25] == 2 and (w, h) in {(1280, 800), (440, 280), (1400, 560)}
+        note = "no alpha"
+    print("%-30s %4dx%-4d colour type %d  %-26s %s" % (f.name, w, h, d[25], note, "ok" if ok else "WRONG"))
+    if not ok:
+        bad.append(f.name)
 sys.exit(1 if bad else 0)
 PY

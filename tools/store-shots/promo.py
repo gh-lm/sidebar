@@ -18,6 +18,15 @@ def font(size, weight):
     return f
 
 
+def mark(size):
+    """The 128 icon carries 16px of transparent padding on each side for the
+    store's own framing. On a tile we are doing the framing ourselves, so
+    that padding is trimmed off first."""
+    im = Image.open(ICON).convert("RGBA")
+    box = im.getbbox()
+    return im.crop(box).resize((size, size), Image.LANCZOS)
+
+
 def rounded(im, radius):
     mask = Image.new("L", im.size, 0)
     ImageDraw.Draw(mask).rounded_rectangle([0, 0, im.size[0] - 1, im.size[1] - 1], radius, fill=255)
@@ -31,7 +40,7 @@ def small_tile():
     d = ImageDraw.Draw(tile)
     d.rectangle([0, 0, W, 4], fill=YELLOW)
 
-    icon = Image.open(ICON).convert("RGBA").resize((62, 62), Image.LANCZOS)
+    icon = mark(62)
     tile.paste(icon, ((W - 62) // 2, 62), icon)
 
     for text, f, fill, y in [
@@ -55,7 +64,7 @@ def marquee():
     d = ImageDraw.Draw(canvas)
     d.rectangle([0, 0, W, 5], fill=YELLOW)
 
-    icon = Image.open(ICON).convert("RGBA").resize((84, 84), Image.LANCZOS)
+    icon = mark(84)
     canvas.paste(icon, (128, 150), icon)
     d.text((128, 268), "Lightmorphic Sidebar", font=font(58, 300), fill=INK)
     d.text((130, 356), "Any website, beside the one you are reading.", font=font(24, 300), fill=DIM)

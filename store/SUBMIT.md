@@ -78,24 +78,46 @@ scratchpad and snippets but not the panel. Pick Functionality & UI.
 
 **Language:** English (United Kingdom)
 
-**Graphics** — all in `store/`, all at the exact required sizes:
+### Graphic assets
 
-| File | Where it goes |
-|---|---|
-| `01-panel.png` | Screenshot 1, 1280x800 |
-| `02-search.png` | Screenshot 2, 1280x800 |
-| `03-scratchpad.png` | Screenshot 3, 1280x800 |
-| `04-snippets.png` | Screenshot 4, 1280x800 |
-| `05-light.png` | Screenshot 5, 1280x800 |
-| `promo-tile-440x280.png` | Small promo tile, 440x280 |
-| `promo-marquee-1400x560.png` | Marquee tile, 1400x560 |
+The form has a slot for each of these. Everything except the marquee is
+required, and the store icon is uploaded here as well as shipping inside the
+zip — it is a separate field on the form, not taken from the package.
 
-The marquee is optional. It is only used if the extension is picked for a
-featured placement, and it costs nothing to supply, so upload it.
+| Slot on the form | File | Size |
+|---|---|---|
+| Store icon | `store/store-icon-128.png` | 128x128 |
+| Screenshot 1 | `store/01-panel.png` | 1280x800 |
+| Screenshot 2 | `store/02-search.png` | 1280x800 |
+| Screenshot 3 | `store/03-scratchpad.png` | 1280x800 |
+| Screenshot 4 | `store/04-snippets.png` | 1280x800 |
+| Screenshot 5 | `store/05-light.png` | 1280x800 |
+| Small promo tile | `store/promo-tile-440x280.png` | 440x280 |
+| Marquee promo tile | `store/promo-marquee-1400x560.png` | 1400x560 |
+| YouTube video | none | leave empty |
 
-The 128x128 store icon is taken from the package and does not need uploading.
-All seven files are 24-bit PNG with no alpha channel, which the store
-requires and rejects unclearly if it is wrong.
+Five screenshots is the maximum the form accepts, and one is the minimum.
+
+The video field is listed with the required assets but the form lets you
+submit without it, and there is no video.
+
+Two things about these files are easy to get wrong and neither gives a clear
+error:
+
+**The store icon is built differently from the others.** Google asks for
+96x96 of artwork sitting in the middle of a 128x128 image, with 16 pixels of
+transparent padding on every side, and it keeps its transparency. Drawn full
+bleed it comes out visibly bigger than every other icon in the store, and an
+icon with no transparency at all gets dropped into a frame with rounded
+corners instead. `./make-icons.sh` builds it to that rule and puts a copy in
+`store/`.
+
+**The two promo tiles are the opposite: 24-bit, no transparency at all.**
+The store rejects an alpha channel on those and does not say why.
+
+The screenshots are full bleed with square corners and no border, which is
+what the store asks for. `tools/store-shots/build.sh` checks the size and
+the colour type of every one of these files after drawing them.
 
 **Support and homepage URLs**
 
@@ -240,7 +262,7 @@ https://sidebar.lightmorphic.com/privacy.html
 - [ ] Publisher email verified in the account settings
 - [ ] `dist/lightmorphic-sidebar-1.0.0.zip` uploaded (68 KB, 18 files)
 - [ ] Detailed description pasted
-- [ ] All five screenshots, the promo tile and the marquee uploaded
+- [ ] Store icon, five screenshots, promo tile and marquee all uploaded
 - [ ] Every permission justification pasted
 - [ ] Privacy policy URL pasted and the three certifications ticked
 - [ ] Group Productivity, category Functionality & UI, non-trader
