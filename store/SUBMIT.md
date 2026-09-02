@@ -66,15 +66,28 @@ Chrome, Edge, Brave, Vivaldi and Opera, from version 114.
 single "Productivity" of the old store was split up in 2023, so Productivity
 on its own is no longer a complete answer.
 
-Group: **Productivity**
+These are the only choices, read off the live store rather than the
+documentation, which is out of date:
+
+| Group | Categories |
+|---|---|
+| Productivity | Workflow & Planning, Tools, Communication, Education, Developer Tools |
+| Make Chrome Yours | Functionality & UI, Privacy & Security, Accessibility |
+| Lifestyle | Household, Entertainment, Games, News & Weather, Shopping, Social Networking, Travel |
+
+Group: **Make Chrome Yours**
 Category: **Functionality & UI**
 
 Google describes that one as extensions that enhance the Chrome user
-interface, such as tab managers, shortcut managers and app launchers, which
-is what this is: it adds a panel to the browser and its whole pitch is
-replacing the tab you keep going back to. The runner-up is **Workflow &
-Planning** (time trackers, to-do lists, note takers), which fits the
-scratchpad and snippets but not the panel. Pick Functionality & UI.
+interface, such as tab managers, shortcut managers and app launchers. That is
+what this is: it adds a panel to the browser, and its whole pitch is
+replacing the tab you keep going back to.
+
+The alternative is **Productivity → Workflow & Planning**, where Lightmorphic
+Paste sits. It fits the scratchpad and the snippets but not the panel, and
+Productivity is the busier group to be found in. If you would rather have the
+two extensions filed together, use that instead; nothing else on this page
+changes.
 
 **Language:** English (United Kingdom)
 
@@ -280,7 +293,7 @@ https://sidebar.lightmorphic.com/privacy.html
 - [ ] Five screenshots, small promo tile and marquee all uploaded
 - [ ] Every permission justification pasted
 - [ ] Privacy policy URL pasted and the three certifications ticked
-- [ ] Group Productivity, category Functionality & UI, non-trader
+- [ ] Group Make Chrome Yours, category Functionality & UI, non-trader
 
 Review usually takes a few days. A first submission that asks for host
 permissions is sometimes queued longer.
