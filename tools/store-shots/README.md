@@ -1,7 +1,8 @@
 # Store images
 
-`./build.sh` rewrites every file in `store/` — the five 1280x800 screenshots
-and the 440x280 tile — and checks each one against what the store accepts.
+`./build.sh` rewrites every file in `store/` — the five 1280x800 screenshots,
+the 440x280 tile and the 1400x560 marquee — and checks each one against
+what the store accepts.
 
 They are captures of the extension actually running, not mockups. Chrome is
 launched with `chrome/` loaded unpacked and each shot is the extension's own

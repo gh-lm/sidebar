@@ -62,7 +62,20 @@ browser. It is a side panel and nothing more.
 Chrome, Edge, Brave, Vivaldi and Opera, from version 114.
 ```
 
-**Category:** Productivity
+**Category.** The form asks for a group and then a category inside it. The
+single "Productivity" of the old store was split up in 2023, so Productivity
+on its own is no longer a complete answer.
+
+Group: **Productivity**
+Category: **Functionality & UI**
+
+Google describes that one as extensions that enhance the Chrome user
+interface, such as tab managers, shortcut managers and app launchers, which
+is what this is: it adds a panel to the browser and its whole pitch is
+replacing the tab you keep going back to. The runner-up is **Workflow &
+Planning** (time trackers, to-do lists, note takers), which fits the
+scratchpad and snippets but not the panel. Pick Functionality & UI.
+
 **Language:** English (United Kingdom)
 
 **Graphics** — all in `store/`, all at the exact required sizes:
@@ -75,12 +88,14 @@ Chrome, Edge, Brave, Vivaldi and Opera, from version 114.
 | `04-snippets.png` | Screenshot 4, 1280x800 |
 | `05-light.png` | Screenshot 5, 1280x800 |
 | `promo-tile-440x280.png` | Small promo tile, 440x280 |
+| `promo-marquee-1400x560.png` | Marquee tile, 1400x560 |
 
-Marquee (1400x560) is optional and is not supplied.
+The marquee is optional. It is only used if the extension is picked for a
+featured placement, and it costs nothing to supply, so upload it.
 
 The 128x128 store icon is taken from the package and does not need uploading.
-All six files are 24-bit PNG with no alpha channel, which the store requires
-and rejects unclearly if it is wrong.
+All seven files are 24-bit PNG with no alpha channel, which the store
+requires and rejects unclearly if it is wrong.
 
 **Support and homepage URLs**
 
@@ -225,10 +240,10 @@ https://sidebar.lightmorphic.com/privacy.html
 - [ ] Publisher email verified in the account settings
 - [ ] `dist/lightmorphic-sidebar-1.0.0.zip` uploaded (68 KB, 18 files)
 - [ ] Detailed description pasted
-- [ ] All five screenshots and the promo tile uploaded
+- [ ] All five screenshots, the promo tile and the marquee uploaded
 - [ ] Every permission justification pasted
 - [ ] Privacy policy URL pasted and the three certifications ticked
-- [ ] Category Productivity, non-trader
+- [ ] Group Productivity, category Functionality & UI, non-trader
 
 Review usually takes a few days. A first submission that asks for host
 permissions is sometimes queued longer.

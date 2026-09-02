@@ -37,7 +37,7 @@ f = TTFont(sys.argv[1]); f.flavor = None; f.save(sys.argv[2])
 PY
 
 python3 "$HERE/compose.py" "$WORK/out" "$REPO/store" "$FONT"
-python3 "$HERE/tile.py" "$REPO/store/promo-tile-440x280.png" "$FONT" "$REPO/chrome/icons/icon-128.png"
+python3 "$HERE/promo.py" "$WORK/out" "$REPO/store" "$FONT" "$REPO/chrome/icons/icon-128.png"
 
 # The store rejects transparency on the tiles, and says so unclearly.
 python3 - "$REPO/store" <<'PY'
@@ -47,7 +47,7 @@ bad = []
 for f in sorted(pathlib.Path(sys.argv[1]).glob("*.png")):
     d = f.open("rb").read(33)
     w, h = unpack(">II", d[16:24])
-    ok = d[25] == 2 and (w, h) in {(1280, 800), (440, 280)}
+    ok = d[25] == 2 and (w, h) in {(1280, 800), (440, 280), (1400, 560)}
     print("%-30s %dx%d  %d-bit  colour type %d  %s" % (f.name, w, h, d[24], d[25], "ok" if ok else "WRONG"))
     if not ok: bad.append(f.name)
 sys.exit(1 if bad else 0)
