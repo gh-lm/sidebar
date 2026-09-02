@@ -123,11 +123,21 @@ and one with no transparency at all is dropped into a rounded frame instead.
 standalone copy of the same file, in case a field for it turns up elsewhere
 on the form.
 
-**Support and homepage URLs**
+**Website**
 
 ```
 https://sidebar.lightmorphic.com/
 ```
+
+**Support URL**
+
+```
+https://github.com/lightmorphic/sidebar/issues
+```
+
+Issues are enabled on the repository and the page is public, so anyone
+reaching it from the listing can read what has been reported and open
+something themselves without being asked for anything first.
 
 **Support email**
 
@@ -266,6 +276,7 @@ https://sidebar.lightmorphic.com/privacy.html
 - [ ] Publisher email verified in the account settings
 - [ ] `dist/lightmorphic-sidebar-1.0.0.zip` uploaded (68 KB, 18 files)
 - [ ] Detailed description pasted
+- [ ] Website and support URL both filled in, and they are different
 - [ ] Five screenshots, small promo tile and marquee all uploaded
 - [ ] Every permission justification pasted
 - [ ] Privacy policy URL pasted and the three certifications ticked
