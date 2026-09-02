@@ -5,6 +5,10 @@ Everything on this page is ready to copy straight into the form at
 
 Upload: `dist/lightmorphic-sidebar-1.0.0.zip`
 
+Version 1.0.0 is a first submission and has never been uploaded. A version
+number cannot be reused, so if this one is rejected and resubmitted, bump it
+in `chrome/manifest.json` and rebuild with `./package.sh` first.
+
 ---
 
 ## 1. Store listing tab
@@ -73,6 +77,10 @@ Chrome, Edge, Brave, Vivaldi and Opera, from version 114.
 | `promo-tile-440x280.png` | Small promo tile, 440x280 |
 
 Marquee (1400x560) is optional and is not supplied.
+
+The 128x128 store icon is taken from the package and does not need uploading.
+All six files are 24-bit PNG with no alpha channel, which the store requires
+and rejects unclearly if it is wrong.
 
 **Support and homepage URLs**
 
@@ -165,7 +173,24 @@ single "allow every site" for anyone who would rather not be asked again; it is
 off by default and revocable from the same button.
 ```
 
-**Remote code:** No, I am not using remote code. Everything is in the package.
+**Remote code:** No, I am not using remote code. There is no `fetch`, no
+`eval`, no CDN and no remote script tag anywhere in the package.
+
+**Test instructions** (limit 500 characters; there is no login, so leave the
+username and password boxes empty)
+
+```
+No account or login is needed.
+
+1. Open the panel from the toolbar icon, or Ctrl+Shift+S.
+2. Search is shown first. Type a word, press a lettered circle. Results
+   open inside the panel.
+3. Press the notepad icon, type anything, close and reopen the panel. The
+   text is still there.
+4. In your bookmark manager, Other Bookmarks now holds a folder called
+   "Lightmorphic Sidebar" containing what you typed. That folder is the
+   whole of the storage. Nothing is sent anywhere.
+```
 
 **Data usage** — tick nothing. Do not tick any of the data categories: the
 extension collects and transmits none of them. Then tick all three
@@ -198,7 +223,7 @@ https://sidebar.lightmorphic.com/privacy.html
 
 - [ ] Developer account fee of $5 paid
 - [ ] Publisher email verified in the account settings
-- [ ] `dist/lightmorphic-sidebar-1.0.0.zip` uploaded (142 KB, 17 files)
+- [ ] `dist/lightmorphic-sidebar-1.0.0.zip` uploaded (68 KB, 18 files)
 - [ ] Detailed description pasted
 - [ ] All five screenshots and the promo tile uploaded
 - [ ] Every permission justification pasted

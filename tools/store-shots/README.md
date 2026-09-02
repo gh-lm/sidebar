@@ -1,12 +1,21 @@
 # Store images
 
 `./build.sh` rewrites every file in `store/` — the five 1280x800 screenshots
-and the 440x280 tile.
+and the 440x280 tile — and checks each one against what the store accepts.
 
-What it photographs is the real panel: `chrome/` is copied unchanged and
-given `stub.js`, a fake `chrome.*` that answers with fixture data, so the
-pixels come from the shipping HTML and CSS rather than a drawing. Screenshot
-1 loads the real site in the panel over the network.
+They are captures of the extension actually running, not mockups. Chrome is
+launched with `chrome/` loaded unpacked and each shot is the extension's own
+panel page, with the real bookmarks, storage and favicon service behind it.
+Screenshot 1 has a real site loaded in the panel over the network.
 
-Needs `node` and `python3`. Headless Chrome and puppeteer are downloaded on
-first run into `work/`, which is not committed.
+The sample data is `store/sample-data.json`: invented people, an
+`@example.com` address, and a phone number from the Ofcom drama range
+(`07700 900xxx`) which is reserved and can never belong to anyone. Nothing
+real goes into a public image.
+
+Headless Chrome cannot show the dialog that grants an optional host
+permission, so `shoot.js` writes the grant into the throwaway profile
+instead — the same end state as pressing "Allow all sites".
+
+Needs `node` and `python3`. Puppeteer and Chrome download on first run into
+`work/`, along with the throwaway browser profile. None of it is committed.

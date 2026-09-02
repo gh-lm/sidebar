@@ -1,65 +1,54 @@
 #!/bin/bash
-# Rebuilds every image in store/ from the panel's own HTML and CSS.
+# Rebuilds every image in store/ from the extension actually running.
 #
-# The panel is real: chrome/ is copied as-is and handed a stub browser
-# (stub.js) that answers chrome.bookmarks and friends with fixture data, so
-# what is photographed is the shipping markup, not a mockup. Headless Chrome
-# comes from puppeteer, downloaded on first run into work/.
+# Chrome is launched with chrome/ loaded unpacked, and each screenshot is a
+# capture of the extension's own panel page, with the real chrome.bookmarks,
+# chrome.storage and favicon service behind it. The sample data in
+# store/sample-data.json is written through the browser's own bookmarks API,
+# so the panel reads it exactly as it reads a real user's.
+#
+# Needs node and python3. Headless Chrome and puppeteer are downloaded on
+# first run into work/, which is not committed.
 set -euo pipefail
 cd "$(dirname "$0")"
 HERE=$(pwd)
 WORK=$HERE/work
-REPO=$HERE/../..
+REPO=$(cd ../.. && pwd)
 
-rm -rf "$WORK/site"
-mkdir -p "$WORK/site" "$WORK/node"
-cp -r "$REPO/chrome" "$WORK/site/app"
-cp frame.html tile.html "$WORK/site/"
-cp stub.js "$WORK/site/app/sidebar/stub.js"
-cp -r fav "$WORK/site/fav"
-
-python3 - "$WORK/site/app/sidebar" <<'PY'
-import pathlib, sys
-d = pathlib.Path(sys.argv[1])
-h = d / "sidebar.html"
-s = h.read_text()
-tag = '<script type="module" src="sidebar.js"></script>'
-h.write_text(s.replace(tag, '<script src="stub.js"></script>\n  ' + tag))
-j = d / "sidebar.js"
-j.write_text(j.read_text() + '''
-/* harness hooks, added by tools/store-shots/build.sh */
-window.__tab = (n) => document.querySelector(`.rail-btn[data-panel="${n}"]`).click();
-window.__open = (u) => openPanelSite(u);
-''')
-PY
+mkdir -p "$WORK/node" "$WORK/out"
+rm -rf "$WORK/profile"
 
 export PUPPETEER_CACHE_DIR="$WORK/node/.cache"
 cd "$WORK/node"
 [ -d node_modules/puppeteer ] || { npm init -y >/dev/null 2>&1; npm install puppeteer --no-audit --no-fund >/dev/null; }
 
-cd "$WORK/site"
-python3 -m http.server 8731 >/dev/null 2>&1 &
-SERVER=$!
-trap 'kill $SERVER 2>/dev/null' EXIT
-sleep 1
+# Node resolves modules from the script's own directory, so it runs from
+# beside node_modules rather than from tools/store-shots.
+cp "$HERE/shoot.js" "$WORK/node/"
+node shoot.js "$REPO" "$WORK/out" "$WORK/profile"
 
-mkdir -p "$WORK/out"
-# Node resolves modules from the script's own directory, so the scripts run
-# from beside node_modules rather than from tools/store-shots.
-cp "$HERE/shoot.js" "$HERE/tile.js" "$WORK/node/"
-cd "$WORK/node"
-node shoot.js "$WORK/out"
-node tile.js "$WORK/out/promo-tile-440x280.png"
+# The captures are taken at 3x and resampled down, which is what makes the
+# type crisp at the store's exact pixel sizes.
+FONT=$WORK/Manrope.ttf
+python3 - "$REPO/chrome/fonts/Manrope.woff2" "$FONT" <<'PY'
+import sys
+from fontTools.ttLib import TTFont
+f = TTFont(sys.argv[1]); f.flavor = None; f.save(sys.argv[2])
+PY
 
-# Shot at 2x-3x and resampled down, which is what makes the type crisp at
-# the store's exact pixel sizes.
-python3 - "$WORK/out" "$REPO/store" <<'PY'
+python3 "$HERE/compose.py" "$WORK/out" "$REPO/store" "$FONT"
+python3 "$HERE/tile.py" "$REPO/store/promo-tile-440x280.png" "$FONT" "$REPO/chrome/icons/icon-128.png"
+
+# The store rejects transparency on the tiles, and says so unclearly.
+python3 - "$REPO/store" <<'PY'
 import pathlib, sys
-from PIL import Image
-src, dst = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
-dst.mkdir(exist_ok=True)
-for f in sorted(src.glob("*.png")):
-    size = (440, 280) if "tile" in f.name else (1280, 800)
-    Image.open(f).convert("RGB").resize(size, Image.LANCZOS).save(dst / f.name)
-    print(f.name, size)
+from struct import unpack
+bad = []
+for f in sorted(pathlib.Path(sys.argv[1]).glob("*.png")):
+    d = f.open("rb").read(33)
+    w, h = unpack(">II", d[16:24])
+    ok = d[25] == 2 and (w, h) in {(1280, 800), (440, 280)}
+    print("%-30s %dx%d  %d-bit  colour type %d  %s" % (f.name, w, h, d[24], d[25], "ok" if ok else "WRONG"))
+    if not ok: bad.append(f.name)
+sys.exit(1 if bad else 0)
 PY

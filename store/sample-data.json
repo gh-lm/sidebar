@@ -1,0 +1,16 @@
+{
+  "_comment": "Sample data for the store screenshots. Invented people only. The phone number is from the Ofcom drama range 07700 900xxx, which is reserved and can never belong to anyone. tools/store-shots/build.sh loads this into a throwaway browser profile before capturing.",
+  "pins": [
+    "https://lightmorphic.com",
+    "https://news.ycombinator.com",
+    "https://en.wikipedia.org"
+  ],
+  "scratchpad": "Wednesday\n\n  ring the framer back — 3pm\n  invoice 214 still unpaid\n  book the ferry before the price goes up\n\nJohn Smith's new address\n  14 Bell Lane, Norwich NR2 1AB\n\nThat paragraph I'm not sure about yet:\n  \"...which is why we stopped charging per seat.\"",
+  "snippets": [
+    { "text": "sally.jones@example.com" },
+    { "text": "Sally Jones, 14 Bell Lane, Norwich NR2 1AB" },
+    { "text": "Thanks for this — I'll come back to you before the end of the week." },
+    { "text": "07700 900412" },
+    { "text": "Sorry for the slow reply, it has been a busy fortnight here." }
+  ]
+}
