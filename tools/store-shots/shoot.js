@@ -19,7 +19,10 @@ const SHOTS = [
     file: "01-panel.png",
     h: "Any website,|beside the one|you are reading",
     s: "Pin a site to the rail and it opens here in the panel,|like a small window beside whatever you are reading.",
-    open: "https://sidebar.lightmorphic.com/",
+    // A neutral third-party site, not our own. The listing was once rejected
+    // for a run of brand names, and our own hero carries a list of browsers
+    // in its small print, which is the same thing in a picture.
+    open: "https://en.wikipedia.org/wiki/Side_panel",
     settle: 5000,
   },
   {

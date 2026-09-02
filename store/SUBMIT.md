@@ -5,9 +5,38 @@ Everything on this page is ready to copy straight into the form at
 
 Upload: `dist/lightmorphic-sidebar-1.0.0.zip`
 
-Version 1.0.0 is a first submission and has never been uploaded. A version
-number cannot be reused, so if this one is rejected and resubmitted, bump it
-in `chrome/manifest.json` and rebuild with `./package.sh` first.
+The package was already uploaded on 2 September 2026 and was not what got
+rejected. See below: the listing text was, so 1.0.0 stands and this file
+does not need uploading again unless the code changes.
+
+---
+
+## Rejected once, on 2 September 2026
+
+Reference **Yellow Argon**, under spam and placement: "having excessive
+keywords in the item's description", quoting this line:
+
+> DuckDuckGo, Google, Google Images, Bing, Startpage, Mojeek and Qwant.
+
+That was a run of seven brand names in a row, and it reads to the reviewer
+as keyword stuffing whether it was meant that way or not. It is gone. The
+description now says "seven search engines" and names none of them.
+
+The same policy clause covers screenshots and promotional images, not just
+the description, so the first screenshot was reshot as well: it had our own
+website in the panel, whose small print lists five browsers by name. It now
+shows an ordinary third-party page instead, which demonstrates the feature
+better anyway.
+
+**The rule to keep.** No list of brand names anywhere a reviewer reads or
+looks: description, title, screenshots, tiles. Say what the thing does and
+how many of something there are. The permission justifications are not
+public listing text and can stay specific.
+
+**No version bump is needed.** Nothing about the package was rejected and
+nothing in it has changed, so 1.0.0 stands. Edit the listing text, replace
+the first screenshot and the marquee, and resubmit the same draft. A version
+number only becomes unusable once it has been published.
 
 ---
 
@@ -39,10 +68,10 @@ Keep a scratchpad one click away. Save the lines of text you retype every week
 and click one to drop it straight into whatever box you were typing in. No
 titles to fill in, no filing.
 
-Search is in the panel too. The mark, the name, one box, and a row of letters
-for the engines: DuckDuckGo, Google, Google Images, Bing, Startpage, Mojeek and
-Qwant. Press a letter and it searches there. Results open in the panel, in the
-site's phone layout so they fit the width.
+Search is in the panel too. One box, and a row of letters for the seven
+search engines you can pick from, so changing where you search is one press
+and not a trip to settings. Results open in the panel, in the site's phone
+layout so they fit the width.
 
 Everything you save lives in one bookmarks folder, so if your browser syncs
 bookmarks it all follows you to your other machines. There is no account to
@@ -59,7 +88,7 @@ Light, dark, or following the browser, on one button.
 Lightmorphic Sidebar does not touch your new tab page or anything else in the
 browser. It is a side panel and nothing more.
 
-Chrome, Edge, Brave, Vivaldi and Opera, from version 114.
+Works in Chrome and the browsers built on it, from version 114.
 ```
 
 **Category.** The form asks for a group and then a category inside it. The
