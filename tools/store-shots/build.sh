@@ -39,9 +39,9 @@ PY
 python3 "$HERE/compose.py" "$WORK/out" "$REPO/store" "$FONT"
 python3 "$HERE/promo.py" "$WORK/out" "$REPO/store" "$FONT" "$REPO/chrome/icons/icon-128.png"
 
-# Two different rules, and neither failure gives a clear error: the tiles and
-# screenshots must have no alpha, while the store icon must keep its, and must
-# be 96x96 of artwork inside 16px of transparent padding.
+# Two opposite rules, and neither failure gives a clear error: the tiles and
+# screenshots must have no alpha, while the icon must keep its, so the
+# rounded corners come out transparent rather than as white notches.
 python3 - "$REPO/store" <<'PY'
 import pathlib, sys
 from struct import unpack
@@ -52,10 +52,11 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.png")):
     d = f.open("rb").read(33)
     w, h = unpack(">II", d[16:24])
     if f.name == "store-icon-128.png":
-        box = Image.open(f).convert("RGBA").getbbox()
-        pad = (box[0], box[1], w - box[2], h - box[3])
-        ok = (w, h) == (128, 128) and d[25] == 6 and set(pad) == {16}
-        note = "artwork %dx%d, padding %d" % (box[2] - box[0], box[3] - box[1], pad[0])
+        im = Image.open(f).convert("RGBA")
+        box = im.getbbox()
+        clear = im.getpixel((0, 0))[3] == 0
+        ok = (w, h) == (128, 128) and d[25] == 6 and box == (0, 0, 128, 128) and clear
+        note = "full bleed, corners clear" if clear else "corners NOT transparent"
     else:
         ok = d[25] == 2 and (w, h) in {(1280, 800), (440, 280), (1400, 560)}
         note = "no alpha"

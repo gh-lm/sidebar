@@ -155,15 +155,18 @@ transparency here and does not say why. `tools/store-shots/build.sh` reads
 the PNG header of every file after drawing it and fails the build if the
 colour type is not 2.
 
-**The icon is not in this section.** It comes from the zip, from the
-`icons` block in the manifest. Google asks for the 128 to be 96x96 of
-artwork centred in a 128x128 image with 16 pixels of transparent padding on
-each side — the opposite rule to the tiles, since here the transparency is
-wanted. Drawn full bleed it comes out visibly bigger than other listings,
-and one with no transparency at all is dropped into a rounded frame instead.
-`./make-icons.sh` builds it to that rule. `store/store-icon-128.png` is a
-standalone copy of the same file, in case a field for it turns up elsewhere
-on the form.
+**The icon is not in this section.** It comes from the zip, from the `icons`
+block in the manifest. It is 128x128, full bleed, with the rounded corners
+transparent rather than filled — the opposite rule to the tiles, where an
+alpha channel is refused.
+
+Google's written advice is 96x96 of artwork inside 16 pixels of transparent
+padding, which suits a mark that needs breathing room. Ours already is an
+app-icon shape with its own margin drawn in, so padding it again left a wide
+empty border and made it look small beside every other listing. Full bleed is
+the right call here. `./make-icons.sh` builds it, and
+`store/store-icon-128.png` is a standalone copy in case a field for it turns
+up elsewhere on the form.
 
 **Website**
 

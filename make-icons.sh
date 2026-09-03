@@ -4,14 +4,12 @@ set -euo pipefail
 cd "$(dirname "$0")"
 for S in 16 32 48; do rsvg-convert -w "$S" -h "$S" brand/icon.svg -o "chrome/icons/icon-$S.png"; done
 
-# The 128 is the one the store shows. Google asks for 96x96 of artwork with
-# 16px of transparent padding on each side, and warns that an icon with no
-# alpha gets dropped into a frame with rounded corners instead. Drawn full
-# bleed it comes out oversized next to every other listing.
-rsvg-convert -w 96 -h 96 brand/icon.svg -o /tmp/lm-icon-96.png
-magick /tmp/lm-icon-96.png -background none -gravity center -extent 128x128 \
-  PNG32:chrome/icons/icon-128.png
-rm -f /tmp/lm-icon-96.png
+# The 128 is the one the store shows. Google's advice is 96x96 of artwork
+# inside 16px of transparent padding, but that assumes a mark that needs
+# breathing room. Ours is already an app-icon shape -- a rounded square with
+# its own margin drawn in -- so padding it again just makes it look small
+# next to everything else. Full bleed, with the corners transparent.
+rsvg-convert -w 128 -h 128 brand/icon.svg -o chrome/icons/icon-128.png
 
 
 rsvg-convert -w 96 -h 96 brand/icon.svg -o site/images/lightmorphic-sidebar-mark.png
