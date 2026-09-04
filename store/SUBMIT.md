@@ -324,8 +324,10 @@ Same form, same place, and everything on the listing tabs stays as it is.
 1. Bump the version in `chrome/manifest.json` and run `./package.sh`.
 2. Open the developer console and click the extension.
 3. **Package** in the left menu, then **Upload new package** at the top right.
-4. Choose the new zip from `dist/`. The version is read out of the file, so
-   there is nothing to type.
+4. Choose the new zip from `dist/`. There is no version box to fill in: the
+   store reads it from `manifest.json` inside the zip. The file name plays
+   no part, and `package.sh` names the file to match only so the right one
+   is easy to pick.
 5. **Submit for review**, and let it publish automatically once approved.
 
 The version has to be higher than the published one every time; a number
