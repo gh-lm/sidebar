@@ -317,6 +317,24 @@ https://sidebar.lightmorphic.com/privacy.html
 
 ---
 
+## Putting up an update
+
+Same form, same place, and everything on the listing tabs stays as it is.
+
+1. Bump the version in `chrome/manifest.json` and run `./package.sh`.
+2. Open the developer console and click the extension.
+3. **Package** in the left menu, then **Upload new package** at the top right.
+4. Choose the new zip from `dist/`. The version is read out of the file, so
+   there is nothing to type.
+5. **Submit for review**, and let it publish automatically once approved.
+
+The version has to be higher than the published one every time; a number
+that has been published can never be used again. An update that asks for no
+new permission is usually reviewed faster than a first submission. One that
+adds a permission goes back into the slow queue.
+
+---
+
 ## What changed in 1.0.1
 
 Worth having to hand if the review asks, and worth putting in the "what's
