@@ -255,8 +255,11 @@ about as wide as a phone.
 
 `favicon`
 ```
-Draws the site icon on each pinned button, from the browser's own cache. It
-makes no network request.
+Draws the site icon on each pinned button from the browser's own cache, with
+no network request. The cache only holds sites this profile has opened in a
+tab, so when it comes back empty the icon is fetched from that pinned site's
+own address instead. Never from a third-party icon service, which would tell
+someone else every site the user has pinned.
 ```
 
 Host permissions (`*://*/*`, optional)
@@ -351,6 +354,10 @@ Separately, the rule that strips that header was tied to the pinned site's
 own domain even for someone who had allowed every site, so a site that
 redirects to a different domain entirely was never covered. Allowing every
 site now installs one rule that applies everywhere.
+
+A pinned site also showed a grey globe instead of its icon unless the site
+had already been opened in a tab, because the icon came only from the
+browser's own cache. It now falls back to the site's own icon.
 
 No new permissions. Nothing else changed.
 

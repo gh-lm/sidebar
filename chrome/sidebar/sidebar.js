@@ -674,6 +674,73 @@ window.addEventListener("blur", hideSiteMenu);
 
 let dragSiteUrl = null;
 
+function cachedFaviconUrl(pageUrl, size = 32) {
+  const favicon = new URL(chrome.runtime.getURL("/_favicon/"));
+  favicon.searchParams.set("pageUrl", pageUrl);
+  favicon.searchParams.set("size", String(size));
+  return favicon.toString();
+}
+
+// What Chrome hands back when it has never seen the site. Learned once, at
+// runtime, by asking for an address that cannot exist -- rather than
+// hard-coding pixels that change with the browser version.
+let placeholderSignature = null;
+
+function signatureOf(image) {
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 16;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(image, 0, 0, 16, 16);
+    return ctx.getImageData(0, 0, 16, 16).data.join(",");
+  } catch {
+    return null; // tainted or not drawable: treat as unknown, change nothing
+  }
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const probe = new Image();
+    probe.onload = () => resolve(probe);
+    probe.onerror = reject;
+    probe.src = src;
+  });
+}
+
+async function getPlaceholderSignature() {
+  if (placeholderSignature !== null) return placeholderSignature;
+  try {
+    const probe = await loadImage(cachedFaviconUrl("https://never.a.real.site.invalid/"));
+    placeholderSignature = signatureOf(probe);
+  } catch {
+    placeholderSignature = null;
+  }
+  return placeholderSignature;
+}
+
+// Swap in the site's own icon, but only when the cached one turned out to be
+// the placeholder. A site the user has visited keeps the instant local copy
+// and costs no request at all.
+async function useRealFaviconIfPlaceholder(img, host) {
+  const placeholder = await getPlaceholderSignature();
+  if (!placeholder) return;
+  try {
+    await (img.complete ? Promise.resolve() : loadImage(img.src));
+  } catch {
+    return;
+  }
+  if (signatureOf(img) !== placeholder) return;
+  // Straight to the site the user pinned, and nowhere else. Left alone if it
+  // has no icon there, so the button keeps the grey globe rather than going
+  // blank.
+  try {
+    const real = await loadImage(`https://${host}/favicon.ico`);
+    if (real.naturalWidth > 0) img.src = real.src;
+  } catch {
+    /* no icon at the usual place; the placeholder stays */
+  }
+}
+
 function renderRailSites(webPanels) {
   railSites.innerHTML = "";
   for (const url of webPanels) {
@@ -724,15 +791,18 @@ function renderRailSites(webPanels) {
     // third party every site the user had pinned, every time the panel
     // opened — indefensible in a privacy extension, and a remote request
     // in a package that should make none.
-    const favicon = new URL(chrome.runtime.getURL("/_favicon/"));
-    favicon.searchParams.set("pageUrl", url);
-    favicon.searchParams.set("size", "32");
-    img.src = favicon.toString();
+    img.src = cachedFaviconUrl(url);
     img.alt = "";
     img.addEventListener("error", () => {
       img.remove();
       btn.textContent = "•";
     });
+    // The cache only holds sites this profile has actually opened in a tab.
+    // Pin something you have never browsed and Chrome hands back its grey
+    // globe rather than nothing, so the button looks broken on exactly the
+    // big, obvious sites people pin first. Asking the site itself is the
+    // only other source that is not a third party watching what you pin.
+    useRealFaviconIfPlaceholder(img, host);
     btn.appendChild(img);
     btn.addEventListener("click", () => openPanelSite(url));
     btn.addEventListener("contextmenu", (e) => {
