@@ -1,13 +1,15 @@
-# Submitting Lightmorphic Sidebar 1.0.0 to the Chrome Web Store
+# Submitting Lightmorphic Sidebar 1.0.1 to the Chrome Web Store
 
 Everything on this page is ready to copy straight into the form at
 <https://chrome.google.com/webstore/devconsole>. Nothing else needs writing.
 
-Upload: `dist/lightmorphic-sidebar-1.0.0.zip`
+Upload: `dist/lightmorphic-sidebar-1.0.1.zip`
 
-The package was already uploaded on 2 September 2026 and was not what got
-rejected. See below: the listing text was, so 1.0.0 stands and this file
-does not need uploading again unless the code changes.
+1.0.0 is published and live, so that number can never be used again. This is
+an update, not a first submission: the code has changed since, and the
+version is now 1.0.1. Updates are usually reviewed faster than a first
+submission, unless they ask for a permission the published version did not
+have. This one does not.
 
 ---
 
@@ -33,10 +35,8 @@ looks: description, title, screenshots, tiles. Say what the thing does and
 how many of something there are. The permission justifications are not
 public listing text and can stay specific.
 
-**No version bump is needed.** Nothing about the package was rejected and
-nothing in it has changed, so 1.0.0 stands. Edit the listing text, replace
-the first screenshot and the marquee, and resubmit the same draft. A version
-number only becomes unusable once it has been published.
+The corrected listing went on to be published as 1.0.0. Everything below now
+describes the 1.0.1 update.
 
 ---
 
@@ -317,11 +317,30 @@ https://sidebar.lightmorphic.com/privacy.html
 
 ---
 
+## What changed in 1.0.1
+
+Worth having to hand if the review asks, and worth putting in the "what's
+new" box if the form offers one:
+
+Pinned sites that answered on a different address than the one typed came
+back as "refused to connect". bbc.com serves www.bbc.com, and permission for
+the first did not cover the second, so the header that blocks framing
+survived. Permission now covers a site's subdomains as well.
+
+Separately, the rule that strips that header was tied to the pinned site's
+own domain even for someone who had allowed every site, so a site that
+redirects to a different domain entirely was never covered. Allowing every
+site now installs one rule that applies everywhere.
+
+No new permissions. Nothing else changed.
+
+---
+
 ## 4. Before you press Submit
 
 - [ ] Developer account fee of $5 paid
 - [ ] Publisher email verified in the account settings
-- [ ] `dist/lightmorphic-sidebar-1.0.0.zip` uploaded (68 KB, 18 files)
+- [ ] `dist/lightmorphic-sidebar-1.0.1.zip` uploaded (68 KB, 18 files)
 - [ ] Detailed description pasted
 - [ ] Website and support URL both filled in, and they are different
 - [ ] Five screenshots, small promo tile and marquee all uploaded
