@@ -263,10 +263,12 @@ Host permissions (`*://*/*`, optional)
 ```
 Never requested at install; the extension starts with access to no websites at
 all. It is asked one site at a time, from the user's click, when they open that
-site in the panel. The seven search engines are asked for together on the first
-search rather than as seven separate prompts. The Information tab also offers a
-single "allow every site" for anyone who would rather not be asked again; it is
-off by default and revocable from the same button.
+site in the panel, and covers that site's own domain and its subdomains,
+because a site that answers on www is otherwise refused. The search engines are
+asked for together on the first search rather than as separate prompts. The
+Information tab also offers a single "allow every site" for anyone who would
+rather not be asked again; it is off by default and revocable from the same
+button.
 ```
 
 **Remote code:** No, I am not using remote code. There is no `fetch`, no

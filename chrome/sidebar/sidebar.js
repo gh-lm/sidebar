@@ -140,9 +140,27 @@ async function registerPair(key, match) {
   }
 }
 
+// A pinned address and the address it actually serves are often different
+// hosts: bbc.com sends you to www.bbc.com. Permission for the first does not
+// cover the second, so the headers that stop a site being framed survive and
+// the panel shows "refused to connect". Asking for the site's subdomains as
+// well covers the whole family in one prompt. "*." matches no subdomain too,
+// so this includes the bare host.
+function siteScope(host) {
+  const bare = host.replace(/^www\./i, "");
+  const looksLikeADomain = bare.includes(".") && !/^[\d.]+$/.test(bare) && !bare.includes(":");
+  return looksLikeADomain ? `*://*.${bare}/*` : `*://${host}/*`;
+}
+
+// The domain the rule and the pin are keyed on, so www and bare forms of the
+// same site do not end up with two of everything.
+function siteDomain(host) {
+  return host.replace(/^www\./i, "");
+}
+
 async function ensureMobileScript(host) {
   if (await ensureMobileScriptEverywhere()) return;
-  await registerPair(host, `*://${host}/*`);
+  await registerPair(siteDomain(host), siteScope(host));
 }
 
 // A current Chrome on Android. Kept close to the real thing so nothing
@@ -150,10 +168,14 @@ async function ensureMobileScript(host) {
 const MOBILE_UA =
   "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36";
 
+// Reserved for the single rule used when every site is allowed, so it can
+// be replaced rather than piling up beside the per-site ones.
+const ALL_SITES_RULE_ID = 1;
+
 function hostRuleId(host) {
   let h = 0;
   for (let i = 0; i < host.length; i++) h = (h * 31 + host.charCodeAt(i)) & 0x7fffffff;
-  return (h % 2000000000) + 1; // DNR ids must be >= 1
+  return (h % 2000000000) + 2; // >= 1, and never ALL_SITES_RULE_ID
 }
 
 // Host permission is OPTIONAL and asked for at the moment the user opens
@@ -161,7 +183,7 @@ function hostRuleId(host) {
 // site until they pin one. Returns false if they decline, so the caller can
 // fall back to opening the site in a tab instead of showing a dead frame.
 async function ensureHostAccess(host) {
-  const origins = [`*://${host}/*`];
+  const origins = [siteScope(host)];
   if (await chrome.permissions.contains({ origins })) return true;
   try {
     return await chrome.permissions.request({ origins });
@@ -179,7 +201,19 @@ async function allowFramingFor(url) {
   }
   if (!(await ensureHostAccess(host))) return false;
   await ensureMobileScript(host);
-  const id = hostRuleId(host);
+  const domain = siteDomain(host);
+  // Someone who has allowed every site gets one rule covering every site.
+  // Scoping it to the pinned domain leaves a site that redirects elsewhere
+  // -- bbc.com sends a UK reader to bbc.co.uk -- with its framing headers
+  // intact, so the panel still says "refused to connect" however much
+  // permission has been granted.
+  let everywhere = false;
+  try {
+    everywhere = await chrome.permissions.contains({ origins: ALL_SITES });
+  } catch {
+    /* treat as not granted */
+  }
+  const id = everywhere ? ALL_SITES_RULE_ID : hostRuleId(domain);
   await chrome.declarativeNetRequest.updateSessionRules({
     removeRuleIds: [id],
     addRules: [
@@ -205,7 +239,10 @@ async function allowFramingFor(url) {
           ],
         },
         condition: {
-          requestDomains: [host],
+          // requestDomains matches the domain and everything under it, so
+          // one entry covers www and any other subdomain the site redirects
+          // to. Left off entirely when every site is allowed.
+          ...(everywhere ? {} : { requestDomains: [domain] }),
           resourceTypes: ["sub_frame", "xmlhttprequest", "script", "stylesheet", "image", "font", "other"],
         },
       },
