@@ -82,6 +82,18 @@ body {
   background: var(--muted);
 }
 
+/* Folded away: the icons stay, everything else goes. Chromium owns the
+   panel's width and gives an extension no way to change it, so folding does
+   not narrow the panel on its own -- drag its edge and the rail sits there
+   as a strip of buttons until you want the panel back. */
+.shell.folded .content { display: none; }
+
+.shell.folded .rail { border-left: 0; }
+
+.rail-btn-min svg { transition: transform 0.18s ease; }
+
+.shell.folded .rail-btn-min svg { transform: scaleX(-1); }
+
 .rail-btn {
   position: relative;
   width: 34px;

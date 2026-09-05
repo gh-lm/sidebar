@@ -359,6 +359,10 @@ A pinned site also showed a grey globe instead of its icon unless the site
 had already been opened in a tab, because the icon came only from the
 browser's own cache. It now falls back to the site's own icon.
 
+The arrow at the top of the icon strip now folds the panel away to just
+those icons, instead of closing it. Chromium's own close button still closes
+it outright.
+
 No new permissions. Nothing else changed.
 
 ---

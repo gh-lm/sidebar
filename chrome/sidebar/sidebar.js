@@ -826,29 +826,38 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-// ---- Close ----
+// ---- Fold ----
 const railMinimize = document.getElementById("railMinimize");
+const shell = document.querySelector(".shell");
 
-// Collapsing the panel's CONTENTS does nothing useful: Chromium owns the
-// side panel's width, so hiding what is inside leaves the page squeezed
-// exactly as before — it still looks open, because it is. The only way to
-// give the page its width back is to close the panel. Chrome 132 added
-// sidePanel.close(); older versions get window.close(), which a side panel
-// page is allowed to call on itself.
-async function closePanel() {
-  try {
-    if (chrome.sidePanel?.close) {
-      const win = await chrome.windows.getCurrent();
-      await chrome.sidePanel.close({ windowId: win.id });
-      return;
-    }
-  } catch {
-    /* fall through */
-  }
-  window.close();
+// Chromium owns the side panel's width and gives an extension no way to
+// change it, so folding cannot narrow the panel by itself -- the page is
+// squeezed exactly as before until the panel's edge is dragged in. What it
+// does give you is the rail on its own, so the panel can be left as a strip
+// of buttons rather than closed and reopened. Chromium's own X in the header
+// still closes it outright.
+function setFolded(folded) {
+  shell.classList.toggle("folded", folded);
+  railMinimize.setAttribute("aria-expanded", String(!folded));
+  const label = folded ? "Open the panel back up" : "Fold the panel away, leaving the icons";
+  railMinimize.setAttribute("aria-label", label);
+  railMinimize.dataset.tip = folded ? "Open back up" : "Fold away, leaving the icons";
+  chrome.storage.local.set({ folded }).catch(() => {});
 }
 
-railMinimize.addEventListener("click", closePanel);
+railMinimize.addEventListener("click", () => setFolded(!shell.classList.contains("folded")));
+
+// Picking anything in the rail means you want to see it, so it unfolds. The
+// alternative is a click that visibly does nothing. Delegated, because the
+// pinned-site buttons are built as the pins are read and are not here yet.
+shell.querySelector(".rail").addEventListener("click", (e) => {
+  if (e.target.closest("#railMinimize")) return;
+  if (e.target.closest(".rail-btn") && shell.classList.contains("folded")) setFolded(false);
+});
+
+chrome.storage.local.get("folded").then(({ folded }) => {
+  if (folded) setFolded(true);
+}).catch(() => {});
 
 railAddSite.addEventListener("click", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
