@@ -1,9 +1,7 @@
-### Before you open this
+### Thanks for taking the time to contribute
 
-Issues are very welcome — bug reports, feature requests, anything you've
-noticed. Please open one any time.
+If this is reporting a bug or an idea rather than a finished fix, an issue
+is actually the most helpful way to get it to me — it's quicker to read
+and easier for me to act on straight away.
 
-Pull requests, though, are unlikely to get merged: this project is coded
-and maintained by one person, and outside code doesn't fit that workflow.
-If you've spotted a bug or have an idea, an issue is genuinely the more
-useful way to tell me — it'll get read and acted on either way.
+Pull requests are still very welcome, of course!
