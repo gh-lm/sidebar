@@ -45,6 +45,9 @@ PY
 # travel with the font.
 [ -f chrome/fonts/OFL.txt ] || fail "chrome/fonts/OFL.txt is missing; the bundled font's licence must ship."
 
+# The GPL asks for its text to travel with the work.
+[ -f chrome/LICENSE ] || fail "chrome/LICENSE is missing; the GPL must ship inside the package."
+
 # The extension finds a user's existing data by the name it had before the
 # rename. Blanket find-and-replace over these orphans every existing user's
 # saved work, and nothing errors - the panel simply comes up empty.
