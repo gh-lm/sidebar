@@ -1,0 +1,88 @@
+/* The five legal pages. One stylesheet so they cannot drift apart.
+   Dark only: there is no light theme anywhere in Lightmorphic Sidebar. */
+@font-face {
+  font-family: "Manrope";
+  src: url("fonts/Manrope.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+  --bg: #101013;
+  --fg: #f2f1ec;
+  --panel: #191920;
+  --panel-border: rgba(242, 241, 236, 0.12);
+  --muted-fg: #9b9a94;
+  --accent: #fbc711;
+  --link: #ffd34d;
+  --panel-radius: 1.375rem;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Manrope", system-ui, sans-serif;
+  line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1.25rem;
+}
+
+main {
+  max-width: 65ch;
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--panel-radius);
+  padding: clamp(1.25rem, 5vw, 2.5rem);
+}
+
+.mark { display: block; width: 56px; height: 56px; margin-bottom: 1.25rem; }
+.back { display: inline-block; text-decoration: none; }
+
+h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 0.5rem; }
+h2 { font-size: 1.125rem; font-weight: 600; margin: 2rem 0 0.6rem; }
+p, li { margin: 0 0 1.1rem; }
+
+ul { padding-left: 1.2rem; }
+a { color: var(--link); overflow-wrap: anywhere; }
+a:hover { color: var(--accent); }
+
+.lede { color: var(--muted-fg); }
+
+/* The legal sub-footer: who we are on the left, the five pages on the
+   right, dropping under each other only when there is no room to sit
+   alongside. */
+.legal {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--panel-border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  color: var(--muted-fg);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.legal p { margin: 0; max-width: 46ch; }
+.legal a { color: var(--muted-fg); text-decoration: none; }
+.legal a:hover { color: var(--fg); }
+
+.legal nav {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem 1.25rem;
+}
+
+@media (max-width: 34rem) {
+  .legal nav { margin-left: 0; justify-content: flex-start; }
+}

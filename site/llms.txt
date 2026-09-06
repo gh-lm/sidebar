@@ -35,7 +35,7 @@ is transmitted to Lightmorphic. Deleting the folder deletes the data.
 
 Lightmorphic Ltd, registered in England and Wales, company number 17423646.
 Registered office: 82A James Carter Road, Mildenhall, IP28 7DE, United
-Kingdom. Contact: sidebar@lightmorphic.com
+Kingdom. Contact: https://sidebar.lightmorphic.com/complaints.html
 
 ## Pages
 

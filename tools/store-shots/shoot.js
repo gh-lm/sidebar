@@ -44,11 +44,10 @@ const SHOTS = [
     tab: "snippets",
   },
   {
-    file: "05-light.png",
-    h: "Light or dark,|however you read",
-    s: "One button cycles light, dark, and following|the browser. Everything stays in your browser.",
-    tab: "snippets",
-    light: true,
+    file: "05-private.png",
+    h: "It starts with|access to|no websites",
+    s: "No account, no server, no analytics. What you save lives|in one bookmarks folder, which is yours to delete.",
+    tab: "information",
   },
 ];
 
@@ -160,7 +159,6 @@ const SHOTS = [
   for (const shot of SHOTS) {
     await page.goto(PANEL, { waitUntil: "networkidle2", timeout: 60000 });
     await new Promise((r) => setTimeout(r, 1200));
-    await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), shot.light ? "light" : "dark");
     if (shot.tab) await page.evaluate((n) => document.querySelector(`.rail-btn[data-panel="${n}"]`).click(), shot.tab);
     if (shot.open) {
       await page.evaluate((u) => {

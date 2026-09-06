@@ -339,22 +339,12 @@ function renderEngines() {
   }
 }
 
-// Is the panel dark at this moment — whether that came from the browser or
-// from the button on the rail.
-function panelIsDark() {
-  const forced = document.documentElement.getAttribute("data-theme");
-  if (forced) return forced === "dark";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
-
 function searchUrlFor(q) {
   // Bare domains and addresses go straight there; anything else searches.
   const looksLikeUrl = /^(https?:\/\/|[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$))/i.test(q);
   if (looksLikeUrl) return q.startsWith("http") ? q : `https://${q}`;
-  // Engines that follow the browser need nothing; the ones that do not are
-  // told, so results match the panel they are sitting in.
-  const dark = panelIsDark() && engine.dark ? engine.dark : "";
-  return engine.url + encodeURIComponent(q) + dark;
+  // The panel is always dark, so any engine that takes a dark hint gets one.
+  return engine.url + encodeURIComponent(q) + (engine.dark || "");
 }
 
 // Every engine is a different site, so asking one at a time meant a prompt
@@ -1456,48 +1446,6 @@ allowAllBtn?.addEventListener("click", async () => {
 paintAllowAll();
 chrome.permissions.onAdded?.addListener(paintAllowAll);
 chrome.permissions.onRemoved?.addListener(paintAllowAll);
-
-// ---- Appearance ----
-// Three states, cycling: follow the browser, force light, force dark. The
-// icon shows what is on screen NOW rather than what was chosen, so in
-// automatic it changes with the browser and carries a dot to say so.
-const railTheme = document.getElementById("railTheme");
-
-const SUN =
-  '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="3.6"/><path d="M10 1.8v2M10 16.2v2M18.2 10h-2M3.8 10h-2M15.8 4.2l-1.4 1.4M5.6 14.4l-1.4 1.4M15.8 15.8l-1.4-1.4M5.6 5.6L4.2 4.2"/></svg>';
-const MOON =
-  '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16.2 12.4A7 7 0 0 1 7.6 3.8a7 7 0 1 0 8.6 8.6z"/></svg>';
-
-const MODES = ["auto", "light", "dark"];
-const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
-
-function paintTheme(mode) {
-  const root = document.documentElement;
-  if (mode === "auto") root.removeAttribute("data-theme");
-  else root.setAttribute("data-theme", mode);
-
-  const dark = mode === "dark" || (mode === "auto" && prefersDark.matches);
-  railTheme.innerHTML = dark ? MOON : SUN;
-  railTheme.dataset.mode = mode;
-  railTheme.dataset.tip =
-    mode === "auto" ? "Appearance: following the browser" : `Appearance: always ${mode}`;
-  railTheme.setAttribute("aria-label", railTheme.dataset.tip);
-}
-
-chrome.storage.local.get("theme").then(({ theme = "auto" }) => paintTheme(theme));
-
-railTheme.addEventListener("click", async () => {
-  const now = railTheme.dataset.mode || "auto";
-  const next = MODES[(MODES.indexOf(now) + 1) % MODES.length];
-  await chrome.storage.local.set({ theme: next });
-  paintTheme(next);
-});
-
-// In automatic, follow the browser as it changes rather than waiting for
-// the panel to be reopened.
-prefersDark.addEventListener("change", () => {
-  if ((railTheme.dataset.mode || "auto") === "auto") paintTheme("auto");
-});
 
 // ---- First run ----
 // Chrome gives an extension no install-time dialog, so the panel says it

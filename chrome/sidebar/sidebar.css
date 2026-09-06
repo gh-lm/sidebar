@@ -5,46 +5,19 @@
   font-display: swap;
 }
 :root {
-  color-scheme: light dark;
-  --bg: #ffffff; --fg: #09090b;
-  --panel: #ffffff; --panel-border: rgba(24, 24, 40, 0.10);
-  --border: #e4e4e7; --muted: #f4f4f5; --muted-fg: #71717a;
+  /* Dark, always. There is no light theme and no switch: the panel sits
+     against web pages of every colour, and one predictable ground it can be
+     recognised by beats following the browser somewhere it does not suit. */
+  color-scheme: dark;
+  --bg: #09090b; --fg: #fafafa;
+  --panel: #1b1d29; --panel-border: rgba(255, 255, 255, 0.09);
+  --border: #27272a; --muted: #1c1c1f; --muted-fg: #a1a1aa;
   --accent: #fbc711; --accent-hover: #ddaf0f; --on-accent: #645007;
-  --danger: #cc372d; --danger-bg: #fef2f1;
+  --danger: #f34236; --danger-bg: #350f0c;
   --radius: 0.875rem;
   --rail-width: 44px;
-  /* Tooltip: dark bubble on light mode (contrasts with the page),
-     reversed on dark mode. */
-  --tip-bg: #111827; --tip-fg: #ffffff;
-}
-
-/* Follow the browser's own light/dark mode automatically -- the panel is
-   dark when the browser is dark, light when it's light, and tracks the OS
-   on "auto". Standard prefers-color-scheme, no toggle, no override. */
-/* Dark applies when the browser asks for it AND the user has not chosen
-   light, or when the user has chosen dark outright. Written twice rather
-   than once, because a media query cannot be overridden by an attribute
-   from inside itself. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #09090b; --fg: #fafafa;
-    --panel: #1b1d29; --panel-border: rgba(255,255,255,.09);
-    --border: #27272a; --muted: #1c1c1f; --muted-fg: #a1a1aa;
-    --danger: #f34236; --danger-bg: #350f0c;
-    --tip-bg: #fafafa; --tip-fg: #111827;
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg: #09090b; --fg: #fafafa;
-  --panel: #1b1d29; --panel-border: rgba(255,255,255,.09);
-  --border: #27272a; --muted: #1c1c1f; --muted-fg: #a1a1aa;
-  --danger: #f34236; --danger-bg: #350f0c;
   --tip-bg: #fafafa; --tip-fg: #111827;
 }
-
-:root[data-theme="light"] { color-scheme: light; }
-:root[data-theme="dark"] { color-scheme: dark; }
 
 * { box-sizing: border-box; }
 
@@ -1065,18 +1038,6 @@ dialog#siteDialog input {
 }
 
 :root {
-  --scroll-thumb: rgba(24, 24, 40, 0.22);
-  --scroll-thumb-strong: rgba(24, 24, 40, 0.4);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --scroll-thumb: rgba(255, 255, 255, 0.18);
-    --scroll-thumb-strong: rgba(255, 255, 255, 0.34);
-  }
-}
-
-:root[data-theme="dark"] {
   --scroll-thumb: rgba(255, 255, 255, 0.18);
   --scroll-thumb-strong: rgba(255, 255, 255, 0.34);
 }

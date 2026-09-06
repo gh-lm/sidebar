@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lightmorphic Sidebar: the tab that stays</title>
 <meta name="description" content="A side panel for Chrome holding the site you always go back to, plus search, a scratchpad and snippets. Syncs through your bookmarks: no account, no server.">
-<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#101013" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#101013">
 <link rel="canonical" href="https://sidebar.lightmorphic.com/">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -29,45 +28,14 @@
   }
 
   :root {
-    color-scheme: light;
-    --ink: #0a0a0c;
-    --paper: #f6f5f1;
-    --paper-2: #ebe9e2;
-    --accent: #fbc711;
-    --navy: #111827;
-    --rule: rgba(10, 10, 12, 0.14);
-    --dim: #5d5c57;
-    --quiet-ink: #3a3935;
-    --numeral: #8f6c03;
-    --bg-contrast: #f6f5f1;
-    --grain: 0.5;
-    --panel-w: 336px;
-    --gutter: clamp(1.25rem, 4vw, 4rem);
-  }
-
-  /* Night is ink and warm off-white, not the same palette inverted: paper
-     grain at full strength on a dark ground reads as dirt. */
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      color-scheme: dark;
-      --ink: #f2f1ec;
-      --paper: #101013;
-      --paper-2: #191920;
-      --navy: #05050a;
-      --rule: rgba(242, 241, 236, 0.16);
-      --dim: #9b9a94;
-      --quiet-ink: #b9b7b0;
-      --numeral: #ffc006;
-      --bg-contrast: #101013;
-      --grain: 0.22;
-    }
-  }
-
-  :root[data-theme="dark"] {
+    /* Dark, always. There is no light theme and no switch. Ink and warm
+       off-white rather than the light palette inverted: paper grain at full
+       strength on a dark ground reads as dirt, so it is kept low. */
     color-scheme: dark;
     --ink: #f2f1ec;
     --paper: #101013;
     --paper-2: #191920;
+    --accent: #fbc711;
     --navy: #05050a;
     --rule: rgba(242, 241, 236, 0.16);
     --dim: #9b9a94;
@@ -75,6 +43,8 @@
     --numeral: #ffc006;
     --bg-contrast: #101013;
     --grain: 0.22;
+    --panel-w: 336px;
+    --gutter: clamp(1.25rem, 4vw, 4rem);
   }
 
   * { box-sizing: border-box; }
@@ -166,33 +136,6 @@
   /* A circle holding a sun or a moon. In automatic it shows whichever is
      actually on screen, with a dot to say the browser is choosing. A third
      neutral icon would tell you nothing about what you are looking at. */
-  .theme {
-    position: relative;
-    width: 2.125rem;
-    height: 2.125rem;
-    display: grid;
-    place-items: center;
-    border: 1px solid var(--rule);
-    border-radius: 50%;
-    background: none;
-    color: var(--ink);
-    cursor: pointer;
-    flex: 0 0 auto;
-    padding: 0;
-  }
-  .theme:hover { border-color: var(--ink); }
-  .theme svg { width: 17px; height: 17px; display: block; }
-  .theme[data-mode="auto"]::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--accent);
-    border: 1.5px solid var(--paper);
-  }
 
   /* ---------- hero ---------- */
   .hero { padding-block: clamp(3rem, 9vw, 7rem) clamp(2.5rem, 6vw, 4rem); }
@@ -312,6 +255,33 @@
   figure { margin: 1.75rem 0 0; }
   figure svg { width: 100%; height: auto; display: block; }
 
+  /* The legal sub-footer: who we are on the left, the five pages on the
+     right, dropping under each other only when there is no room. */
+  .legal {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--dim);
+  }
+  .legal p { margin: 0; max-width: 52ch; }
+  .legal nav {
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.35rem 1.25rem;
+  }
+  @media (max-width: 34rem) {
+    .legal nav { margin-left: 0; justify-content: flex-start; }
+  }
+
   /* ---------- inverted block ---------- */
   /* This band is dark whichever theme is on, so its text is set outright
      rather than with a token that swaps: --paper is near-black in dark mode,
@@ -353,7 +323,9 @@
     margin: 0 0 clamp(3rem, 6vw, 4.5rem);
     display: grid;
     gap: 1.75rem 3rem;
-    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+    /* min() or the 22rem floor is itself wider than a small phone, and the
+       whole column hangs off the screen. */
+    grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
     align-items: start;
   }
   .faq-list dt {
@@ -636,7 +608,6 @@
     "legalName": "Lightmorphic Ltd",
     "url": "https://lightmorphic.com",
     "logo": "https://sidebar.lightmorphic.com/images/lightmorphic-sidebar-mark.png",
-    "email": "sidebar@lightmorphic.com",
     "identifier": "17423646",
     "address": {
       "@type": "PostalAddress",
@@ -648,7 +619,6 @@
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "customer support",
-      "email": "sidebar@lightmorphic.com",
       "availableLanguage": "English"
     },
     "sameAs": [
@@ -656,7 +626,7 @@
       "https://github.com/lightmorphic"
     ]
   },
-  "dateModified": "2026-09-04"
+  "dateModified": "2026-09-06"
 }
 </script>
 <script type="application/ld+json">
@@ -672,7 +642,6 @@
     "legalName": "Lightmorphic Ltd",
     "url": "https://lightmorphic.com",
     "logo": "https://sidebar.lightmorphic.com/images/lightmorphic-sidebar-mark.png",
-    "email": "sidebar@lightmorphic.com",
     "identifier": "17423646",
     "address": {
       "@type": "PostalAddress",
@@ -684,7 +653,6 @@
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "customer support",
-      "email": "sidebar@lightmorphic.com",
       "availableLanguage": "English"
     },
     "sameAs": [
@@ -692,7 +660,7 @@
       "https://github.com/lightmorphic"
     ]
   },
-  "dateModified": "2026-09-04"
+  "dateModified": "2026-09-06"
 }
 </script>
 <script type="application/ld+json">
@@ -765,7 +733,6 @@
       <a href="#private">Privacy</a>
       <a href="https://github.com/lightmorphic/sidebar">Source</a>
       <a class="get" href="https://github.com/lightmorphic/sidebar">Get it</a>
-      <button class="theme" id="theme" type="button" data-mode="auto" title="Appearance: following your browser" aria-label="Appearance: following your browser"></button>
       <div id="all-apps"></div>
     </nav>
   </header>
@@ -1054,61 +1021,31 @@ Charlie</span></button>
 
   <footer>
     <div class="col">
-      <div class="who">
-        <p><strong>Lightmorphic Ltd</strong>, registered in England and Wales,
-          company number
-          <a href="https://find-and-update.company-information.service.gov.uk/company/17423646">17423646</a>.</p>
-        <p>Registered office: 82A James Carter Road, Mildenhall, IP28 7DE.</p>
-        <p><a href="mailto:sidebar@lightmorphic.com">sidebar@lightmorphic.com</a></p>
-      </div>
-      <span>© <span id="year">2026</span> Lightmorphic Ltd. Lightmorphic Sidebar is free and open source.</span>
-      <span>Last updated <time datetime="2026-09-04" id="updated">4 September 2026</time></span>
       <nav>
         <a href="#how">How it works</a>
         <a href="#questions">Questions</a>
         <a href="#private">Site access</a>
-        <a href="privacy.html">Privacy policy</a>
         <a href="https://github.com/lightmorphic/sidebar">Source on GitHub</a>
         <a href="https://lightmorphic.com" target="_blank" rel="noopener">Lightmorphic</a>
       </nav>
+      <div class="legal">
+        <p>&copy; <span id="year">2026</span> Lightmorphic Ltd. Registered in England and Wales, company number
+          <a href="https://find-and-update.company-information.service.gov.uk/company/17423646">17423646</a>.
+          Registered office: 82A James Carter Road, Mildenhall, IP28 7DE.
+          Page last updated: <time datetime="2026-09-06" id="updated">6 September 2026</time>.</p>
+        <nav aria-label="Legal">
+          <a href="privacy.html">Privacy</a>
+          <a href="cookies.html">Cookies</a>
+          <a href="terms.html">Terms</a>
+          <a href="accessibility.html">Accessibility</a>
+          <a href="complaints.html">Complaints</a>
+        </nav>
+      </div>
     </div>
   </footer>
 </div>
 
 <script>
-  // Appearance: follow the browser, or force one. Applied before anything
-  // else so the page never flashes the wrong way round.
-  const themeBtn = document.getElementById("theme");
-  const SUN = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="3.6"/><path d="M10 1.8v2M10 16.2v2M18.2 10h-2M3.8 10h-2M15.8 4.2l-1.4 1.4M5.6 14.4l-1.4 1.4M15.8 15.8l-1.4-1.4M5.6 5.6L4.2 4.2"/></svg>';
-  const MOON = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16.2 12.4A7 7 0 0 1 7.6 3.8a7 7 0 1 0 8.6 8.6z"/></svg>';
-  const MODES = ["auto", "light", "dark"];
-  const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-  function paintTheme(mode) {
-    if (mode === "auto") document.documentElement.removeAttribute("data-theme");
-    else document.documentElement.setAttribute("data-theme", mode);
-    const dark = mode === "dark" || (mode === "auto" && darkQuery.matches);
-    themeBtn.innerHTML = dark ? MOON : SUN;
-    themeBtn.dataset.mode = mode;
-    const label = mode === "auto" ? "Appearance: following your browser" : "Appearance: always " + mode;
-    themeBtn.title = label;
-    themeBtn.setAttribute("aria-label", label);
-  }
-
-  let saved = "auto";
-  try { saved = localStorage.getItem("theme") || "auto"; } catch { /* private mode */ }
-  paintTheme(saved);
-
-  themeBtn.addEventListener("click", () => {
-    const next = MODES[(MODES.indexOf(themeBtn.dataset.mode) + 1) % MODES.length];
-    try { localStorage.setItem("theme", next); } catch { /* nothing to do */ }
-    paintTheme(next);
-  });
-
-  darkQuery.addEventListener("change", () => {
-    if (themeBtn.dataset.mode === "auto") paintTheme("auto");
-  });
-
   const views = [...document.querySelectorAll(".demo-view")];
   const tabs = [...document.querySelectorAll(".demo-rail button")];
 

@@ -83,8 +83,6 @@ asks for that one site, and nothing else. Nothing is sent anywhere: no
 accounts, no servers, no analytics, no remote code. Everything stays in your
 browser.
 
-Light, dark, or following the browser, on one button.
-
 Lightmorphic Sidebar does not touch your new tab page or anything else in the
 browser. It is a side panel and nothing more.
 
@@ -134,7 +132,7 @@ PNG with no alpha. At least one is required.
 | 2 | `store/02-search.png` |
 | 3 | `store/03-scratchpad.png` |
 | 4 | `store/04-snippets.png` |
-| 5 | `store/05-light.png` |
+| 5 | `store/05-private.png` |
 
 All five are 1280x800, 24-bit, no alpha. They are full bleed with square
 corners and no border, which is what the store asks for.
@@ -358,6 +356,10 @@ site now installs one rule that applies everywhere.
 A pinned site also showed a grey globe instead of its icon unless the site
 had already been opened in a tab, because the icon came only from the
 browser's own cache. It now falls back to the site's own icon.
+
+The panel is dark throughout. The light theme and its switch are gone: the
+panel sits against web pages of every colour, and one ground it can be
+recognised by beats following the browser somewhere it does not suit.
 
 The arrow at the top of the icon strip now folds the panel away to just
 those icons, instead of closing it. Chromium's own close button still closes
