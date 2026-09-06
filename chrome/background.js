@@ -107,15 +107,38 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // the reply comes later
   }
   if (message?.type === "open-panel") {
+    // Opening the side panel is only allowed while the user's click still
+    // counts, and every await spends a little of that. So it goes first,
+    // before anything is written or looked up, using the window the click
+    // came from rather than asking which window is current.
+    const windowId = sender?.tab?.windowId;
+    let opening;
+    try {
+      opening =
+        windowId == null
+          ? Promise.reject(new Error("no window for this click"))
+          : chrome.sidePanel.open({ windowId });
+    } catch (e) {
+      opening = Promise.reject(e);
+    }
+
     (async () => {
       await chrome.storage.local.set({
-        openPanel: { panel: message.panel, url: message.url },
-        pageStrip: false,
+        openPanel: { panel: message.panel, url: message.url, at: Date.now() },
       });
-      const win = await chrome.windows.getCurrent();
-      await chrome.sidePanel.open({ windowId: win.id });
-    })().catch(() => {});
-    return false;
+      try {
+        await opening;
+      } catch (e) {
+        // The panel did not open, so the strip must stay: hiding it first
+        // and failing here is how a click ended up making everything
+        // disappear with nothing to click on.
+        sendResponse({ ok: false, detail: String(e) });
+        return;
+      }
+      await chrome.storage.local.set({ pageStrip: false });
+      sendResponse({ ok: true });
+    })().catch((e) => sendResponse({ ok: false, detail: String(e) }));
+    return true;
   }
   return false;
 });

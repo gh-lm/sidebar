@@ -974,13 +974,21 @@ railMinimize.addEventListener("click", () => {
 // Opening the panel any other way means the strip has done its job.
 chrome.storage.local.set({ pageStrip: false }).catch(() => {});
 
-// The strip says which section to land on.
-chrome.storage.local.get("openPanel").then(({ openPanel }) => {
+// The strip says which section to land on. Read on load, and also watched
+// briefly afterwards: the panel can finish loading before the worker has
+// finished writing which section was asked for.
+function obeyOpenRequest(openPanel) {
   if (!openPanel) return;
+  if (typeof openPanel.at === "number" && Date.now() - openPanel.at > 15000) return;
   chrome.storage.local.remove("openPanel").catch(() => {});
   if (openPanel.url) openPanelSite(openPanel.url);
   else if (openPanel.panel) showPanel(openPanel.panel);
-}).catch(() => {});
+}
+
+chrome.storage.local.get("openPanel").then(({ openPanel }) => obeyOpenRequest(openPanel)).catch(() => {});
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes.openPanel?.newValue) obeyOpenRequest(changes.openPanel.newValue);
+});
 
 railAddSite.addEventListener("click", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

@@ -82,6 +82,15 @@
     return strip;
   }
 
+  // A click that did not work should look like it did not work.
+  function flash(button) {
+    button.animate(
+      [{ background: "rgba(239,68,68,.45)" }, { background: "transparent" }],
+      { duration: 700 }
+    );
+    button.title = "Could not open the panel. Use the toolbar icon.";
+  }
+
   function iconButton({ label, svg, img, letter, panel, url }) {
     const b = document.createElement("button");
     b.type = "button";
@@ -108,7 +117,14 @@
         delete b.dataset.dragged;
         return;
       }
-      chrome.runtime.sendMessage({ type: "open-panel", panel, url }).catch(() => {});
+      chrome.runtime
+        .sendMessage({ type: "open-panel", panel, url })
+        .then((reply) => {
+          // If the panel refused to open, the strip stays put and says so,
+          // rather than the click appearing to do nothing.
+          if (reply && reply.ok === false) flash(b);
+        })
+        .catch(() => flash(b));
     });
     return b;
   }
