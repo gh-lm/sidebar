@@ -59,6 +59,20 @@ chrome.runtime.onMessage.addListener((message) => {
     bootTasks();
     return false;
   }
+  // A click on the on-page icon strip. The strip cannot open the panel
+  // itself -- sidePanel.open() has to be called from an extension page or
+  // the worker, and needs the window the click happened in.
+  if (message?.type === "open-panel") {
+    (async () => {
+      await chrome.storage.local.set({
+        openPanel: { panel: message.panel, url: message.url },
+        pageStrip: false,
+      });
+      const win = await chrome.windows.getCurrent();
+      await chrome.sidePanel.open({ windowId: win.id });
+    })().catch(() => {});
+    return false;
+  }
   return false;
 });
 

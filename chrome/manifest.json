@@ -49,7 +49,9 @@
     {
       "resources": [
         "lib/mobile-ua.js",
-        "lib/panel-scroll.js"
+        "lib/panel-scroll.js",
+        "lib/page-rail.js",
+        "icons/icon-32.png"
       ],
       "matches": [
         "*://*/*"

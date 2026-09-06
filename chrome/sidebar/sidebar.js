@@ -122,6 +122,15 @@ async function registerPair(key, match) {
       world: "MAIN",
       js: ["lib/mobile-ua.js"],
     },
+    {
+      // The icon strip on the page itself. Top frame only, and after the
+      // page has settled, so it is never drawn inside a panel or an ad.
+      id: `pagerail-${key}`,
+      matches: [match],
+      allFrames: false,
+      runAt: "document_idle",
+      js: ["lib/page-rail.js"],
+    },
   ];
   let existing = [];
   try {
@@ -828,35 +837,37 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 // ---- Fold ----
 const railMinimize = document.getElementById("railMinimize");
-const shell = document.querySelector(".shell");
 
-// Chromium owns the side panel's width and gives an extension no way to
-// change it, so folding cannot narrow the panel by itself -- the page is
-// squeezed exactly as before until the panel's edge is dragged in. What it
-// does give you is the rail on its own, so the panel can be left as a strip
-// of buttons rather than closed and reopened. Chromium's own X in the header
-// still closes it outright.
-function setFolded(folded) {
-  shell.classList.toggle("folded", folded);
-  railMinimize.setAttribute("aria-expanded", String(!folded));
-  const label = folded ? "Open the panel back up" : "Fold the panel away, leaving the icons";
-  railMinimize.setAttribute("aria-label", label);
-  railMinimize.dataset.tip = folded ? "Open back up" : "Fold away, leaving the icons";
-  chrome.storage.local.set({ folded }).catch(() => {});
+// Chromium will not let the side panel be narrower than 360px and gives an
+// extension no way to change that, so hiding what is inside the panel leaves
+// the page squeezed exactly as before. The only way to hand the width back
+// and still keep the icons within reach is to close the panel and draw them
+// on the page instead -- lib/page-rail.js, on sites already allowed.
+async function foldAway() {
+  await chrome.storage.local.set({ pageStrip: true }).catch(() => {});
+  try {
+    if (chrome.sidePanel?.close) {
+      const win = await chrome.windows.getCurrent();
+      await chrome.sidePanel.close({ windowId: win.id });
+      return;
+    }
+  } catch {
+    /* older Chrome, or refused: window.close() below still works */
+  }
+  window.close();
 }
 
-railMinimize.addEventListener("click", () => setFolded(!shell.classList.contains("folded")));
+railMinimize.addEventListener("click", foldAway);
 
-// Picking anything in the rail means you want to see it, so it unfolds. The
-// alternative is a click that visibly does nothing. Delegated, because the
-// pinned-site buttons are built as the pins are read and are not here yet.
-shell.querySelector(".rail").addEventListener("click", (e) => {
-  if (e.target.closest("#railMinimize")) return;
-  if (e.target.closest(".rail-btn") && shell.classList.contains("folded")) setFolded(false);
-});
+// Opening the panel any other way means the strip has done its job.
+chrome.storage.local.set({ pageStrip: false }).catch(() => {});
 
-chrome.storage.local.get("folded").then(({ folded }) => {
-  if (folded) setFolded(true);
+// The strip says which section to land on.
+chrome.storage.local.get("openPanel").then(({ openPanel }) => {
+  if (!openPanel) return;
+  chrome.storage.local.remove("openPanel").catch(() => {});
+  if (openPanel.url) openPanelSite(openPanel.url);
+  else if (openPanel.panel) showPanel(openPanel.panel);
 }).catch(() => {});
 
 railAddSite.addEventListener("click", async () => {
