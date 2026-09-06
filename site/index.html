@@ -377,6 +377,9 @@
   .who a:hover { color: var(--ink); }
 
   footer .col { padding-block: 2rem 3rem; display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; }
+  /* The source band is the first thing in the footer now, so it does not
+     need the gap that separated it from the site's own links. */
+  footer .col > .legal:first-child { margin-top: 0; }
   footer nav { margin-left: auto; display: flex; gap: 1.5rem; flex-wrap: wrap; }
   footer a { text-decoration: none; }
   footer a:hover { color: var(--ink); }
@@ -1036,13 +1039,6 @@ Charlie</span></button>
 
   <footer>
     <div class="col">
-      <nav>
-        <a href="#how">How it works</a>
-        <a href="#questions">Questions</a>
-        <a href="#private">Site access</a>
-        <a href="https://github.com/lightmorphic/sidebar">Source on GitHub</a>
-        <a href="https://lightmorphic.com" target="_blank" rel="noopener">Lightmorphic</a>
-      </nav>
       <!-- Where the code is. Its own band between the site's own links and
            the legal ones, because it is neither. -->
       <div class="legal source">
