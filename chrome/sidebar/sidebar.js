@@ -904,13 +904,45 @@ chrome.permissions.onRemoved.addListener(refreshDrawPermission);
 async function foldAway() {
   // The worker does the work: it outlives this page, and it has to put the
   // strip into tabs that are already open, which a registered content script
-  // never reaches.
+  // never reaches. It answers, so a fold that cannot work says why instead
+  // of closing the panel onto nothing.
+  let result;
   try {
-    await chrome.runtime.sendMessage({ type: "fold" });
+    result = await chrome.runtime.sendMessage({ type: "fold" });
   } catch {
-    await chrome.storage.local.set({ pageStrip: true }).catch(() => {});
+    result = { ok: false, reason: "error" };
   }
-  window.close();
+  if (result?.ok) {
+    window.close();
+    return;
+  }
+  const why = {
+    "chrome-page":
+      "The strip is drawn on the page, and no extension may draw on Chrome's own pages. " +
+      "Switch to an ordinary website, then fold.",
+    "no-access":
+      "This site has not been allowed yet, so nothing can be drawn on it. " +
+      "Open Information and turn on access for every site, then fold.",
+  }[result?.reason] || "Something stopped the strip being drawn, so the panel has stayed open.";
+  showFoldProblem(why);
+}
+
+// Said in the panel, where the user is looking, rather than in a console.
+function showFoldProblem(text) {
+  let note = document.getElementById("foldProblem");
+  if (!note) {
+    note = document.createElement("p");
+    note.id = "foldProblem";
+    note.className = "fold-problem";
+    note.setAttribute("role", "status");
+    document.querySelector(".content").prepend(note);
+  }
+  note.textContent = text;
+  note.hidden = false;
+  clearTimeout(showFoldProblem.timer);
+  showFoldProblem.timer = setTimeout(() => {
+    note.hidden = true;
+  }, 9000);
 }
 
 railMinimize.addEventListener("click", () => {
@@ -919,10 +951,21 @@ railMinimize.addEventListener("click", () => {
   // nothing behind -- which is what it did, and it looks like a broken
   // button. Requested before anything is awaited, or the click is spent.
   if (!mayDrawOnPages) {
-    chrome.permissions
-      .request({ origins: ALL_SITES })
-      .catch(() => false)
-      .then(() => foldAway());
+    // The dialog is Chrome's, and a side panel losing focus while it is up
+    // can leave this promise unsettled. Fold anyway after a moment, so the
+    // button is never simply dead; a fold that then cannot draw explains
+    // itself.
+    // It can throw outright rather than rejecting -- "must be called during
+    // a user gesture" -- and an uncaught throw here would leave the button
+    // doing nothing at all.
+    let asked;
+    try {
+      asked = chrome.permissions.request({ origins: ALL_SITES }).catch(() => false);
+    } catch {
+      asked = Promise.resolve(false);
+    }
+    const gaveUp = new Promise((resolve) => setTimeout(resolve, 20000, false));
+    Promise.race([asked, gaveUp]).then(() => foldAway());
     return;
   }
   foldAway();

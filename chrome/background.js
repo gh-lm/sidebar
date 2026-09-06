@@ -51,7 +51,7 @@ bootTasks();
 chrome.runtime.onInstalled.addListener(bootTasks);
 chrome.runtime.onStartup.addListener(bootTasks);
 
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // The panel pings us when it opens; message delivery starts the worker,
   // which is the reliable carrier for once-per-launch work (onStartup alone
   // has proved unreliable in practice).
@@ -67,25 +67,44 @@ chrome.runtime.onMessage.addListener((message) => {
   // AFTER it is registered -- which never includes the tab being looked at.
   // So the strip is injected into the open tabs directly.
   if (message?.type === "fold") {
+    // Answered, not fire-and-forget: if the strip cannot be drawn where the
+    // user is standing, the panel needs to say so rather than closing and
+    // leaving an empty screen, which is what it did.
     (async () => {
+      const [active] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!active || !/^https?:/i.test(active.url || "")) {
+        sendResponse({ ok: false, reason: "chrome-page" });
+        return;
+      }
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: active.id },
+          files: ["lib/page-rail.js"],
+        });
+      } catch (e) {
+        sendResponse({ ok: false, reason: "no-access", detail: String(e) });
+        return;
+      }
       await chrome.storage.local.set({ pageStrip: true });
+      // Now the rest of the open tabs, so the strip is already there when
+      // the user switches to one.
       const tabs = await chrome.tabs.query({});
       await Promise.all(
         tabs
-          .filter((t) => t.id != null && /^https?:/i.test(t.url || ""))
+          .filter((t) => t.id !== active.id && t.id != null && /^https?:/i.test(t.url || ""))
           .map((t) =>
             chrome.scripting
               .executeScript({ target: { tabId: t.id }, files: ["lib/page-rail.js"] })
               .catch(() => {
-                /* no permission for this site, or a page extensions cannot
-                   touch. The strip simply does not appear there. */
+                /* a site that has not been allowed; it simply has no strip */
               })
           )
       );
+      sendResponse({ ok: true });
       const win = await chrome.windows.getCurrent();
       if (chrome.sidePanel?.close) await chrome.sidePanel.close({ windowId: win.id }).catch(() => {});
-    })().catch(() => {});
-    return false;
+    })().catch((e) => sendResponse({ ok: false, reason: "error", detail: String(e) }));
+    return true; // the reply comes later
   }
   if (message?.type === "open-panel") {
     (async () => {

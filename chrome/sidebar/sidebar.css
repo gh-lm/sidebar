@@ -1113,3 +1113,18 @@ dialog#siteDialog input {
   accent-color: var(--accent);
   margin: 0;
 }
+
+/* Why a fold did nothing. Sits above whatever section is open, and goes on
+   its own after a few seconds. */
+.fold-problem {
+  margin: 0 0 0.5rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--radius);
+  background: var(--muted);
+  border: 1px solid var(--accent);
+  color: var(--fg);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.fold-problem[hidden] { display: none; }
