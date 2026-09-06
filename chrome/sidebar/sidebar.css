@@ -562,7 +562,35 @@ body {
 .panel-nav button svg { width: 17px; height: 17px; }
 .panel-nav button:hover { background: var(--muted); }
 .panel-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-#panelPopOut { margin-left: 0.25rem; }
+/* The one thing in this bar that takes you out of the panel, so it is the
+   one that reads as a button rather than another glyph. The rest are
+   navigation and stay as icons. */
+#panelPopOut {
+  width: auto;
+  height: 30px;
+  gap: 0.35rem;
+  padding: 0 0.6rem;
+  margin-left: 0.35rem;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  font: 500 0.78rem/1 inherit;
+  font-family: inherit;
+}
+
+#panelPopOut svg { width: 15px; height: 15px; }
+
+#panelPopOut:hover {
+  background: var(--accent);
+  border-color: transparent;
+  color: #111827;
+}
+
+/* Squeezed into the narrowest panel Chrome allows, the address shrinks to a
+   stub like "ligh..." which tells you nothing. Better to drop it and leave
+   the buttons room; the page below says where you are. */
+@media (max-width: 400px) {
+  .panel-nav-host { display: none; }
+}
 
 .panel-nav-host {
   flex: 1;
