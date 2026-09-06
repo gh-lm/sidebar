@@ -154,6 +154,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         .then((r) => r?.[0]?.result)
         .catch((e) => ({ error: String(e).slice(0, 80) }));
       say(`strip on the page: ${JSON.stringify(drawn)}`);
+      // Closing the panel on the strength of "the injection did not throw"
+      // is how this kept failing quietly. Check it is actually on screen,
+      // and if it is not, stay open and say what was found.
+      if (!drawn || drawn.onScreen !== true) {
+        await chrome.storage.local.set({ pageStrip: false });
+        sendResponse({ ok: false, reason: "not-visible", detail: JSON.stringify(drawn) });
+        return;
+      }
       sendResponse({ ok: true });
       if (dryRun) {
         say("dry run, panel left open");

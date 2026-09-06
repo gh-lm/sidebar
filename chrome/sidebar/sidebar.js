@@ -768,15 +768,49 @@ async function useRealFaviconIfPlaceholder(img, host) {
     return;
   }
   if (signatureOf(img) !== placeholder) return;
-  // Straight to the site the user pinned, and nowhere else. Left alone if it
-  // has no icon there, so the button keeps the grey globe rather than going
-  // blank.
-  try {
-    const real = await loadImage(`https://${host}/favicon.ico`);
-    if (real.naturalWidth > 0) img.src = real.src;
-  } catch {
-    /* no icon at the usual place; the placeholder stays */
+  const real = await findSiteIcon(host);
+  if (real) img.src = real;
+}
+
+// Straight to the site the user pinned, and nowhere else. /favicon.ico is
+// only a convention: plenty of sites have none and declare their icon in the
+// page instead, which is why lightmorphic.com came up as a grey globe. So
+// try the usual places, then read the page and use what it actually names.
+async function findSiteIcon(host) {
+  for (const path of ["/favicon.ico", "/favicon.svg", "/favicon.png", "/apple-touch-icon.png"]) {
+    try {
+      const im = await loadImage(`https://${host}${path}`);
+      if (im.naturalWidth > 0) return im.src;
+    } catch {
+      /* not there; try the next */
+    }
   }
+  // Reading the page needs permission for it. Without that the fetch is
+  // refused and fills the console with CORS complaints for no gain.
+  try {
+    if (!(await chrome.permissions.contains({ origins: [siteScope(host)] }))) return null;
+  } catch {
+    return null;
+  }
+  try {
+    const res = await fetch(`https://${host}/`, { credentials: "omit" });
+    const html = (await res.text()).slice(0, 60000);
+    const links = [...html.matchAll(/<link\b[^>]*>/gi)].map((m) => m[0]);
+    for (const tag of links) {
+      if (!/rel\s*=\s*["']?[^"'>]*\bicon\b/i.test(tag)) continue;
+      const href = tag.match(/href\s*=\s*["']([^"']+)["']/i)?.[1];
+      if (!href) continue;
+      try {
+        const im = await loadImage(new URL(href, `https://${host}/`).href);
+        if (im.naturalWidth > 0) return im.src;
+      } catch {
+        /* declared but not loadable; keep looking */
+      }
+    }
+  } catch {
+    /* no permission for this site, or it would not answer */
+  }
+  return null;
 }
 
 function renderRailSites(webPanels) {
@@ -958,12 +992,16 @@ async function foldAway() {
     "no-access":
       "This site has not been allowed yet, so nothing can be drawn on it. " +
       "Open Information and turn on access for every site, then fold.",
-  }[result?.reason] || "Something stopped the strip being drawn, so the panel has stayed open.";
-  showFoldProblem(why);
+  }[result?.reason] ||
+    (result?.reason === "not-visible"
+      ? "The strip was put on the page but ended up somewhere it cannot be seen. " +
+        "Tap to copy what was found, and send it to me: " + (result.detail || "")
+      : "Something stopped the strip being drawn, so the panel has stayed open.");
+  showFoldProblem(why, result?.detail);
 }
 
 // Said in the panel, where the user is looking, rather than in a console.
-function showFoldProblem(text) {
+function showFoldProblem(text, copyable) {
   let note = document.getElementById("foldProblem");
   if (!note) {
     note = document.createElement("p");
@@ -979,7 +1017,11 @@ function showFoldProblem(text) {
   showFoldProblem.timer = setTimeout(() => {
     note.hidden = true;
   }, 20000);
-  note.onclick = () => { note.hidden = true; };
+  note.onclick = () => {
+    // Worth copying rather than transcribing from the screen.
+    if (copyable) navigator.clipboard.writeText(copyable).catch(() => {});
+    note.hidden = true;
+  };
   note.style.cursor = "pointer";
 }
 
