@@ -28,6 +28,19 @@ p.write_text(json.dumps(d, indent=2) + "\n")
 print(f"{d['name']}  version {d['version']}")
 PY
 
+# Only the current one, so there is never a question of which zip is which.
+rm -f "$DEST"/lightmorphic-sidebar-test-*.zip
 ( cd "$DEST/extension" && zip -qr "../lightmorphic-sidebar-test-$N.zip" . -x '.*' )
-rm -f "$DEST"/lightmorphic-sidebar-test-*.zip.old
+
+# Keep the readme's headline in step with what was just built.
+if [ -f "$DEST/README.md" ]; then
+  python3 - "$DEST/README.md" "$N" <<'PY2'
+import pathlib, re, sys
+p, n = pathlib.Path(sys.argv[1]), sys.argv[2]
+s = p.read_text()
+s = re.sub(r"Lightmorphic Sidebar \(test \d+\)", f"Lightmorphic Sidebar (test {n})", s)
+s = re.sub(r"version 1\.0\.1\.\d+", f"version 1.0.1.{n}", s)
+p.write_text(s)
+PY2
+fi
 echo "$DEST/extension"
