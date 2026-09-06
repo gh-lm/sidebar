@@ -289,13 +289,12 @@ const searchRecent = document.getElementById("searchRecent");
 // a menu and takes one line: press the letter and it searches with that
 // engine there and then, rather than setting a preference and waiting.
 const ENGINES = [
-  // DuckDuckGo's own lightweight endpoint. The full site does not fit a
-  // panel even at phone width — it still scrolls sideways — and it throws a
-  // bot challenge at a framed request. This one fits, loads instantly and
-  // just works.
-  // kae=d is DuckDuckGo's own dark theme, and the light pages have no other
-  // way of knowing: they do not follow the browser's setting.
-  { id: "ddg", letter: "D", name: "DuckDuckGo", url: "https://lite.duckduckgo.com/lite/?q=", dark: "&kae=d" },
+  // The real DuckDuckGo, not its lite endpoint. The lite one was chosen
+  // because the full site was said not to fit a panel and to challenge a
+  // framed request; measured in the panel, neither is true any more. It
+  // fits at panel width, it frames, and it follows the browser into dark on
+  // its own, while lite is a wall of plain text that ignored the dark hint.
+  { id: "ddg", letter: "D", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=" },
   { id: "google", letter: "G", name: "Google", url: "https://www.google.com/search?q=" },
   { id: "gimages", letter: "I", name: "Google Images", url: "https://www.google.com/search?tbm=isch&q=" },
   { id: "bing", letter: "B", name: "Bing", url: "https://www.bing.com/search?q=" },
@@ -936,11 +935,17 @@ document.addEventListener("change", (e) => {
   if (e.target.name === "searchOpensIn") {
     chrome.storage.local.set({ searchOpensIn: e.target.value }).catch(() => {});
   }
+  if (e.target.name === "linksOpenIn") {
+    chrome.storage.local.set({ linksOpenIn: e.target.value }).catch(() => {});
+  }
 });
 
-chrome.storage.local.get("searchOpensIn").then(({ searchOpensIn = "panel" }) => {
-  for (const input of document.querySelectorAll('input[name="searchOpensIn"]')) {
-    input.checked = input.value === searchOpensIn;
+chrome.storage.local.get(["searchOpensIn", "linksOpenIn"]).then((saved) => {
+  for (const [name, fallback] of [["searchOpensIn", "panel"], ["linksOpenIn", "panel"]]) {
+    const value = saved[name] || fallback;
+    for (const input of document.querySelectorAll(`input[name="${name}"]`)) {
+      input.checked = input.value === value;
+    }
   }
 }).catch(() => {});
 
@@ -1586,3 +1591,4 @@ document.getElementById("stripTryNow")?.addEventListener("click", async () => {
   ];
   out.textContent = lines.join("\n");
 });
+

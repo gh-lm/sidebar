@@ -20,6 +20,50 @@
 
   if (document.getElementById("lightmorphic-sidebar-scroll")) return;
 
+  // Following a link inside the panel keeps you in a column about a phone
+  // wide. Set to do so, a click hands the link to the main window instead,
+  // at full width, and leaves the panel on the results you came from.
+  let linksToMainWindow = false;
+  const readLinkSetting = () =>
+    chrome.storage.local
+      .get("linksOpenIn")
+      .then(({ linksOpenIn }) => {
+        linksToMainWindow = linksOpenIn === "tab";
+      })
+      .catch(() => {});
+  readLinkSetting();
+  try {
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === "local" && "linksOpenIn" in changes) readLinkSetting();
+    });
+  } catch {
+    /* an orphaned copy after a reload; the page will get a fresh one */
+  }
+
+  document.addEventListener(
+    "click",
+    (e) => {
+      if (!linksToMainWindow || e.defaultPrevented || e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target.closest && e.target.closest("a[href]");
+      if (!a) return;
+      let href;
+      try {
+        href = new URL(a.href, location.href);
+      } catch {
+        return;
+      }
+      if (!/^https?:$/.test(href.protocol)) return;
+      // Staying on the same site is usually paging or a filter, and belongs
+      // in the panel. It is leaving for a result that wants the room.
+      if (href.hostname === location.hostname) return;
+      e.preventDefault();
+      e.stopPropagation();
+      chrome.runtime.sendMessage({ type: "open-tab", url: href.href }).catch(() => {});
+    },
+    true
+  );
+
   // Dark blob on a light page, light blob on a dark one. Read once the page
   // has painted, because the background is often set by a stylesheet.
   function inkFor() {

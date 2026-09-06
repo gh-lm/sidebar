@@ -178,6 +178,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true; // the reply comes later
   }
+  // A link followed inside the panel, handed to the main window.
+  if (message?.type === "open-tab" && message.url) {
+    (async () => {
+      const [here] = await chrome.tabs.query({ active: true, currentWindow: true });
+      await chrome.tabs.create({ url: message.url, index: here ? here.index + 1 : undefined });
+    })().catch(() => {});
+    return false;
+  }
   if (message?.type === "open-panel") {
     // Opening the side panel is only allowed while the user's click still
     // counts, and every await spends a little of that. So it goes first,
