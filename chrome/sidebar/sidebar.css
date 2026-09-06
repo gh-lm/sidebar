@@ -396,8 +396,8 @@ body {
 
 .panel-zoom {
   width: auto !important;
-  padding: 0 0.35rem;
-  font-size: 0.6875rem !important;
+  padding: 0 0.4rem;
+  font-size: 0.78rem !important;
   font-weight: 600;
   color: var(--muted-fg);
 }
@@ -547,8 +547,8 @@ body {
   flex-shrink: 0;
 }
 .panel-nav button {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -559,7 +559,7 @@ body {
   cursor: pointer;
   flex-shrink: 0;
 }
-.panel-nav button svg { width: 17px; height: 17px; }
+.panel-nav button svg { width: 20px; height: 20px; }
 .panel-nav button:hover { background: var(--muted); }
 .panel-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* The one thing in this bar that takes you out of the panel, so it is the
@@ -567,17 +567,20 @@ body {
    navigation and stay as icons. */
 #panelPopOut {
   width: auto;
-  height: 30px;
+  height: 34px;
   gap: 0.35rem;
-  padding: 0 0.6rem;
-  margin-left: 0.35rem;
+  padding: 0 0.7rem;
+  /* Hard against the right edge, away from the navigation. The address used
+     to push it there, but the address is dropped in a narrow panel and the
+     button then slid back to sit among the arrows. */
+  margin-left: auto;
   background: var(--muted);
   border: 1px solid var(--border);
   font: 500 0.78rem/1 inherit;
   font-family: inherit;
 }
 
-#panelPopOut svg { width: 15px; height: 15px; }
+#panelPopOut svg { width: 17px; height: 17px; }
 
 #panelPopOut:hover {
   background: var(--accent);
@@ -593,7 +596,10 @@ body {
 }
 
 .panel-nav-host {
-  flex: 1;
+  /* Takes only the room it needs and gives it up first. The Open button is
+     pushed right by its own auto margin, so the address no longer has to
+     act as the spacer. */
+  flex: 0 1 auto;
   min-width: 0;
   margin-left: 0.25rem;
   font-size: 0.8125rem;
