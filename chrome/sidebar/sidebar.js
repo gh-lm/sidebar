@@ -602,6 +602,7 @@ async function setWebPanels(list) {
   await chrome.storage.local.set({ webPanels: list });
   renderRailSites(list);
   store.writePanels(list).catch(() => {});
+  forgetIcons(list).catch(() => {});
 }
 
 function openSiteDialog({ url = "", editing = null } = {}) {
@@ -627,6 +628,9 @@ siteForm.addEventListener("submit", async (e) => {
   }
   siteDialog.close();
   openPanelSite(url);
+  // Opening it asks for permission for the site, which is what makes its
+  // icon readable, so the icon is taken straight afterwards.
+  captureIconFor(url).catch(() => {});
 });
 
 // What the panel has opened, and where in that list we are. Only navigations
@@ -758,7 +762,109 @@ async function useRealFaviconIfPlaceholder(img, host) {
   }
   if (signatureOf(img) !== placeholder) return;
   const real = await findSiteIcon(host);
-  if (real) img.src = real;
+  if (!real) return;
+  img.src = real;
+  keepIcon(host, real);
+}
+
+// Icons taken at pinning time and kept, the way a browser keeps a bookmark's
+// icon. Held in memory so the rail can draw without waiting on a read.
+let keptIcons = {};
+
+chrome.storage.local.get("siteIcons").then(({ siteIcons = {} }) => {
+  keptIcons = siteIcons;
+}).catch(() => {});
+
+// Pins made before icons were kept: fetch each one once, quietly.
+chrome.storage.local.get(["webPanels", "siteIcons"]).then(({ webPanels = [], siteIcons = {} }) => {
+  keptIcons = siteIcons;
+  for (const url of webPanels) captureIconFor(url).catch(() => {});
+}).catch(() => {});
+
+// Stored as the image itself rather than an address, so a pin keeps its icon
+// even if the site later moves it, goes down, or has its permission taken
+// away. A favicon is a couple of kilobytes; anything larger is left alone.
+async function keepIcon(host, iconUrl) {
+  const domain = siteDomain(host);
+  if (keptIcons[domain]) return;
+  try {
+    const res = await fetch(iconUrl);
+    const blob = await res.blob();
+    if (!blob.type.startsWith("image/") || blob.size > 120000) return;
+    // Drawn down to 32px before keeping it. Some sites answer with a 256px
+    // icon, and twenty kilobytes of base64 per pin adds up for something
+    // that is never shown above 22px. The blob is ours by now, so the
+    // canvas is not tainted and can be read back.
+    const dataUrl = await shrink(blob).catch(() => readAsDataUrl(blob));
+    const { siteIcons = {} } = await chrome.storage.local.get("siteIcons");
+    siteIcons[domain] = dataUrl;
+    keptIcons = siteIcons;
+    await chrome.storage.local.set({ siteIcons });
+  } catch {
+    /* not readable from here; the rail keeps whatever it drew */
+  }
+}
+
+function readAsDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function shrink(blob, size = 32) {
+  // SVG has no intrinsic size to a canvas in every engine, and it is small
+  // already, so it is kept as it came.
+  if (blob.type.includes("svg")) return readAsDataUrl(blob);
+  const bitmap = await createImageBitmap(blob);
+  const side = Math.min(size, Math.max(bitmap.width, bitmap.height)) || size;
+  const canvas = new OffscreenCanvas(side, side);
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(bitmap, 0, 0, side, side);
+  bitmap.close();
+  return readAsDataUrl(await canvas.convertToBlob({ type: "image/png" }));
+}
+
+// Take the icon at the moment of pinning, like Vivaldi does, rather than
+// hoping it can be found later.
+async function captureIconFor(url) {
+  let host;
+  try {
+    host = new URL(url).hostname;
+  } catch {
+    return;
+  }
+  if (keptIcons[siteDomain(host)]) return;
+  const found = await findSiteIcon(host);
+  if (found) await keepIcon(host, found);
+  renderRailSites(await getWebPanels());
+}
+
+// A pin removed should not leave its picture behind.
+async function forgetIcons(keep) {
+  const domains = new Set(
+    keep.map((u) => {
+      try {
+        return siteDomain(new URL(u).hostname);
+      } catch {
+        return "";
+      }
+    })
+  );
+  const { siteIcons = {} } = await chrome.storage.local.get("siteIcons").catch(() => ({}));
+  let changed = false;
+  for (const domain of Object.keys(siteIcons)) {
+    if (!domains.has(domain)) {
+      delete siteIcons[domain];
+      changed = true;
+    }
+  }
+  if (changed) {
+    keptIcons = siteIcons;
+    await chrome.storage.local.set({ siteIcons }).catch(() => {});
+  }
 }
 
 // Straight to the site the user pinned, and nowhere else. /favicon.ico is
@@ -852,18 +958,21 @@ function renderRailSites(webPanels) {
     // third party every site the user had pinned, every time the panel
     // opened — indefensible in a privacy extension, and a remote request
     // in a package that should make none.
-    img.src = cachedFaviconUrl(url);
+    // A kept copy first: taken when the site was pinned, so it does not
+    // depend on the browser's cache, on the network, or on still having
+    // permission for the site.
+    const kept = keptIcons[siteDomain(host)];
+    img.src = kept || cachedFaviconUrl(url);
     img.alt = "";
     img.addEventListener("error", () => {
       img.remove();
       btn.textContent = "•";
     });
-    // The cache only holds sites this profile has actually opened in a tab.
-    // Pin something you have never browsed and Chrome hands back its grey
-    // globe rather than nothing, so the button looks broken on exactly the
-    // big, obvious sites people pin first. Asking the site itself is the
-    // only other source that is not a third party watching what you pin.
-    useRealFaviconIfPlaceholder(img, host);
+    // No kept copy yet: draw whatever the browser has, and go and find the
+    // real one. The browser's cache only holds sites this profile has opened
+    // in a tab, so pin something you have only read about and it hands back
+    // a grey globe -- on exactly the big, obvious sites people pin first.
+    if (!kept) useRealFaviconIfPlaceholder(img, host);
     btn.appendChild(img);
     btn.addEventListener("click", () => openPanelSite(url));
     btn.addEventListener("contextmenu", (e) => {

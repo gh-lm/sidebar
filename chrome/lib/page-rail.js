@@ -173,8 +173,11 @@
     }
 
     let pins = [];
+    let icons = {};
     try {
-      ({ webPanels: pins = [] } = await chrome.storage.local.get("webPanels"));
+      const saved = await chrome.storage.local.get(["webPanels", "siteIcons"]);
+      pins = saved.webPanels || [];
+      icons = saved.siteIcons || {};
     } catch {
       /* no pins to draw */
     }
@@ -187,9 +190,15 @@
         /* keep the raw string */
       }
       // The browser's favicon service is only readable from an extension
-      // page, and this is a web page, so a real icon is not available here.
-      // A letter is at least legible, rather than a broken image.
-      strip.append(iconButton({ label: name, letter: name.replace(/^www\./, "")[0], url }));
+      // page, and this is a web page. The copy kept when the site was pinned
+      // is an image we already hold, so it works here; a letter is the
+      // fallback for a pin made before icons were kept.
+      const kept = icons[name.replace(/^www\./, "")];
+      strip.append(
+        kept
+          ? iconButton({ label: name, img: kept, url })
+          : iconButton({ label: name, letter: name.replace(/^www\./, "")[0], url })
+      );
     }
 
     // Sending it away. It comes back the next time the panel is folded, or
@@ -272,7 +281,7 @@
 
   const onChanged = (changes, area) => {
     if (area !== "local") return;
-    if (["pageStrip", "webPanels", "stripSide", "stripTop"].some((k) => k in changes)) sync();
+    if (["pageStrip", "webPanels", "siteIcons", "stripSide", "stripTop"].some((k) => k in changes)) sync();
   };
   chrome.storage.onChanged.addListener(onChanged);
 
