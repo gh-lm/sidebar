@@ -7,9 +7,12 @@ Upload: `dist/lightmorphic-sidebar-1.0.1.zip`
 
 1.0.0 is published and live, so that number can never be used again. This is
 an update, not a first submission: the code has changed since, and the
-version is now 1.0.1. Updates are usually reviewed faster than a first
-submission, unless they ask for a permission the published version did not
-have. This one does not.
+version is now 1.0.1.
+
+**This one adds a permission**, `cookies`, so expect the slower review an
+update normally escapes. It is there for one thing: a site in the panel is
+inside a frame and cannot see its own cookies, so cookie banners come back
+every time. The justification below explains it.
 
 ---
 
@@ -249,6 +252,21 @@ Two things, for one site at a time and only after the user has granted
 permission for that site: removing the headers that stop a site being displayed
 inside a panel, and requesting that site's phone layout, because the panel is
 about as wide as a phone.
+```
+
+`cookies`
+
+```
+A site shown in the panel sits inside a frame, and a frame counts as a
+different site from the page around it, so the browser holds back most of
+that site's own cookies. In practice that means a cookie banner the user
+already answered in an ordinary tab reappears in the panel every single
+time. When the user opens a site in the panel, and only for that site, its
+cookies are copied into a storage partition belonging to this extension, so
+the site can see its own settings there. The originals are never modified
+and keep their SameSite protection everywhere else in the browser; the
+copies are readable only inside this extension's own panel. No cookie is
+read for any other purpose, and none is sent anywhere.
 ```
 
 `favicon`

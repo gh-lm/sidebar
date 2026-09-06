@@ -38,6 +38,7 @@
     "clipboardWrite",
     "tabs",
     "scripting",
+    "cookies",
     "bookmarks",
     "declarativeNetRequestWithHostAccess",
     "favicon"

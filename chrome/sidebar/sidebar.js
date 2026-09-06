@@ -205,6 +205,48 @@ async function ensureHostAccess(host) {
   }
 }
 
+// A site shown in the panel sits inside a frame, and a frame is a different
+// site from the page around it. Most cookies say "only send me to my own
+// site", so the browser holds them back -- which is why a consent banner
+// answered in an ordinary tab comes straight back in the panel, over and
+// over, on a panel it takes up a third of.
+//
+// The originals are not touched. Copies are written into a compartment that
+// belongs to this panel and nothing else, so the site sees its own settings
+// here while its cookies keep their protection everywhere else in the
+// browser.
+async function mirrorCookiesIntoPanel(host) {
+  if (!chrome.cookies?.getAll) return;
+  const partitionKey = { topLevelSite: `chrome-extension://${chrome.runtime.id}` };
+  const domain = siteDomain(host);
+  let cookies = [];
+  try {
+    cookies = await chrome.cookies.getAll({ domain });
+  } catch {
+    return; // no access to this site's cookies, so nothing to carry over
+  }
+  await Promise.all(
+    cookies.map((c) => {
+      const copy = {
+        url: `https://${c.domain.replace(/^\./, "")}${c.path}`,
+        name: c.name,
+        value: c.value,
+        path: c.path,
+        secure: true,
+        httpOnly: c.httpOnly,
+        // Only meaningful inside the panel's own compartment.
+        sameSite: "no_restriction",
+        partitionKey,
+      };
+      if (c.domain.startsWith(".")) copy.domain = c.domain;
+      if (!c.session) copy.expirationDate = c.expirationDate;
+      return chrome.cookies.set(copy).catch(() => {
+        /* one the browser will not copy; the rest still go */
+      });
+    })
+  );
+}
+
 async function allowFramingFor(url) {
   let host;
   try {
@@ -214,6 +256,7 @@ async function allowFramingFor(url) {
   }
   if (!(await ensureHostAccess(host))) return false;
   await ensureMobileScript(host);
+  await mirrorCookiesIntoPanel(host);
   const domain = siteDomain(host);
   // Someone who has allowed every site gets one rule covering every site.
   // Scoping it to the pinned domain leaves a site that redirects elsewhere
