@@ -12,7 +12,24 @@
    Runs in the ISOLATED world: it never touches the page's own scripts. */
 (() => {
   if (window.top !== window) return; // top-level pages only, never a frame
-  if (document.documentElement.dataset.lmSidebarRail) return; // already here
+
+  // A copy of this script from before the extension was reloaded can still
+  // be sitting on the page. Its listener is dead -- reloading an extension
+  // cuts every content script already running from it -- but its mark is
+  // still on the page. Bowing out on seeing that mark is what left the strip
+  // permanently unable to appear on any tab that had been open across a
+  // reload. So take over from it instead of standing down.
+  const previous = document.documentElement.__lmSidebarRail;
+  if (previous && typeof previous.teardown === "function") {
+    try {
+      previous.teardown();
+    } catch {
+      /* it was already cut off; its host is removed below either way */
+    }
+  }
+  for (const stale of [...document.documentElement.children]) {
+    if (stale.tagName === "DIV" && stale.style.zIndex === "2147483647") stale.remove();
+  }
   document.documentElement.dataset.lmSidebarRail = "1";
 
   const CLOSE_ICON = '<path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/>';
@@ -253,10 +270,19 @@
     else hide();
   }
 
-  chrome.storage.onChanged.addListener((changes, area) => {
+  const onChanged = (changes, area) => {
     if (area !== "local") return;
     if (["pageStrip", "webPanels", "stripSide", "stripTop"].some((k) => k in changes)) sync();
-  });
+  };
+  chrome.storage.onChanged.addListener(onChanged);
+
+  // What the next copy needs to retire this one cleanly.
+  document.documentElement.__lmSidebarRail = {
+    teardown() {
+      chrome.storage.onChanged.removeListener(onChanged);
+      hide();
+    },
+  };
 
   sync();
 })();

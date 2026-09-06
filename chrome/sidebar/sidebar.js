@@ -1018,11 +1018,27 @@ function showFoldProblem(text, copyable) {
     note.hidden = true;
   }, 20000);
   note.onclick = () => {
-    // Worth copying rather than transcribing from the screen.
-    if (copyable) navigator.clipboard.writeText(copyable).catch(() => {});
+    // Worth copying rather than transcribing from the screen. The clipboard
+    // API refuses when the panel does not have focus, which is easy to hit
+    // here, so the text is selected as well and can be copied by hand.
+    if (copyable) {
+      navigator.clipboard.writeText(copyable).catch(() => {});
+      const range = document.createRange();
+      range.selectNodeContents(note);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      try {
+        document.execCommand("copy");
+      } catch {
+        /* left selected, so it can be copied by hand */
+      }
+      return; // stay up while there is something to take from it
+    }
     note.hidden = true;
   };
   note.style.cursor = "pointer";
+  note.style.userSelect = "text";
 }
 
 railMinimize.addEventListener("click", () => {
