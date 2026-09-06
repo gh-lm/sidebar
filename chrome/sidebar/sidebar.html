@@ -112,7 +112,12 @@
              Without that the scrollbar eats the page's right-hand gutter and
              everything looks shoved over. -->
         <div class="frame-clip" id="frameClip" hidden>
-          <iframe id="webPanelFrame" class="web-frame"></iframe>
+          <!-- Everything a normal page needs, minus allow-top-navigation: without
+               that, a site can replace the whole panel with itself, taking the
+               rail and the buttons with it. Some search results do exactly
+               that on purpose, to break out of frames. -->
+          <iframe id="webPanelFrame" class="web-frame"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads allow-storage-access-by-user-activation"></iframe>
         </div>
       </section>
 

@@ -20,6 +20,28 @@
 
   if (document.getElementById("lightmorphic-sidebar-scroll")) return;
 
+  // Tell the panel where this frame has actually got to. Following a link in
+  // here is invisible from outside -- the frame is another site and its
+  // address cannot be read from the panel -- so without this, Open and
+  // Reload act on the address the panel was first sent to rather than the
+  // page you are looking at.
+  let toldPanel = "";
+  function tellPanel() {
+    if (location.href === toldPanel) return;
+    toldPanel = location.href;
+    try {
+      chrome.runtime.sendMessage({ type: "panel-frame-url", url: location.href }).catch(() => {});
+    } catch {
+      /* an orphaned copy after a reload of the extension */
+    }
+  }
+  tellPanel();
+  addEventListener("popstate", tellPanel);
+  addEventListener("hashchange", tellPanel);
+  // Sites that change the address without a navigation, which the events
+  // above do not always cover.
+  setInterval(tellPanel, 1500);
+
   // Following a link inside the panel keeps you in a column about a phone
   // wide. Set to do so, a click hands the link to the main window instead,
   // at full width, and leaves the panel on the results you came from.

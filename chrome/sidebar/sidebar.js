@@ -603,15 +603,32 @@ document.getElementById("panelReload").addEventListener("click", reloadPanel);
 // a page to keep. This hands the panel's page to a real tab. It is the one
 // thing here that deliberately reaches outside the panel, and only when
 // asked.
+// A link followed inside the panel changes where you are, and the panel
+// cannot see that for itself: the frame is another site. The script running
+// in there says so, and Open, Reload and the address then act on the page
+// actually in front of you.
+chrome.runtime.onMessage.addListener((message) => {
+  if (message?.type !== "panel-frame-url" || !message.url) return false;
+  if (!document.getElementById("panel-panels")?.classList.contains("active")) return false;
+  currentPanelUrl = message.url;
+  try {
+    panelNavHost.textContent = new URL(message.url).hostname;
+  } catch {
+    /* leave the address as it was */
+  }
+  return false;
+});
+
 document.getElementById("panelPopOut").addEventListener("click", () => {
-  if (!currentPanelUrl) return;
+  // Taken now. The panel is cleared a few lines down, synchronously, while
+  // the tab is still being opened -- so reading it in there got null and
+  // opened an empty new tab instead of the page.
+  const url = currentPanelUrl;
+  if (!url) return;
   // Beside the tab it came from, not at the far end of the strip of tabs.
   chrome.tabs.query({ active: true, currentWindow: true }).then(([here]) => {
-    chrome.tabs.create({
-      url: currentPanelUrl,
-      index: here ? here.index + 1 : undefined,
-    });
-  }).catch(() => chrome.tabs.create({ url: currentPanelUrl }));
+    chrome.tabs.create({ url, index: here ? here.index + 1 : undefined });
+  }).catch(() => chrome.tabs.create({ url }));
   // The page is in the main window now, so showing it in the panel as well
   // is just the same thing twice. Back to the search page.
   webPanelFrame.src = "about:blank";
