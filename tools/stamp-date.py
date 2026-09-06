@@ -11,7 +11,8 @@ import subprocess
 import sys
 from datetime import date
 
-PAGES = ("site/index.html", "site/privacy.html")
+PAGES = ("site/index.html", "site/privacy.html", "site/cookies.html",
+         "site/terms.html", "site/accessibility.html", "site/complaints.html")
 SITEMAP = "site/sitemap.xml"
 
 
