@@ -2,7 +2,12 @@
 # Regenerates every raster icon from the one SVG. Needs rsvg-convert.
 set -euo pipefail
 cd "$(dirname "$0")"
-for S in 16 32 48; do rsvg-convert -w "$S" -h "$S" brand/icon.svg -o "chrome/icons/icon-$S.png"; done
+# The small sizes come from the simplified mark. At 16px the full one's
+# three dots are half a pixel across and its panel block is invisible, so it
+# renders as a dark square with a yellow smudge -- which is what a toolbar
+# button and a browser tab both show.
+for S in 16 32; do rsvg-convert -w "$S" -h "$S" brand/icon-small.svg -o "chrome/icons/icon-$S.png"; done
+rsvg-convert -w 48 -h 48 brand/icon.svg -o chrome/icons/icon-48.png
 
 # The 128 is the one the store shows. Google's advice is 96x96 of artwork
 # inside 16px of transparent padding, but that assumes a mark that needs
@@ -20,8 +25,14 @@ rsvg-convert -w 180 -h 180 brand/icon.svg -o site/images/lightmorphic-sidebar-ma
 # ask the server for /favicon.ico regardless and never look at the HTML:
 # bookmark bars, history, feed readers, link previews. Without one they show
 # a blank page icon. The .ico carries three sizes so each picks its own.
-cp brand/icon.svg site/favicon.svg
-magick -background none brand/icon.svg -define icon:auto-resize=48,32,16 site/favicon.ico
+# A browser tab draws the icon at 16px, so the site's icon is the simplified
+# mark. The .ico carries the full mark only at 48, where it reads.
+cp brand/icon-small.svg site/favicon.svg
+rsvg-convert -w 48 -h 48 brand/icon.svg -o /tmp/lm-fav-48.png
+rsvg-convert -w 32 -h 32 brand/icon-small.svg -o /tmp/lm-fav-32.png
+rsvg-convert -w 16 -h 16 brand/icon-small.svg -o /tmp/lm-fav-16.png
+magick /tmp/lm-fav-48.png /tmp/lm-fav-32.png /tmp/lm-fav-16.png site/favicon.ico
+rm -f /tmp/lm-fav-48.png /tmp/lm-fav-32.png /tmp/lm-fav-16.png
 command -v optipng >/dev/null && optipng -quiet -o2 chrome/icons/*.png site/images/*.png
 
 # optipng squeezes these down to a palette. That still carries transparency,
