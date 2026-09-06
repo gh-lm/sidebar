@@ -2,7 +2,7 @@
 
 Dates are when the version was submitted to the Chrome Web Store.
 
-## 1.1.0 — unreleased
+## 1.1.0 — 6 September 2026
 
 - A site's icon is taken when it is pinned and kept, so it is there whether
   or not the site has been visited or is reachable.
