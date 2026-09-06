@@ -62,6 +62,31 @@ chrome.runtime.onMessage.addListener((message) => {
   // A click on the on-page icon strip. The strip cannot open the panel
   // itself -- sidePanel.open() has to be called from an extension page or
   // the worker, and needs the window the click happened in.
+  // Folding. Done here rather than in the panel because the panel is about
+  // to close, and a registered content script only reaches pages loaded
+  // AFTER it is registered -- which never includes the tab being looked at.
+  // So the strip is injected into the open tabs directly.
+  if (message?.type === "fold") {
+    (async () => {
+      await chrome.storage.local.set({ pageStrip: true });
+      const tabs = await chrome.tabs.query({});
+      await Promise.all(
+        tabs
+          .filter((t) => t.id != null && /^https?:/i.test(t.url || ""))
+          .map((t) =>
+            chrome.scripting
+              .executeScript({ target: { tabId: t.id }, files: ["lib/page-rail.js"] })
+              .catch(() => {
+                /* no permission for this site, or a page extensions cannot
+                   touch. The strip simply does not appear there. */
+              })
+          )
+      );
+      const win = await chrome.windows.getCurrent();
+      if (chrome.sidePanel?.close) await chrome.sidePanel.close({ windowId: win.id }).catch(() => {});
+    })().catch(() => {});
+    return false;
+  }
   if (message?.type === "open-panel") {
     (async () => {
       await chrome.storage.local.set({

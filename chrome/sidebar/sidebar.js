@@ -20,6 +20,10 @@ setTimeout(async () => {
   });
 }, 5000);
 
+// Every site. Declared up here because it is read while this module is
+// still being evaluated, and a const is unusable before its own line runs.
+const ALL_SITES = ["*://*/*"];
+
 // ---- Icon rail ----
 // Only tab buttons (data-panel) switch views. The "+" button and the
 // pinned-site favicons are .rail-btn too but have their own handlers --
@@ -879,21 +883,50 @@ const railMinimize = document.getElementById("railMinimize");
 // the page squeezed exactly as before. The only way to hand the width back
 // and still keep the icons within reach is to close the panel and draw them
 // on the page instead -- lib/page-rail.js, on sites already allowed.
+// Whether we may draw on pages at all, kept current so the click handler can
+// read it without awaiting. chrome.permissions.request only works while the
+// click is still "fresh", and an await spends that.
+let mayDrawOnPages = false;
+
+function refreshDrawPermission() {
+  chrome.permissions
+    .contains({ origins: ALL_SITES })
+    .then((yes) => {
+      mayDrawOnPages = yes;
+    })
+    .catch(() => {});
+}
+
+refreshDrawPermission();
+chrome.permissions.onAdded.addListener(refreshDrawPermission);
+chrome.permissions.onRemoved.addListener(refreshDrawPermission);
+
 async function foldAway() {
-  await chrome.storage.local.set({ pageStrip: true }).catch(() => {});
+  // The worker does the work: it outlives this page, and it has to put the
+  // strip into tabs that are already open, which a registered content script
+  // never reaches.
   try {
-    if (chrome.sidePanel?.close) {
-      const win = await chrome.windows.getCurrent();
-      await chrome.sidePanel.close({ windowId: win.id });
-      return;
-    }
+    await chrome.runtime.sendMessage({ type: "fold" });
   } catch {
-    /* older Chrome, or refused: window.close() below still works */
+    await chrome.storage.local.set({ pageStrip: true }).catch(() => {});
   }
   window.close();
 }
 
-railMinimize.addEventListener("click", foldAway);
+railMinimize.addEventListener("click", () => {
+  // The strip is drawn on the page, so it needs to be allowed on pages. Ask
+  // first, from this click, rather than closing the panel and leaving
+  // nothing behind -- which is what it did, and it looks like a broken
+  // button. Requested before anything is awaited, or the click is spent.
+  if (!mayDrawOnPages) {
+    chrome.permissions
+      .request({ origins: ALL_SITES })
+      .catch(() => false)
+      .then(() => foldAway());
+    return;
+  }
+  foldAway();
+});
 
 // Opening the panel any other way means the strip has done its job.
 chrome.storage.local.set({ pageStrip: false }).catch(() => {});
@@ -1234,7 +1267,6 @@ for (const link of document.querySelectorAll(".info-link")) {
 // asked again. Off by default and revocable from the same button, because
 // "allow everything" should be a decision someone makes rather than one
 // they are walked into.
-const ALL_SITES = ["*://*/*"];
 const allowAllBtn = document.getElementById("allowAllBtn");
 const allowAllState = document.getElementById("allowAllState");
 
