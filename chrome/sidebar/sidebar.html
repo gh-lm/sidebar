@@ -218,9 +218,22 @@
         </article>
 
         <article class="info-card">
-          <h3>Closing it</h3>
-          <p>The chevron at the top of the rail closes the panel, which is what gives the page its full width back. Chrome fixes the panel's width and gives extensions no say over it, so there is no half-open state worth having. The toolbar icon brings it back.</p>
+          <h3>Folding it away</h3>
+          <p>The chevron at the top of the rail closes the panel and leaves a small strip of icons against the edge of the page, so what you reach for most is still one click away while the page has its full width back. Click any icon on the strip to open the panel again on that section.</p>
+          <p>Drag the strip by its mark to move it up or down. The cross at the bottom sends it away until the next time you fold the panel.</p>
+          <p class="info-aside">Chrome will not let the side panel be narrower than 360 pixels and gives extensions no say over it, so folding the panel without closing it would leave that much of the page still covered. Closing it and drawing the strip on the page is the only way to hand the width back.</p>
           <p class="info-aside" id="shortcutHint">Checking&hellip;</p>
+        </article>
+
+        <article class="info-card">
+          <h3>Which side</h3>
+          <p>Chrome decides which side the panel itself is docked on, and only you can move it: right-click the panel's header, or find it in Chrome's own appearance settings. This panel notices and turns itself round to match, so the icons always sit on the edge nearest the page.</p>
+          <p>The strip on the page follows the panel unless you tell it otherwise.</p>
+          <div class="side-choice" role="radiogroup" aria-label="Which side the strip sits on">
+            <label><input type="radio" name="sidePreference" value="auto" checked> Follow the panel</label>
+            <label><input type="radio" name="sidePreference" value="left"> Always left</label>
+            <label><input type="radio" name="sidePreference" value="right"> Always right</label>
+          </div>
         </article>
 
         <div class="info-links">

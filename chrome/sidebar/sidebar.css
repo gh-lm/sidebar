@@ -58,11 +58,20 @@ body {
 
 .shell {
   display: flex;
-  /* Rail sits on the RIGHT edge of the panel (the outermost edge of the
-     window, since Chromium docks the side panel on the right) -- content
-     first, rail second. */
+  /* The rail sits on the edge nearest the page, so it is the part the eye
+     lands on. Chromium docks the panel on the right by default, which puts
+     the rail on the panel's left... except the panel can be moved to the
+     left of the window, and then the mirror image is right. Which way round
+     is decided at runtime from sidePanel.getLayout(). */
   flex-direction: row-reverse;
   height: 100%;
+}
+
+.shell.rail-left { flex-direction: row; }
+
+.shell.rail-left .rail {
+  border-left: 0;
+  border-right: 1px solid var(--border);
 }
 
 /* Icon rail -- Vivaldi-style: a slim strip of icon-only buttons, one per
@@ -1053,3 +1062,26 @@ dialog#siteDialog input {
 
 :hover::-webkit-scrollbar-thumb { background: var(--scroll-thumb); background-clip: content-box; }
 ::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-strong); background-clip: content-box; }
+
+/* Which side the strip sits on. Radio buttons rather than a cycling button:
+   there are three states and no obvious order to cycle them in. */
+.side-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.side-choice label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.side-choice input {
+  accent-color: var(--accent);
+  margin: 0;
+}

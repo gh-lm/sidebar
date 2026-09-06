@@ -15,6 +15,8 @@
   if (document.documentElement.dataset.lmSidebarRail) return; // already here
   document.documentElement.dataset.lmSidebarRail = "1";
 
+  const CLOSE_ICON = '<path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/>';
+
   const ICONS = {
     search:
       '<circle cx="9" cy="9" r="5.25"/><path d="M12.9 12.9L16.5 16.5"/>',
@@ -26,12 +28,12 @@
 
   let host = null;
   let shadow = null;
+  let side = "right";
+  let topPercent = 50;
 
   function build() {
     host = document.createElement("div");
-    host.style.cssText =
-      "all: initial; position: fixed; right: 0; top: 50%; " +
-      "transform: translateY(-50%); z-index: 2147483647;";
+    host.style.cssText = "all: initial; position: fixed; z-index: 2147483647;";
     shadow = host.attachShadow({ mode: "closed" });
 
     const style = document.createElement("style");
@@ -43,10 +45,9 @@
         align-items: center;
         gap: 2px;
         padding: 6px 4px;
-        border-radius: 10px 0 0 10px;
+        border-radius: var(--corners);
         background: #111827;
         border: 1px solid rgba(255, 255, 255, 0.12);
-        border-right: 0;
         box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
         font-family: system-ui, sans-serif;
       }
@@ -67,6 +68,9 @@
       .mark { width: 20px; height: 20px; border-radius: 4px; }
       .letter { font: 600 12px system-ui, sans-serif; }
       hr { width: 16px; border: 0; border-top: 1px solid rgba(255,255,255,.14); margin: 3px 0; }
+      .grip { cursor: grab; color: #64748b; }
+      .grip:active { cursor: grabbing; }
+      .close:hover { background: rgba(239, 68, 68, 0.25); color: #fecaca; }
     `;
     shadow.append(style);
 
@@ -98,6 +102,12 @@
       b.append(el);
     }
     b.addEventListener("click", () => {
+      // A drag ends with a click; ignore that one, or moving the strip also
+      // opens the panel.
+      if (b.dataset.dragged === "1") {
+        delete b.dataset.dragged;
+        return;
+      }
       chrome.runtime.sendMessage({ type: "open-panel", panel, url }).catch(() => {});
     });
     return b;
@@ -107,14 +117,20 @@
     const strip = shadow ? shadow.querySelector(".strip") : build();
     strip.textContent = "";
 
-    strip.append(
-      iconButton({
-        label: "Lightmorphic Sidebar",
-        img: chrome.runtime.getURL("icons/icon-32.png"),
-        panel: "search",
-      })
-    );
+    // Drag handle. The mark doubles as it, so the strip does not grow a
+    // control that does nothing but exist.
+    const grip = iconButton({
+      label: "Lightmorphic Sidebar \u2014 drag to move it up or down",
+      img: chrome.runtime.getURL("icons/icon-32.png"),
+      panel: "search",
+    });
+    grip.classList.add("grip");
+    makeDraggable(grip);
+    strip.append(grip);
     strip.append(document.createElement("hr"));
+    strip.appendChild(document.createComment("sections"));
+    strip.append(
+    );
     for (const [panel, label] of [
       ["search", "Search"],
       ["scratchpad", "Scratchpad"],
@@ -143,7 +159,65 @@
       strip.append(iconButton({ label: name, letter: name.replace(/^www\./, "")[0], url }));
     }
 
+    // Sending it away. It comes back the next time the panel is folded, or
+    // from the toolbar icon, so this is a dismissal rather than a setting.
+    strip.append(document.createElement("hr"));
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "close";
+    close.title = "Hide this strip";
+    close.setAttribute("aria-label", "Hide this strip");
+    close.innerHTML =
+      `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" ` +
+      `stroke-linecap="round">${CLOSE_ICON}</svg>`;
+    close.addEventListener("click", () => {
+      chrome.storage.local.set({ pageStrip: false }).catch(() => {});
+    });
+    strip.append(close);
+
+    place();
     if (!host.isConnected) document.documentElement.append(host);
+  }
+
+  // Which edge, and how far down. Both are remembered, so the strip stays
+  // where it was put.
+  function place() {
+    if (!host) return;
+    host.style.left = side === "left" ? "0px" : "auto";
+    host.style.right = side === "left" ? "auto" : "0px";
+    host.style.top = `${topPercent}%`;
+    host.style.transform = "translateY(-50%)";
+    const strip = shadow.querySelector(".strip");
+    if (strip) {
+      strip.style.setProperty("--corners", side === "left" ? "0 10px 10px 0" : "10px 0 0 10px");
+      strip.style[side === "left" ? "borderLeft" : "borderRight"] = "0";
+      strip.style[side === "left" ? "borderRight" : "borderLeft"] = "";
+    }
+  }
+
+  // Dragging moves it up and down only: the edge is a deliberate choice made
+  // in Information, not something to lose by accident with a stray drag.
+  function makeDraggable(handle) {
+    let dragging = false;
+    handle.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      handle.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    handle.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const pct = Math.min(92, Math.max(8, (e.clientY / window.innerHeight) * 100));
+      if (Math.abs(pct - topPercent) > 0.5) handle.dataset.dragged = "1";
+      topPercent = pct;
+      host.style.top = `${pct}%`;
+    });
+    const stop = () => {
+      if (!dragging) return;
+      dragging = false;
+      chrome.storage.local.set({ stripTop: topPercent }).catch(() => {});
+    };
+    handle.addEventListener("pointerup", stop);
+    handle.addEventListener("pointercancel", stop);
   }
 
   function hide() {
@@ -151,18 +225,21 @@
   }
 
   async function sync() {
-    let visible = false;
+    let settings;
     try {
-      ({ pageStrip: visible = false } = await chrome.storage.local.get("pageStrip"));
+      settings = await chrome.storage.local.get(["pageStrip", "stripSide", "stripTop"]);
     } catch {
       return;
     }
-    if (visible) await render();
+    side = settings.stripSide === "left" ? "left" : "right";
+    topPercent = typeof settings.stripTop === "number" ? settings.stripTop : 50;
+    if (settings.pageStrip) await render();
     else hide();
   }
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && ("pageStrip" in changes || "webPanels" in changes)) sync();
+    if (area !== "local") return;
+    if (["pageStrip", "webPanels", "stripSide", "stripTop"].some((k) => k in changes)) sync();
   });
 
   sync();

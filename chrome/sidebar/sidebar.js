@@ -835,6 +835,42 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
+// ---- Which edge ----
+// Chromium can dock the side panel on either side, and moving it is the
+// user's own setting -- an extension can read it but not set it. So the
+// panel reads it and mirrors itself, and the page strip follows to the same
+// edge, unless Information has been used to pin the strip to one side.
+async function applySide() {
+  let { sidePreference = "auto" } = await chrome.storage.local.get("sidePreference").catch(() => ({}));
+  let panelSide = "right";
+  try {
+    if (chrome.sidePanel?.getLayout) {
+      const layout = await chrome.sidePanel.getLayout();
+      if (layout?.side) panelSide = layout.side;
+    }
+  } catch {
+    /* older Chrome: assume the default */
+  }
+  // Panel docked left means the page is to its right, so the rail belongs on
+  // the panel's right edge, and vice versa.
+  document.querySelector(".shell").classList.toggle("rail-left", panelSide === "right" ? false : true);
+  const stripSide = sidePreference === "auto" ? panelSide : sidePreference;
+  await chrome.storage.local.set({ stripSide, panelSide }).catch(() => {});
+  for (const input of document.querySelectorAll('input[name="sidePreference"]')) {
+    input.checked = input.value === sidePreference;
+  }
+}
+
+applySide();
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") applySide();
+});
+
+document.addEventListener("change", (e) => {
+  if (e.target.name !== "sidePreference") return;
+  chrome.storage.local.set({ sidePreference: e.target.value }).then(applySide).catch(() => {});
+});
+
 // ---- Fold ----
 const railMinimize = document.getElementById("railMinimize");
 
