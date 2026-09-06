@@ -1,13 +1,13 @@
-# Submitting Lightmorphic Sidebar 1.0.1 to the Chrome Web Store
+# Submitting Lightmorphic Sidebar 1.1.0 to the Chrome Web Store
 
 Everything on this page is ready to copy straight into the form at
 <https://chrome.google.com/webstore/devconsole>. Nothing else needs writing.
 
-Upload: `dist/lightmorphic-sidebar-1.0.1.zip`
+Upload: `dist/lightmorphic-sidebar-1.1.0.zip`
 
 1.0.0 is published and live, so that number can never be used again. This is
 an update, not a first submission: the code has changed since, and the
-version is now 1.0.1.
+version is now 1.1.0.
 
 **This one adds a permission**, `cookies`, so expect the slower review an
 update normally escapes. It is there for one thing: a site in the panel is
@@ -39,7 +39,7 @@ how many of something there are. The permission justifications are not
 public listing text and can stay specific.
 
 The corrected listing went on to be published as 1.0.0. Everything below now
-describes the 1.0.1 update.
+describes the 1.1.0 update.
 
 ---
 
@@ -356,7 +356,7 @@ adds a permission goes back into the slow queue.
 
 ---
 
-## What changed in 1.0.1
+## What changed in 1.1.0
 
 Worth having to hand if the review asks, and worth putting in the "what's
 new" box if the form offers one:
@@ -390,7 +390,7 @@ beforehand.
 Reading no longer creates the bookmarks folder. Opening the panel used to
 put one in your bookmarks whether or not you had saved anything.
 
-No new permissions. Nothing else changed.
+One new permission, `cookies`, justified above. Nothing else changed.
 
 ---
 
@@ -398,7 +398,7 @@ No new permissions. Nothing else changed.
 
 - [ ] Developer account fee of $5 paid
 - [ ] Publisher email verified in the account settings
-- [ ] `dist/lightmorphic-sidebar-1.0.1.zip` uploaded (68 KB, 18 files)
+- [ ] `dist/lightmorphic-sidebar-1.1.0.zip` uploaded (98 KB, 20 files)
 - [ ] Detailed description pasted
 - [ ] Website and support URL both filled in, and they are different
 - [ ] Five screenshots, small promo tile and marquee all uploaded

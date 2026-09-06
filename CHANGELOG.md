@@ -2,7 +2,7 @@
 
 Dates are when the version was submitted to the Chrome Web Store.
 
-## 1.0.1 — unreleased
+## 1.1.0 — unreleased
 
 - Pinned sites that answered on a different address came back as "refused to
   connect". Permission now covers a site's subdomains, and allowing every
@@ -22,6 +22,8 @@ Dates are when the version was submitted to the Chrome Web Store.
   presses.
 - Open hands the page you are looking at to a tab, and returns the panel to
   the search box.
+- The bin is labelled Danger zone and says what it takes, including the
+  bookmarks folder the extension made.
 
 ## 1.0.0 — 2 September 2026
 
