@@ -1697,3 +1697,60 @@ document.getElementById("stripTryNow")?.addEventListener("click", async () => {
   out.textContent = lines.join("\n");
 });
 
+
+
+// ---- Remove everything ----
+// Two clicks, the same as deleting a snippet: the first arms it and turns it
+// into a tick, the second does it, and doing nothing puts it back. Chrome
+// gives an extension no hook at uninstall -- no event fires, and afterwards
+// its code is gone -- so this is the only place the question can be asked.
+const railWipe = document.getElementById("railWipe");
+
+if (railWipe) {
+  const WIPE_BIN = railWipe.innerHTML;
+  const WIPE_TICK =
+    '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 10.5l3 3 6-6.5"/></svg>';
+  const IDLE = "Remove everything this has saved";
+  const ARMED = "Click again to remove the scratchpad, snippets and pinned sites";
+
+  let armed = false;
+  let armedTimer = null;
+
+  function disarmWipe() {
+    armed = false;
+    clearTimeout(armedTimer);
+    railWipe.classList.remove("armed");
+    railWipe.innerHTML = WIPE_BIN;
+    railWipe.dataset.tip = IDLE;
+    railWipe.setAttribute("aria-label", IDLE);
+  }
+
+  railWipe.addEventListener("click", async () => {
+    if (!armed) {
+      armed = true;
+      railWipe.classList.add("armed");
+      railWipe.innerHTML = WIPE_TICK;
+      railWipe.dataset.tip = ARMED;
+      railWipe.setAttribute("aria-label", ARMED);
+      armedTimer = setTimeout(disarmWipe, 5000);
+      return;
+    }
+    clearTimeout(armedTimer);
+    await store.removeEverything().catch(() => {});
+    await chrome.storage.local
+      .remove(["notepadText", "snippets", "webPanels", "siteIcons", "recentSearches"])
+      .catch(() => {});
+    keptIcons = {};
+    disarmWipe();
+    notepad.value = "";
+    loadScratchpad();
+    loadSnippets();
+    loadWebPanels();
+    showPanel("search");
+  });
+
+  // Changing your mind should be as easy as doing nothing.
+  railWipe.addEventListener("mouseleave", () => {
+    if (armed) disarmWipe();
+  });
+}

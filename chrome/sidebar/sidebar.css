@@ -1245,3 +1245,12 @@ dialog#siteDialog input {
 }
 
 .info-trace[hidden] { display: none; }
+
+/* Remove everything. Quiet until it is armed, then unmistakably red. */
+.rail-wipe { color: var(--muted-fg); }
+.rail-wipe:hover { color: var(--danger); }
+
+.rail-wipe.armed {
+  background: var(--danger-bg);
+  color: var(--danger);
+}

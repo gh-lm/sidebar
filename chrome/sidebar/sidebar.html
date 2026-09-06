@@ -36,6 +36,11 @@
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4.5v11M4.5 10h11"/></svg>
       </button>
       <div class="rail-spacer"></div>
+      <!-- Chrome gives an extension nothing to hang a question on when it is
+           uninstalled, so the offer to clear up has to come before that. -->
+      <button class="rail-btn rail-wipe" id="railWipe" type="button" data-tip="Remove everything this has saved" aria-label="Remove everything this has saved">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6h11"/><path d="M8 6V4.5h4V6"/><path d="M6 6l.7 9.2a1 1 0 0 0 1 .8h4.6a1 1 0 0 0 1-.8L14 6"/><path d="M8.75 9v4.5M11.25 9v4.5"/></svg>
+      </button>
       <button class="rail-btn rail-btn-information" data-panel="information" role="tab" aria-selected="false" data-tip="Information" aria-label="Information">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.25"/><path d="M10 9v4.5"/><path d="M10 6.4h.01"/></svg>
       </button>
@@ -242,6 +247,12 @@
             <label><input type="radio" name="linksOpenIn" value="panel" checked> Stay in the panel</label>
             <label><input type="radio" name="linksOpenIn" value="tab"> Open in the main window</label>
           </div>
+        </article>
+
+        <article class="info-card">
+          <h3>Removing everything</h3>
+          <p>The bin at the foot of the rail deletes the whole &quot;Lightmorphic Sidebar&quot; bookmarks folder: scratchpad, snippets and pinned sites. Press it once and it turns into a red tick; press that to go through with it. Move away, or leave it a few seconds, and it goes back to normal.</p>
+          <p class="info-aside">Chrome gives an extension nothing to hang a question on at the moment you remove it, and afterwards its code is gone, so it cannot offer to tidy up then. This is the offer, beforehand. If you forget, nothing is stranded: the folder is ordinary bookmarks and deleting it by hand does exactly the same thing.</p>
         </article>
 
         <article class="info-card">

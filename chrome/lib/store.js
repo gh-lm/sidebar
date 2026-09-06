@@ -75,7 +75,11 @@ async function otherBookmarksId() {
 
 let rootIdCache = null;
 
-async function rootId() {
+// create=false is for reading: a read should not bring the folder back into
+// existence. It did, which meant "remove everything" left an empty folder
+// behind a second later, and merely opening the panel created one for
+// someone who had never saved anything.
+async function rootId({ create = true } = {}) {
   if (rootIdCache) {
     const [still] = await bm.get(rootIdCache).catch(() => []);
     if (still) return rootIdCache;
@@ -92,6 +96,7 @@ async function rootId() {
       await renameOldEntries(old.id);
     }
   }
+  if (!found && !create) return null;
   const node = found || (await bm.create({ parentId, title: ROOT_TITLE }));
   rootIdCache = node.id;
   return node.id;
@@ -112,23 +117,35 @@ async function renameOldEntries(folderId) {
   }
 }
 
-async function childByTitle(title) {
-  const kids = await bm.getChildren(await rootId());
+async function childByTitle(title, { create = true } = {}) {
+  const id = await rootId({ create });
+  if (!id) return null;
+  const kids = await bm.getChildren(id);
   return kids.find((k) => k.title === title && k.url) || null;
+}
+
+function isEmpty(value) {
+  if (Array.isArray(value)) return value.length === 0;
+  return value === "" || value === null || value === undefined;
 }
 
 async function putBlob(title, value) {
   const url = encode(value);
-  const existing = await childByTitle(title);
+  // Nothing to save and nowhere already saving it: leave the bookmarks
+  // alone. Otherwise "remove everything" is undone a moment later by the
+  // panel writing its now-empty state back out.
+  const create = !isEmpty(value);
+  const existing = await childByTitle(title, { create });
   if (existing) {
     if (existing.url !== url) await bm.update(existing.id, { url });
-  } else {
-    await bm.create({ parentId: await rootId(), title, url });
+    return;
   }
+  if (!create) return;
+  await bm.create({ parentId: await rootId(), title, url });
 }
 
 async function getBlob(title, fallback) {
-  const node = await childByTitle(title);
+  const node = await childByTitle(title, { create: false });
   if (!node) return fallback;
   const value = decode(node.url);
   return value === null ? fallback : value;
@@ -137,7 +154,9 @@ async function getBlob(title, fallback) {
 /* ---- the three things we keep -------------------------------------- */
 
 export async function readAll() {
-  const kids = await bm.getChildren(await rootId());
+  const id = await rootId({ create: false });
+  if (!id) return { webPanels: [], notepadText: "", snippets: [] };
+  const kids = await bm.getChildren(id);
   const webPanels = kids
     .filter((k) => k.url && !k.url.startsWith(HEAD) && !k.url.startsWith(OLD_HEAD))
     .map((k) => k.url);
@@ -160,7 +179,8 @@ export async function writeSnippets(snippets) {
 // rail order. Rewriting the whole set keeps the two in step without
 // having to track which bookmark belongs to which pin.
 export async function writePanels(urls) {
-  const id = await rootId();
+  const id = await rootId({ create: urls.length > 0 });
+  if (!id) return; // no pins and no folder: nothing to write
   const kids = await bm.getChildren(id);
   const current = kids.filter((k) => k.url && !k.url.startsWith(HEAD));
   for (const k of current) {
@@ -184,11 +204,30 @@ export async function writePanels(urls) {
   }
 }
 
+// Whether bookmarks can be used at all. Asking must not itself create the
+// folder -- it did, which is how an empty one reappeared a moment after
+// "remove everything", and how anyone who never saved anything still ended
+// up with a folder in their bookmarks.
 export async function available() {
   try {
-    await rootId();
+    await otherBookmarksId();
     return true;
   } catch {
     return false;
   }
+}
+
+// Everything this extension has saved, gone. The folder is ordinary
+// bookmarks, so this is the same as deleting it by hand -- offered here
+// because Chrome gives an extension no way to ask at the moment it is
+// uninstalled, by which time it can no longer do anything either.
+export async function removeEverything() {
+  const parentId = await otherBookmarksId();
+  const kids = await bm.getChildren(parentId);
+  const ours = kids.filter(
+    (k) => !k.url && (k.title === ROOT_TITLE || OLD_ROOT_TITLES.includes(k.title))
+  );
+  for (const folder of ours) await bm.removeTree(folder.id);
+  rootIdCache = null;
+  return ours.length;
 }

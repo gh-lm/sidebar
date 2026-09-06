@@ -383,6 +383,13 @@ The arrow at the top of the icon strip now folds the panel away to just
 those icons, instead of closing it. Chromium's own close button still closes
 it outright.
 
+A bin at the foot of the rail removes everything the extension has saved,
+on two presses. Chrome offers no hook at uninstall, so the offer has to come
+beforehand.
+
+Reading no longer creates the bookmarks folder. Opening the panel used to
+put one in your bookmarks whether or not you had saved anything.
+
 No new permissions. Nothing else changed.
 
 ---
