@@ -38,13 +38,27 @@
       <div class="rail-spacer"></div>
       <!-- Chrome gives an extension nothing to hang a question on when it is
            uninstalled, so the offer to clear up has to come before that. -->
-      <button class="rail-btn rail-wipe" id="railWipe" type="button" data-tip="Remove everything this has saved" aria-label="Remove everything this has saved">
+      <button class="rail-btn rail-wipe" id="railWipe" type="button" data-tip="Danger zone" aria-label="Danger zone: remove everything this has saved">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6h11"/><path d="M8 6V4.5h4V6"/><path d="M6 6l.7 9.2a1 1 0 0 0 1 .8h4.6a1 1 0 0 0 1-.8L14 6"/><path d="M8.75 9v4.5M11.25 9v4.5"/></svg>
       </button>
       <button class="rail-btn rail-btn-information" data-panel="information" role="tab" aria-selected="false" data-tip="Information" aria-label="Information">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.25"/><path d="M10 9v4.5"/><path d="M10 6.4h.01"/></svg>
       </button>
     </nav>
+  <!-- The warning has to say the bookmarks go too: they sit in the user's own
+       bookmarks bar, so people reasonably assume they survive. -->
+  <div class="wipe-warn" id="wipeWarn" hidden>
+    <p class="wipe-warn-title">Danger zone</p>
+    <p>This removes <strong>everything the sidebar has saved</strong>:</p>
+    <ul>
+      <li>your scratchpad</li>
+      <li>your snippets</li>
+      <li>your pinned sites and their icons</li>
+      <li>the <strong>Lightmorphic Sidebar bookmarks folder</strong>, and every bookmark inside it</li>
+    </ul>
+    <p>That folder lives in your own bookmarks, so it will disappear from there too. This cannot be undone.</p>
+    <p class="wipe-warn-do">Press the red tick to go ahead, or press Escape to cancel.</p>
+  </div>
 
     <div class="content">
       <section id="panel-search" class="panel-view active">

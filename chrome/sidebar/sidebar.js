@@ -1727,8 +1727,9 @@ if (railWipe) {
   const WIPE_BIN = railWipe.innerHTML;
   const WIPE_TICK =
     '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 10.5l3 3 6-6.5"/></svg>';
-  const IDLE = "Remove everything this has saved";
-  const ARMED = "Click again to remove the scratchpad, snippets and pinned sites";
+  const wipeWarn = document.getElementById("wipeWarn");
+  const IDLE = "Danger zone";
+  const ARMED = "Press again to remove everything, bookmarks included";
 
   let armed = false;
   let armedTimer = null;
@@ -1740,16 +1741,24 @@ if (railWipe) {
     railWipe.innerHTML = WIPE_BIN;
     railWipe.dataset.tip = IDLE;
     railWipe.setAttribute("aria-label", IDLE);
+    if (wipeWarn) wipeWarn.hidden = true;
   }
 
-  railWipe.addEventListener("click", async () => {
+  railWipe.addEventListener("click", async (e) => {
+    // The dismiss-on-outside-click listener below sees this same click as it
+    // bubbles, and by then the button's icon has been swapped, so the click
+    // target is detached and looks like it came from outside.
+    e.stopPropagation();
     if (!armed) {
       armed = true;
       railWipe.classList.add("armed");
       railWipe.innerHTML = WIPE_TICK;
       railWipe.dataset.tip = ARMED;
       railWipe.setAttribute("aria-label", ARMED);
-      armedTimer = setTimeout(disarmWipe, 5000);
+      if (wipeWarn) wipeWarn.hidden = false;
+      // Long enough to read the warning through, not so long that it is
+      // still armed when you have forgotten about it.
+      armedTimer = setTimeout(disarmWipe, 20000);
       return;
     }
     clearTimeout(armedTimer);
@@ -1766,8 +1775,13 @@ if (railWipe) {
     showPanel("search");
   });
 
-  // Changing your mind should be as easy as doing nothing.
-  railWipe.addEventListener("mouseleave", () => {
-    if (armed) disarmWipe();
+  // Changing your mind should be as easy as doing nothing. Moving off the
+  // button no longer cancels -- you have to move off it to read the warning.
+  document.addEventListener("keydown", (e) => {
+    if (armed && e.key === "Escape") disarmWipe();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (armed && !railWipe.contains(e.target)) disarmWipe();
   });
 }

@@ -47,6 +47,7 @@ body {
 
 .shell {
   display: flex;
+  position: relative;
   /* The rail sits on the edge nearest the page, so it is the part the eye
      lands on. Chromium docks the panel on the right by default, which puts
      the rail on the panel's left... except the panel can be moved to the
@@ -1254,3 +1255,46 @@ dialog#siteDialog input {
   background: var(--danger-bg);
   color: var(--danger);
 }
+
+/* The warning that comes with it. A tooltip cannot hold this much and does
+   not wrap, so the armed state opens a proper panel over the content. */
+.wipe-warn {
+  position: absolute;
+  right: calc(var(--rail-width) + 0.5rem);
+  bottom: 0.5rem;
+  left: 0.5rem;
+  z-index: 70;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.875rem;
+  color: var(--fg);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  box-shadow: 0 8px 26px rgba(0,0,0,.45);
+}
+
+.shell.rail-left .wipe-warn {
+  right: 0.5rem;
+  left: calc(var(--rail-width) + 0.5rem);
+}
+
+.wipe-warn[hidden] { display: none; }
+.wipe-warn p { margin: 0 0 0.5rem; }
+.wipe-warn p:last-child { margin-bottom: 0; }
+
+.wipe-warn-title {
+  color: var(--danger);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  letter-spacing: 0.01em;
+}
+
+.wipe-warn ul {
+  margin: 0 0 0.5rem;
+  padding-left: 1.1rem;
+}
+
+.wipe-warn li { margin-bottom: 0.15rem; }
+
+.wipe-warn-do { color: var(--muted-fg); }
