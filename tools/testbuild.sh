@@ -39,7 +39,7 @@ import pathlib, re, sys
 p, n = pathlib.Path(sys.argv[1]), sys.argv[2]
 s = p.read_text()
 s = re.sub(r"Lightmorphic Sidebar \(test \d+\)", f"Lightmorphic Sidebar (test {n})", s)
-s = re.sub(r"version 1\.0\.1\.\d+", f"version 1.0.1.{n}", s)
+s = re.sub(r"version 1\.1\.0\.\d+", f"version 1.1.0.{n}", s)
 p.write_text(s)
 PY2
 fi

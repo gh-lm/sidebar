@@ -2,11 +2,8 @@
 
 Dates are when the version was submitted to the Chrome Web Store.
 
-## 1.0.1 — unreleased
+## 1.1.0 — unreleased
 
-- Pinned sites that answered on a different address came back as "refused to
-  connect". Permission now covers a site's subdomains, and allowing every
-  site installs one rule that applies everywhere.
 - A site's icon is taken when it is pinned and kept, so it is there whether
   or not the site has been visited or is reachable.
 - Cookie banners answered in an ordinary tab no longer come back in the
@@ -24,6 +21,12 @@ Dates are when the version was submitted to the Chrome Web Store.
   the search box.
 - The bin is labelled Danger zone and says what it takes, including the
   bookmarks folder the extension made.
+
+## 1.0.1 — 4 September 2026
+
+- Pinned sites that answered on a different address came back as "refused to
+  connect". Permission now covers a site's subdomains, and allowing every
+  site installs one rule that applies everywhere.
 
 ## 1.0.0 — 2 September 2026
 
