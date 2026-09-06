@@ -1463,3 +1463,30 @@ if (shortcutHint && chrome.commands?.getAll) {
     shortcutHint.textContent = "Set a shortcut at chrome://extensions/shortcuts.";
   });
 }
+
+
+// ---- Why the strip did not appear ----
+// Runs the same work as folding, minus the closing, and shows what the
+// worker actually did. Guessing at this from the outside cost several
+// rounds; the extension can just say.
+document.getElementById("stripTryNow")?.addEventListener("click", async () => {
+  const out = document.getElementById("stripTrace");
+  out.hidden = false;
+  out.textContent = "Trying\u2026";
+  let reply;
+  try {
+    reply = await chrome.runtime.sendMessage({ type: "fold-dry-run" });
+  } catch (e) {
+    reply = { ok: false, detail: String(e) };
+  }
+  const { lastFold } = await chrome.storage.local.get("lastFold").catch(() => ({}));
+  const perms = await chrome.permissions
+    .contains({ origins: ALL_SITES })
+    .catch(() => "unknown");
+  const lines = [
+    `result: ${reply?.ok ? "worked" : "failed"}${reply?.reason ? " (" + reply.reason + ")" : ""}`,
+    `every site allowed: ${perms}`,
+    ...(lastFold?.steps || []).map((t) => `\u2022 ${t}`),
+  ];
+  out.textContent = lines.join("\n");
+});

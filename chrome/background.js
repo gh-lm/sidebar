@@ -66,44 +66,79 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // to close, and a registered content script only reaches pages loaded
   // AFTER it is registered -- which never includes the tab being looked at.
   // So the strip is injected into the open tabs directly.
-  if (message?.type === "fold") {
+  if (message?.type === "fold" || message?.type === "fold-dry-run") {
     // Answered, not fire-and-forget: if the strip cannot be drawn where the
     // user is standing, the panel needs to say so rather than closing and
-    // leaving an empty screen, which is what it did.
+    // leaving an empty screen. Every step is written down as it happens, so
+    // a fold that still goes wrong can be read back from Information.
+    const dryRun = message.type === "fold-dry-run";
+    const note = { at: new Date().toISOString(), dryRun, steps: [] };
+    const say = (step) => {
+      note.steps.push(step);
+      chrome.storage.local.set({ lastFold: note }).catch(() => {});
+    };
     (async () => {
       const [active] = await chrome.tabs.query({ active: true, currentWindow: true });
+      note.activeUrl = (active && active.url) || "(none)";
+      say(`active tab: ${note.activeUrl.slice(0, 60)}`);
       if (!active || !/^https?:/i.test(active.url || "")) {
+        say("stopped: not a page an extension may draw on");
         sendResponse({ ok: false, reason: "chrome-page" });
         return;
       }
+      // Written BEFORE injecting, or the script reads it as still folded
+      // away and draws nothing.
+      await chrome.storage.local.set({ pageStrip: true });
+      say("pageStrip set to true");
       try {
         await chrome.scripting.executeScript({
           target: { tabId: active.id },
           files: ["lib/page-rail.js"],
         });
+        say("strip injected into the active tab");
       } catch (e) {
+        say(`injection refused: ${String(e).slice(0, 120)}`);
+        await chrome.storage.local.set({ pageStrip: false });
         sendResponse({ ok: false, reason: "no-access", detail: String(e) });
         return;
       }
-      await chrome.storage.local.set({ pageStrip: true });
-      // Now the rest of the open tabs, so the strip is already there when
-      // the user switches to one.
       const tabs = await chrome.tabs.query({});
+      let others = 0;
       await Promise.all(
         tabs
           .filter((t) => t.id !== active.id && t.id != null && /^https?:/i.test(t.url || ""))
           .map((t) =>
             chrome.scripting
               .executeScript({ target: { tabId: t.id }, files: ["lib/page-rail.js"] })
+              .then(() => { others += 1; })
               .catch(() => {
                 /* a site that has not been allowed; it simply has no strip */
               })
           )
       );
+      say(`also injected into ${others} other tab(s)`);
+      const drawn = await chrome.scripting
+        .executeScript({
+          target: { tabId: active.id },
+          func: () => !!document.documentElement.dataset.lmSidebarRail,
+        })
+        .then((r) => r?.[0]?.result)
+        .catch(() => null);
+      say(`strip present on the page: ${drawn}`);
       sendResponse({ ok: true });
+      if (dryRun) {
+        say("dry run, panel left open");
+        return;
+      }
       const win = await chrome.windows.getCurrent();
-      if (chrome.sidePanel?.close) await chrome.sidePanel.close({ windowId: win.id }).catch(() => {});
-    })().catch((e) => sendResponse({ ok: false, reason: "error", detail: String(e) }));
+      if (chrome.sidePanel?.close) {
+        await chrome.sidePanel.close({ windowId: win.id }).catch((e) => say(`close refused: ${String(e).slice(0, 80)}`));
+      }
+      say("panel closed");
+    })().catch((e) => {
+      say(`threw: ${String(e).slice(0, 140)}`);
+      sendResponse({ ok: false, reason: "error", detail: String(e) });
+    });
     return true; // the reply comes later
   }
   if (message?.type === "open-panel") {
