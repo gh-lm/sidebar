@@ -31,7 +31,7 @@ BODIES = {
 <p class="lede">Lightmorphic Sidebar collects nothing, sends nothing, and has no server.</p>
 
 <h2>What it stores, and where</h2>
-<p>Your scratchpad, snippets and pinned sites are saved as ordinary bookmarks, in a folder called &quot;Lightmorphic Sidebar&quot; in your Other Bookmarks, with a copy in the browser's extension storage. The extension itself sends nothing anywhere: there is no account, no server of ours, and no network request of any kind to us.</p>
+<p>Your scratchpad, snippets and pinned sites are saved as ordinary bookmarks, in a folder called &quot;Lightmorphic Sidebar&quot; in your Other Bookmarks, with a copy in the browser's extension storage. A bin at the foot of the panel's icon rail removes all of it, that folder included, on two presses. The extension itself sends nothing anywhere: there is no account, no server of ours, and no network request of any kind to us.</p>
 
 <h2>Syncing</h2>
 <p>Because that data is bookmarks, your browser's own sync carries it to your other machines, exactly as it carries the rest of your bookmarks, under whatever settings and encryption your browser provides, between you and your browser maker. We are not involved and cannot see it. If you do not sync bookmarks, nothing leaves the machine. Deleting the folder deletes the data.</p>
@@ -46,7 +46,14 @@ BODIES = {
 <p>When you press &quot;+&quot; to pin a site, it reads the address of the tab you are on so it can fill that address in for you. It is shown on screen, saved only if you press Save, and used nowhere else. The extension does not read page content, and keeps no history of where you go.</p>
 
 <h2>Site icons</h2>
-<p>A pinned site's icon comes from your browser's own cache. Where the browser has none — a site you have never opened in a tab — the icon is fetched from that site itself, and from nowhere else. No icon service is used, because using one would tell a third party every site you have pinned.</p>
+<p>A pinned site's icon is taken at the moment you pin it and kept with the pin, so it is there whether or not you have visited the site and whether or not the site is reachable later. It comes from your browser's own cache, or, where the browser has none, from that site itself and from nowhere else. No icon service is used, because using one would tell a third party every site you have pinned.</p>
+
+<h2>Cookies</h2>
+<p>A site shown in the panel sits inside a frame, and a browser treats a framed site as a different site from the page around it, so it holds back most of that site's own cookies. The practical effect is that a cookie banner you have already answered in an ordinary tab comes back in the panel every time.</p>
+<p>To stop that, when you open a site in the panel the extension copies that site's cookies into a storage area belonging to this extension, so the site can see its own settings there. This happens only for a site you have granted access to, and only when you open it in the panel. The originals are never changed and keep their protection everywhere else in the browser, and the copies can be read only inside this extension's panel. No cookie is read for any other purpose and none is sent anywhere.</p>
+
+<h2>The strip on the page</h2>
+<p>Folding the panel away leaves a small strip of buttons drawn on the page you are reading, so the panel can be brought back. Drawing it means the extension puts a small script into that page, and it does so only on sites you have granted access to. The script draws the strip and listens for clicks on it. It does not read the page, its text, its forms or its addresses.</p>
 
 <h2>No third parties</h2>
 <p>No analytics, no tracking, no remote code, no external fonts or images, and no requests to any service, including ours.</p>
@@ -70,7 +77,8 @@ BODIES = {
 <p>Lightmorphic Sidebar stores what you save in your own bookmarks and in the browser's extension storage. Neither is a cookie, neither is sent anywhere, and both are yours to delete: remove the &quot;Lightmorphic Sidebar&quot; folder from your bookmarks, or remove the extension.</p>
 
 <h2>Sites you open in the panel</h2>
-<p>A website opened inside the panel is a real visit to that website. It can set its own cookies exactly as it would in a tab, under your browser's own cookie settings. Those are that site's cookies, not ours, and we cannot see them.</p>
+<p>A website opened inside the panel is a real visit to that website. It can set its own cookies exactly as it would in a tab, under your browser's own cookie settings. Those are that site's cookies, not ours.</p>
+<p>The panel shows a site inside a frame, and a browser treats a framed site as a different site from the page around it, so it holds back most of that site's own cookies. A banner you have already answered would come back every time. So that a site can see its own settings, the extension copies that site's cookies into a storage area belonging to this extension, for a site you have granted access to and at the moment you open it in the panel. The originals are never changed, the copies are readable only inside this extension's panel, and nothing is sent anywhere or seen by us. There is more on this in the <a href="privacy.html">privacy statement</a>.</p>
 
 <h2>Asking us</h2>
 <p>Questions about this page: <a href="mailto:privacy@lightmorphic.com">privacy@lightmorphic.com</a>.</p>
