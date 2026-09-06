@@ -1475,6 +1475,11 @@ async function loadSnippets() {
       snippet.id === expandedSnippetId ? renderExpanded(snippet) : renderCollapsed(snippet)
     );
   }
+  // With nothing saved, the add box moves to the middle and explains itself.
+  // The first snippet sends it back to the top, where it is out of the way.
+  document
+    .getElementById("panel-snippets")
+    .classList.toggle("snippets-empty", snippets.length === 0);
 }
 
 // Typing in the box at the bottom and clicking away saves it. Nothing to
