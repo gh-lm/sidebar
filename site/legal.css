@@ -86,3 +86,16 @@ a:hover { color: var(--accent); }
 @media (max-width: 34rem) {
   .legal nav { margin-left: 0; justify-content: flex-start; }
 }
+
+/* The source band, above the legal one. */
+.legal.source {
+  margin-top: 2.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.legal + .legal { margin-top: 0; padding-top: 1.25rem; border-top: 0; }
+
+.marks { display: flex; align-items: center; gap: 0.9rem; }
+.marks a { display: inline-flex; color: var(--muted-fg); }
+.marks a:hover { color: var(--fg); }
