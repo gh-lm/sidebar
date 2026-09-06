@@ -2,7 +2,7 @@
 
 Dates are when the version was submitted to the Chrome Web Store.
 
-## 1.1.0 — unreleased
+## 1.0.1 — unreleased
 
 - Pinned sites that answered on a different address came back as "refused to
   connect". Permission now covers a site's subdomains, and allowing every
