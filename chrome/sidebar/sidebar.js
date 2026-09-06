@@ -389,11 +389,21 @@ async function runSearch(q) {
   const query = (q || "").trim();
   if (!query) return;
   lastQuery = query;
-  // Everything stays in the panel: the results load here, the same way a
-  // pinned site does, which means asking for that one host the first time.
-  // Only a refusal sends it to a tab, and that is the fallback in
-  // loadInFrame rather than a choice made here.
-  openPanelSite(searchUrlFor(query));
+  const url = searchUrlFor(query);
+  const { searchOpensIn = "panel" } = await chrome.storage.local.get("searchOpensIn").catch(() => ({}));
+  if (searchOpensIn === "tab") {
+    // Results in the main window, beside the tab you are on, with the panel
+    // left on the search page ready for the next one.
+    const [here] = await chrome.tabs.query({ active: true, currentWindow: true }).catch(() => []);
+    chrome.tabs.create({ url, index: here ? here.index + 1 : undefined }).catch(() => {});
+    showPanel("search");
+  } else {
+    // Everything stays in the panel: the results load here, the same way a
+    // pinned site does, which means asking for that one host the first time.
+    // Only a refusal sends it to a tab, and that is the fallback in
+    // loadInFrame rather than a choice made here.
+    openPanelSite(url);
+  }
   const { recentSearches = [] } = await chrome.storage.local.get("recentSearches");
   const next = [query, ...recentSearches.filter((r) => r !== query)].slice(0, 6);
   await chrome.storage.local.set({ recentSearches: next });
@@ -562,7 +572,22 @@ document.getElementById("panelReload").addEventListener("click", reloadPanel);
 // thing here that deliberately reaches outside the panel, and only when
 // asked.
 document.getElementById("panelPopOut").addEventListener("click", () => {
-  if (currentPanelUrl) chrome.tabs.create({ url: currentPanelUrl });
+  if (!currentPanelUrl) return;
+  // Beside the tab it came from, not at the far end of the strip of tabs.
+  chrome.tabs.query({ active: true, currentWindow: true }).then(([here]) => {
+    chrome.tabs.create({
+      url: currentPanelUrl,
+      index: here ? here.index + 1 : undefined,
+    });
+  }).catch(() => chrome.tabs.create({ url: currentPanelUrl }));
+  // The page is in the main window now, so showing it in the panel as well
+  // is just the same thing twice. Back to the search page.
+  webPanelFrame.src = "about:blank";
+  currentPanelUrl = null;
+  panelHistory = [];
+  panelIndex = -1;
+  panelNav.hidden = true;
+  showPanel("search");
 });
 const siteDialog = document.getElementById("siteDialog");
 const siteForm = document.getElementById("siteForm");
@@ -871,9 +896,19 @@ document.addEventListener("visibilitychange", () => {
 });
 
 document.addEventListener("change", (e) => {
-  if (e.target.name !== "sidePreference") return;
-  chrome.storage.local.set({ sidePreference: e.target.value }).then(applySide).catch(() => {});
+  if (e.target.name === "sidePreference") {
+    chrome.storage.local.set({ sidePreference: e.target.value }).then(applySide).catch(() => {});
+  }
+  if (e.target.name === "searchOpensIn") {
+    chrome.storage.local.set({ searchOpensIn: e.target.value }).catch(() => {});
+  }
 });
+
+chrome.storage.local.get("searchOpensIn").then(({ searchOpensIn = "panel" }) => {
+  for (const input of document.querySelectorAll('input[name="searchOpensIn"]')) {
+    input.checked = input.value === searchOpensIn;
+  }
+}).catch(() => {});
 
 // ---- Fold ----
 const railMinimize = document.getElementById("railMinimize");
@@ -940,9 +975,12 @@ function showFoldProblem(text) {
   note.textContent = text;
   note.hidden = false;
   clearTimeout(showFoldProblem.timer);
+  // Long enough to read and act on, rather than long enough to miss.
   showFoldProblem.timer = setTimeout(() => {
     note.hidden = true;
-  }, 9000);
+  }, 20000);
+  note.onclick = () => { note.hidden = true; };
+  note.style.cursor = "pointer";
 }
 
 railMinimize.addEventListener("click", () => {

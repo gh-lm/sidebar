@@ -1117,6 +1117,14 @@ dialog#siteDialog input {
 /* Why a fold did nothing. Sits above whatever section is open, and goes on
    its own after a few seconds. */
 .fold-problem {
+  /* Pinned to the top of the panel rather than the top of whichever view is
+     open, so a scrolled section cannot hide it. */
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  right: calc(var(--rail-width) + 0.5rem);
+  z-index: 50;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
   margin: 0 0 0.5rem;
   padding: 0.6rem 0.7rem;
   border-radius: var(--radius);
@@ -1128,6 +1136,11 @@ dialog#siteDialog input {
 }
 
 .fold-problem[hidden] { display: none; }
+
+.shell.rail-left .fold-problem {
+  left: calc(var(--rail-width) + 0.5rem);
+  right: 0.5rem;
+}
 
 .info-try {
   margin-top: 0.5rem;

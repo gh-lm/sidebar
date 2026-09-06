@@ -117,14 +117,43 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           )
       );
       say(`also injected into ${others} other tab(s)`);
+      // Not just "is it there" but "where did it land". A fixed element can
+      // be present and still be nowhere the eye can find it, and that is
+      // invisible to every other check.
       const drawn = await chrome.scripting
         .executeScript({
           target: { tabId: active.id },
-          func: () => !!document.documentElement.dataset.lmSidebarRail,
+          func: async () => {
+            // Drawing waits on a read of the saved pins, so looking straight
+            // away reports "not there" for a strip that is about to appear.
+            const find = () =>
+              [...document.documentElement.children].find(
+                (el) => el.tagName === "DIV" && el.style.zIndex === "2147483647"
+              );
+            let host = find();
+            for (let i = 0; i < 20 && !host; i++) {
+              await new Promise((r) => setTimeout(r, 100));
+              host = find();
+            }
+            if (!host) return { present: false, marker: !!document.documentElement.dataset.lmSidebarRail };
+            const r = host.getBoundingClientRect();
+            const cs = getComputedStyle(host);
+            return {
+              present: true,
+              rect: `${Math.round(r.x)},${Math.round(r.y)} ${Math.round(r.width)}x${Math.round(r.height)}`,
+              onScreen: r.width > 0 && r.height > 0 && r.right > 0 && r.bottom > 0 &&
+                r.left < innerWidth && r.top < innerHeight,
+              position: cs.position,
+              visibility: cs.visibility,
+              display: cs.display,
+              opacity: cs.opacity,
+              viewport: `${innerWidth}x${innerHeight}`,
+            };
+          },
         })
         .then((r) => r?.[0]?.result)
-        .catch(() => null);
-      say(`strip present on the page: ${drawn}`);
+        .catch((e) => ({ error: String(e).slice(0, 80) }));
+      say(`strip on the page: ${JSON.stringify(drawn)}`);
       sendResponse({ ok: true });
       if (dryRun) {
         say("dry run, panel left open");
