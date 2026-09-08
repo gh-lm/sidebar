@@ -315,18 +315,18 @@
   <!-- Shown once, the first time the panel is opened. Where things are
        kept is the one thing someone should be told without going looking
        for it. -->
-  <dialog id="welcomeDialog">
-    <h2>Everything stays in your browser</h2>
+  <dialog id="welcomeDialog" aria-labelledby="welcomeTitle">
+    <p class="dialog-title" id="welcomeTitle">Everything stays in your browser</p>
+    <div class="dialog-body">
     <p>Your scratchpad, snippets and pinned sites are saved as ordinary
-      <strong>bookmarks</strong>, in a folder called &ldquo;Lightmorphic Sidebar&rdquo; in
-      Other Bookmarks.</p>
-    <p>That means if your browser syncs bookmarks, they follow you to your other
-      machines &mdash; with no account to make and nothing sent to us. There is no
-      server. Delete the folder and the data is gone.</p>
-    <p>Lightmorphic Sidebar starts with access to no websites, so it has to ask before it
-      can show one in the panel. You can settle that now with one answer, or
-      leave it and be asked about each site as you go &mdash; either way it is
-      changeable later, under Information.</p>
+      <strong>bookmarks</strong>, in a folder called &ldquo;Lightmorphic Sidebar&rdquo;.
+      If your browser syncs bookmarks they follow you to your other machines.
+      No account, no server, nothing sent to us.</p>
+    <p>Lightmorphic Sidebar starts with access to <strong>no websites</strong>,
+      so it has to ask before it can show one in the panel.</p>
+    <p class="dialog-then">Settle it now with one answer, or be asked about each
+      site as you go. Either way you can change it later, under Information.</p>
+    </div>
     <div class="dialog-actions">
       <button type="button" id="welcomeAsk" class="btn-secondary">Ask me each time</button>
       <button type="button" id="welcomeAllow" class="btn-primary">Allow all sites</button>

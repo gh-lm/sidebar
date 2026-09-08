@@ -639,6 +639,59 @@ body {
   white-space: nowrap;
 }
 
+/* The first-run dialog. Left to the browser's own dialog styling it was a
+   white box in the middle of a dark panel; this is the same card as the
+   warning shown when the panel cannot fold, so the two read as one voice. */
+dialog#welcomeDialog {
+  margin: auto;
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--fg);
+  padding: 1rem 1.1rem 1.1rem;
+  width: min(300px, calc(100vw - 1.5rem));
+  /* A side panel can be short. The words scroll; the two buttons stay put,
+     because a dialog whose answer is off the bottom of the screen looks like
+     a dialog with no way out. */
+  max-height: calc(100vh - 1.5rem);
+  overflow: hidden;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+dialog#welcomeDialog::backdrop { background: rgba(0, 0, 0, 0.55); }
+
+dialog#welcomeDialog[open] { display: flex; flex-direction: column; }
+
+dialog#welcomeDialog p { margin: 0 0 0.6rem; }
+
+.dialog-body { overflow-y: auto; min-height: 0; }
+
+.dialog-body p:last-child { margin-bottom: 0; }
+
+.dialog-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.dialog-then { color: var(--muted-fg); }
+
+/* Side by side is two cramped buttons at this width; stacked, the one that
+   settles it sits under the thumb. */
+dialog#welcomeDialog .dialog-actions {
+  flex-direction: column-reverse;
+  gap: 0.4rem;
+  margin-top: 0.9rem;
+}
+
+dialog#welcomeDialog .dialog-actions button {
+  width: 100%;
+  align-self: stretch;
+  padding: 0.55rem 0.8rem;
+}
+
 /* Add/edit-site dialog */
 dialog#siteDialog {
   border: 1px solid var(--panel-border);
