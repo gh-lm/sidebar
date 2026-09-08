@@ -1166,6 +1166,9 @@ async function foldAway() {
     "chrome-page":
       "The strip is drawn on the page, and no extension may draw on Chrome's own pages. " +
       "Switch to an ordinary website, then fold.",
+    "web-store":
+      "Chrome does not let any extension draw on the Web Store, whatever it is " +
+      "allowed. Switch to an ordinary website and fold there.",
     "no-access":
       "This site has not been allowed yet, so nothing can be drawn on it. " +
       "Open Information and turn on access for every site, then fold.",

@@ -86,6 +86,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: false, reason: "chrome-page" });
         return;
       }
+      // The Web Store is an ordinary https address but Chrome protects it
+      // anyway: no extension may script it, whatever permissions it holds.
+      // Worth naming, because the general "not allowed yet" advice sends the
+      // user off to grant access that would make no difference here.
+      if (/^https?:\/\/(chromewebstore\.google\.com([/?#]|$)|chrome\.google\.com\/webstore)/i.test(active.url)) {
+        say("stopped: the Web Store cannot be scripted by any extension");
+        sendResponse({ ok: false, reason: "web-store" });
+        return;
+      }
       // Written BEFORE injecting, or the script reads it as still folded
       // away and draws nothing.
       await chrome.storage.local.set({ pageStrip: true });
