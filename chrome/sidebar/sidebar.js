@@ -106,6 +106,19 @@ async function ensureMobileScriptEverywhere() {
     return false;
   }
   await registerPair("all", "*://*/*");
+  // Per-host registrations made before "every site" was allowed still match,
+  // so a page ran two copies of each script at once. Two copies of the page
+  // rail meant two strips, one of them orphaned and impossible to close.
+  try {
+    const keep = new Set(["scroll-all", "mobile-all", "pagerail-all"]);
+    const stale = (await chrome.scripting.getRegisteredContentScripts())
+      .map((e) => e.id)
+      .filter((id) => /^(scroll|mobile|pagerail)-/.test(id) && !keep.has(id));
+    if (stale.length) await chrome.scripting.unregisterContentScripts({ ids: stale });
+  } catch {
+    /* nothing registered, or the browser refused; the guard in the script
+       itself still stops a second copy drawing */
+  }
   return true;
 }
 

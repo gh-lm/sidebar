@@ -128,7 +128,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             // away reports "not there" for a strip that is about to appear.
             const find = () =>
               [...document.documentElement.children].find(
-                (el) => el.tagName === "DIV" && el.style.zIndex === "2147483647"
+                (el) => el.dataset && el.dataset.lmSidebarRailHost === "1"
               );
             let host = find();
             for (let i = 0; i < 20 && !host; i++) {

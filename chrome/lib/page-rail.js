@@ -27,10 +27,23 @@
       /* it was already cut off; its host is removed below either way */
     }
   }
-  for (const stale of [...document.documentElement.children]) {
-    if (stale.tagName === "DIV" && stale.style.zIndex === "2147483647") stale.remove();
-  }
   document.documentElement.dataset.lmSidebarRail = "1";
+
+  // Retired the moment a newer copy takes over. Drawing waits on a read of
+  // the saved pins, so a copy can be retired while it is still part-way
+  // through drawing; without this it finished anyway and left a second strip
+  // on the page with no listener behind it -- one that could not be closed
+  // and stayed put when the panel opened.
+  let alive = true;
+
+  // Anything belonging to a copy that has gone. Matched on our own attribute
+  // rather than a z-index, which a page is free to use itself.
+  function sweep(keep) {
+    for (const el of [...document.documentElement.children]) {
+      if (el !== keep && el.dataset && el.dataset.lmSidebarRailHost === "1") el.remove();
+    }
+  }
+  sweep(null);
 
   const CLOSE_ICON = '<path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/>';
 
@@ -47,9 +60,12 @@
   let shadow = null;
   let side = "right";
   let topPercent = 50;
+  let dragging = false;
+  let missedRender = false;
 
   function build() {
     host = document.createElement("div");
+    host.dataset.lmSidebarRailHost = "1";
     host.style.cssText = "all: initial; position: fixed; z-index: 2147483647;";
     shadow = host.attachShadow({ mode: "closed" });
 
@@ -147,6 +163,11 @@
   }
 
   async function render() {
+    if (!alive) return;
+    if (dragging) {
+      missedRender = true; // drawn again the moment the pointer is let go
+      return;
+    }
     const strip = shadow ? shadow.querySelector(".strip") : build();
     strip.textContent = "";
 
@@ -217,8 +238,11 @@
     });
     strip.append(close);
 
+    // The read above gave every other copy a chance to retire this one.
+    if (!alive) return;
     place();
     if (!host.isConnected) document.documentElement.append(host);
+    sweep(host);
   }
 
   // Which edge, and how far down. Both are remembered, so the strip stays
@@ -240,14 +264,17 @@
   // Dragging moves it up and down only: the edge is a deliberate choice made
   // in Information, not something to lose by accident with a stray drag.
   function makeDraggable(handle) {
-    let dragging = false;
     handle.addEventListener("pointerdown", (e) => {
       dragging = true;
-      handle.setPointerCapture(e.pointerId);
+      try {
+        handle.setPointerCapture(e.pointerId);
+      } catch {
+        /* the pointer went away between the event and this line */
+      }
       e.preventDefault();
     });
     handle.addEventListener("pointermove", (e) => {
-      if (!dragging) return;
+      if (!dragging || !host) return;
       const pct = Math.min(92, Math.max(8, (e.clientY / window.innerHeight) * 100));
       if (Math.abs(pct - topPercent) > 0.5) handle.dataset.dragged = "1";
       topPercent = pct;
@@ -256,14 +283,23 @@
     const stop = () => {
       if (!dragging) return;
       dragging = false;
+      if (missedRender) {
+        missedRender = false;
+        sync();
+      }
+      // Saving where it was put used to bring the whole strip down and build
+      // it again, which threw away the very button the pointer was holding,
+      // in the middle of the gesture that was holding it.
       chrome.storage.local.set({ stripTop: topPercent }).catch(() => {});
     };
     handle.addEventListener("pointerup", stop);
     handle.addEventListener("pointercancel", stop);
+    handle.addEventListener("lostpointercapture", stop);
   }
 
   function hide() {
     if (host && host.isConnected) host.remove();
+    sweep(null); // strays left by a copy that no longer has a listener
   }
 
   async function sync() {
@@ -281,15 +317,23 @@
 
   const onChanged = (changes, area) => {
     if (area !== "local") return;
-    if (["pageStrip", "webPanels", "siteIcons", "stripSide", "stripTop"].some((k) => k in changes)) sync();
+    // Where it sits is a move. Only what it holds is worth drawing again.
+    if ("stripTop" in changes || "stripSide" in changes) {
+      if (typeof changes.stripTop?.newValue === "number") topPercent = changes.stripTop.newValue;
+      if (changes.stripSide) side = changes.stripSide.newValue === "left" ? "left" : "right";
+      place();
+    }
+    if (["pageStrip", "webPanels", "siteIcons"].some((k) => k in changes)) sync();
   };
   chrome.storage.onChanged.addListener(onChanged);
 
   // What the next copy needs to retire this one cleanly.
   document.documentElement.__lmSidebarRail = {
     teardown() {
+      alive = false;
+      dragging = false;
       chrome.storage.onChanged.removeListener(onChanged);
-      hide();
+      if (host && host.isConnected) host.remove();
     },
   };
 
