@@ -1,13 +1,13 @@
-# Submitting Lightmorphic Sidebar 1.1.0 to the Chrome Web Store
+# Submitting Lightmorphic Sidebar 1.1.1 to the Chrome Web Store
 
 Everything on this page is ready to copy straight into the form at
 <https://chrome.google.com/webstore/devconsole>. Nothing else needs writing.
 
-Upload: `dist/lightmorphic-sidebar-1.1.0.zip`
+Upload: `dist/lightmorphic-sidebar-1.1.1.zip`
 
 1.0.0 is published and live, so that number can never be used again. This is
 an update, not a first submission: the code has changed since, and the
-version is now 1.1.0.
+version is now 1.1.1.
 
 **This one adds a permission**, `cookies`, so expect the slower review an
 update normally escapes. It is there for one thing: a site in the panel is
@@ -39,7 +39,7 @@ how many of something there are. The permission justifications are not
 public listing text and can stay specific.
 
 The corrected listing went on to be published as 1.0.0. Everything below now
-describes the 1.1.0 update.
+describes the 1.1.1 update.
 
 ---
 
@@ -356,7 +356,7 @@ adds a permission goes back into the slow queue.
 
 ---
 
-## What changed in 1.1.0
+## What changed since the published version
 
 Worth having to hand if the review asks, and worth putting in the "what's
 new" box if the form offers one:
@@ -388,6 +388,12 @@ put one in your bookmarks whether or not you had saved anything.
 
 Text throughout the panel was too small or too faint and has been raised.
 
+The on-page strip drew twice on some sites and the spare could not be
+closed; only one is drawn now. Dragging it rebuilt it mid-gesture, so it
+sprang back; it stays under the pointer. Folding on the Web Store gave advice
+that could not help, since Chrome forbids every extension from drawing there;
+it now says so.
+
 One new permission, `cookies`, justified above. Nothing else changed.
 
 ---
@@ -396,7 +402,7 @@ One new permission, `cookies`, justified above. Nothing else changed.
 
 - [ ] Developer account fee of $5 paid
 - [ ] Publisher email verified in the account settings
-- [ ] `dist/lightmorphic-sidebar-1.1.0.zip` uploaded (98 KB, 20 files)
+- [ ] `dist/lightmorphic-sidebar-1.1.1.zip` uploaded (101 KB, 20 files)
 - [ ] Detailed description pasted
 - [ ] Website and support URL both filled in, and they are different
 - [ ] Five screenshots, small promo tile and marquee all uploaded
