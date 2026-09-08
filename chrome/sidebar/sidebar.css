@@ -1105,13 +1105,30 @@ dialog#siteDialog input {
 #panel-search { position: relative; overflow: hidden; }
 
 /* The panel is a column; this sits on the floor of it rather than under the
-   search box, where it would be the second thing you read. */
+   search box, where it would be the second thing you read. A label rather
+   than a line of loose text, so it reads as a note about the panel and not
+   as something left over. */
 .footnote {
-  margin-top: auto;
+  margin: auto 0 0;
   padding-top: 1.5rem;
-  font-size: 0.8125rem;
-  opacity: 0.75;
+  display: flex;
+  justify-content: center;
 }
+
+.footnote-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  color: var(--muted-fg);
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+
+.footnote-label svg { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.9; }
 
 #panel-search.active { display: flex; flex-direction: column; }
 
