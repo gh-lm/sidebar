@@ -1162,42 +1162,89 @@ async function foldAway() {
     window.close();
     return;
   }
-  const why = {
-    "chrome-page":
-      "The strip is drawn on the page, and no extension may draw on Chrome's own pages. " +
-      "Switch to an ordinary website, then fold.",
-    "web-store":
-      "Chrome does not let any extension draw on the Web Store, whatever it is " +
-      "allowed. Switch to an ordinary website and fold there.",
-    "no-access":
-      "This site has not been allowed yet, so nothing can be drawn on it. " +
-      "Open Information and turn on access for every site, then fold.",
-  }[result?.reason] ||
+  const REASONS = {
+    "chrome-page": {
+      title: "Chrome will not allow it here",
+      body:
+        "The strip is drawn on the page itself, and Chrome forbids every extension " +
+        "from drawing on its own pages \u2014 chrome:// settings, the new tab page and " +
+        "the Web Store. The rule protects those pages from being tampered with, and " +
+        "no permission can lift it.",
+      then: "Go to an ordinary website and fold there.",
+    },
+    "web-store": {
+      title: "Chrome will not allow it here",
+      body:
+        "The strip is drawn on the page itself, and Chrome forbids every extension " +
+        "from drawing on the Web Store \u2014 this is the page where extensions are " +
+        "installed and removed, so nothing is allowed to touch it. It is a rule of " +
+        "the browser, not a setting in this extension, and no permission can lift it.",
+      then: "Go to an ordinary website and fold there.",
+    },
+    "no-access": {
+      title: "This site has not been allowed",
+      body:
+        "Nothing can be drawn on a site until you allow it, and this one has not " +
+        "been allowed yet.",
+      then: "Open Information, turn on access for every site, then fold.",
+    },
+  };
+
+  const problem = REASONS[result?.reason] ||
     (result?.reason === "not-visible"
-      ? "The strip was put on the page but ended up somewhere it cannot be seen. " +
-        "Tap to copy what was found, and send it to me: " + (result.detail || "")
-      : "Something stopped the strip being drawn, so the panel has stayed open.");
-  showFoldProblem(why, result?.detail);
+      ? {
+          title: "The strip went somewhere it cannot be seen",
+          body: "It was drawn, but not anywhere on screen.",
+          then: "Click this to copy what was found, and send it to me.",
+        }
+      : {
+          title: "The strip could not be drawn",
+          body: "Something stopped it, so the panel has stayed open.",
+          then: "",
+        });
+  showFoldProblem(problem, result?.detail);
 }
 
-// Said in the panel, where the user is looking, rather than in a console.
-function showFoldProblem(text, copyable) {
+// Said in the panel, in the middle where the eye is, rather than in a console.
+function showFoldProblem({ title, body, then }, copyable) {
   let note = document.getElementById("foldProblem");
   if (!note) {
-    note = document.createElement("p");
+    note = document.createElement("div");
     note.id = "foldProblem";
     note.className = "fold-problem";
-    note.setAttribute("role", "status");
+    note.setAttribute("role", "alertdialog");
+    note.setAttribute("aria-labelledby", "foldProblemTitle");
     document.querySelector(".content").prepend(note);
   }
-  note.textContent = text;
+  note.textContent = "";
+
+  const h = document.createElement("p");
+  h.className = "fold-problem-title";
+  h.id = "foldProblemTitle";
+  h.textContent = title;
+
+  const p = document.createElement("p");
+  p.textContent = body;
+
+  note.append(h, p);
+  if (then) {
+    const next = document.createElement("p");
+    next.className = "fold-problem-then";
+    next.textContent = then;
+    note.append(next);
+  }
+
+  const ok = document.createElement("button");
+  ok.type = "button";
+  ok.className = "fold-problem-ok";
+  ok.textContent = copyable ? "Copy and close" : "Got it";
+  note.append(ok);
+
   note.hidden = false;
   clearTimeout(showFoldProblem.timer);
-  // Long enough to read and act on, rather than long enough to miss.
-  showFoldProblem.timer = setTimeout(() => {
-    note.hidden = true;
-  }, 20000);
-  note.onclick = () => {
+  // It stays until it is dismissed. A warning that takes itself away while
+  // it is being read is worse than no warning.
+  ok.addEventListener("click", () => {
     // Worth copying rather than transcribing from the screen. The clipboard
     // API refuses when the panel does not have focus, which is easy to hit
     // here, so the text is selected as well and can be copied by hand.
@@ -1213,12 +1260,10 @@ function showFoldProblem(text, copyable) {
       } catch {
         /* left selected, so it can be copied by hand */
       }
-      return; // stay up while there is something to take from it
     }
     note.hidden = true;
-  };
-  note.style.cursor = "pointer";
-  note.style.userSelect = "text";
+  });
+  ok.focus();
 }
 
 railMinimize.addEventListener("click", () => {
