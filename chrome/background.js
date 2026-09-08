@@ -11,9 +11,12 @@
 // One pin ships with the install, so the rail is not empty and the idea is
 // obvious the moment the panel opens: click the icon, the site opens here.
 // It is an ordinary pin — editable, removable, and never re-added once the
-// profile has been seeded. Lightmorphic Sidebar's own site is on the rail already, as
-// the mark under the close chevron.
-const DEFAULT_PIN = "https://lightmorphic.com";
+// profile has been seeded. Wikipedia rather than one of our own sites: it is
+// somewhere people actually read beside what they are doing, which is the
+// whole point of the panel, and it reads well at the panel's width.
+// Lightmorphic Sidebar's own site is on the rail already, as the mark under
+// the close chevron.
+const DEFAULT_PIN = "https://en.wikipedia.org";
 
 async function seedPins() {
   const { pinsSeeded } = await chrome.storage.local.get("pinsSeeded");
