@@ -54,6 +54,13 @@ PY
 grep -q 'OLD_ROOT_TITLES' chrome/lib/store.js || fail "the rename migration constants are gone from lib/store.js."
 grep -q 'sidemorphic.invalid' chrome/lib/store.js || fail "the old data prefix is gone from lib/store.js."
 
+# The header rule is browser-wide. This condition is the only thing keeping it
+# inside the panel; without it, ordinary pages load as one browser and fetch as
+# another, logins break, and any site can frame a site that forbids framing.
+# tools/dnr-test proves it properly -- this is here so it cannot ship without.
+grep -q 'tabIds: \[chrome.tabs.TAB_ID_NONE\]' chrome/sidebar/sidebar.js ||
+  fail "the header rule is no longer confined to the panel; see tools/dnr-test/README.md."
+
 mkdir -p dist
 rm -f "$ZIP"
 ( cd chrome && zip -qr "../$ZIP" . -x '.*' )
