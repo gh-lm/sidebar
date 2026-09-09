@@ -2,8 +2,14 @@
 
 Dates are when the version was submitted to the Chrome Web Store.
 
-## 1.1.1 — 8 September 2026
+## 1.1.1 — 9 September 2026
 
+- Logging in to sites could fail while the extension was enabled. The rule
+  that asks a panel site for its phone layout was reaching every tab in the
+  browser: an ordinary page loaded as a desktop browser while everything it
+  fetched went out as an Android phone, and a site that ties a session to one
+  browser refused the login. The same rule was taking the security headers off
+  pages nobody had pinned. It now applies only to the panel.
 - Folding drew two strips on sites where more than one copy of the script was
   registered, and the spare one could not be closed and stayed on the page
   when the panel opened. Only one is drawn now, and the old registrations are

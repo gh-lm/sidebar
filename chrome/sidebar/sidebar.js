@@ -308,6 +308,13 @@ async function allowFramingFor(url) {
           ],
         },
         condition: {
+          // Only requests that belong to no tab, which is what the side
+          // panel's own requests are. Without this the rule reached every
+          // tab in the browser: an ordinary page loaded as a desktop browser
+          // while everything it fetched went out as an Android phone, and a
+          // site that ties a session to one browser rejected the login.
+          // It also took the security headers off pages nobody had pinned.
+          tabIds: [chrome.tabs.TAB_ID_NONE],
           // requestDomains matches the domain and everything under it, so
           // one entry covers www and any other subdomain the site redirects
           // to. Left off entirely when every site is allowed.
