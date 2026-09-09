@@ -21,5 +21,12 @@ only thing `sidePanel.open()` accepts — and checks that a page which sends
 `X-Frame-Options: DENY` still appears in it, and that the same site's cookies
 in an ordinary tab are unchanged afterwards.
 
+`stripprobe.js` answers the question the fault was reported as: with the strip
+drawn on a page and the panel closed, it walks a whole login -- a request that
+sets a session cookie, a redirect, and a page that only renders when the
+cookie comes back -- and compares every header the server saw against the same
+walk in a browser with no extension loaded at all. Run it against a checkout
+from before the fix and the user-agent count comes back as two.
+
 Delete the profile directory between runs; the permission is granted by
 writing it into the profile, as headless Chrome cannot show the prompt.
