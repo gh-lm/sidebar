@@ -42,4 +42,4 @@ company number 17423646. Registered office: 82A James Carter Road, Mildenhall,
 IP28 7DE. Questions go to sidebar@lightmorphic.com
 
 Published at https://sidebar.lightmorphic.com/privacy.html — source at
-https://github.com/lightmorphic/sidebar
+https://sidebar.lightmorphic.com/code

@@ -42,7 +42,7 @@ from the same button.
 | `chrome/` | The extension itself — load this unpacked; `package.sh` zips it for the store |
 | `store/SUBMIT.md` | Everything to paste into the Web Store form, ready to copy |
 | `store/` | The listing images and their sample data; `tools/store-shots/build.sh` regenerates them |
-| `site/` | sidebar.lightmorphic.com, published by the Pages workflow |
+| `site/` | sidebar.lightmorphic.com, hosted on Buildmorphic |
 
 ## Developing
 

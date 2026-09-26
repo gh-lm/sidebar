@@ -178,10 +178,10 @@ https://sidebar.lightmorphic.com/
 **Support URL**
 
 ```
-https://github.com/lightmorphic/sidebar/issues
+https://sidebar.lightmorphic.com/bugs
 ```
 
-Issues are enabled on the repository and the page is public, so anyone
+The bug list is public, so anyone
 reaching it from the listing can read what has been reported and open
 something themselves without being asked for anything first.
 

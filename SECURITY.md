@@ -3,8 +3,7 @@
 If you have found a way this extension could be used against the person who
 installed it, please tell us before telling anyone else.
 
-**Where:** <complaints@lightmorphic.com>, or GitHub's private reporting on
-this repository (Security, then "Report a vulnerability").
+**Where:** <complaints@lightmorphic.com>.
 
 Please say what you did, what happened, and what you expected. A rough
 recipe is worth more than a long description.
