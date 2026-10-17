@@ -203,7 +203,7 @@ def sub_footer(current: str) -> str:
   <p>&copy; Lightmorphic Ltd. Registered in England and Wales, company number
     <a href="https://find-and-update.company-information.service.gov.uk/company/{COMPANY_NO}">{COMPANY_NO}</a>.
     Registered office: {OFFICE}.
-    Page last updated: <time datetime="{DATE_ISO}" id="updated">{DATE_HUMAN}</time>.</p>
+    <span class="updated">Page last updated: <time datetime="{DATE_ISO}" id="updated">{DATE_HUMAN}</time>.</span></p>
   <nav aria-label="Legal">
 {links}
   </nav>
