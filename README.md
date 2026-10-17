@@ -5,7 +5,7 @@
 <p align="center">
   <a href="CHANGELOG.md"><img alt="Version 1.1.1" src="https://img.shields.io/badge/version-1.1.1-fbc711?style=flat-square&labelColor=111827"></a>
   <a href="LICENSE"><img alt="Licence: GNU GPL v3" src="https://img.shields.io/badge/licence-GPL--3.0-60a5fa?style=flat-square&labelColor=111827"></a>
-  <a href="https://chromewebstore.google.com/search/Lightmorphic%20Sidebar"><img alt="Published on the Chrome Web Store" src="https://img.shields.io/badge/published-Chrome%20Web%20Store-34d399?style=flat-square&labelColor=111827"></a>
+  <a href="https://chromewebstore.google.com/detail/lightmorphic-sidebar/bgppfeckflfdoibaelfolpgcdoifoili"><img alt="Published on the Chrome Web Store" src="https://img.shields.io/badge/published-Chrome%20Web%20Store-34d399?style=flat-square&labelColor=111827"></a>
   <img alt="Account: none" src="https://img.shields.io/badge/account-none-c084fc?style=flat-square&labelColor=111827">
 </p>
 
@@ -30,7 +30,7 @@ Store extensions: Edge, Brave, Vivaldi or Opera. There is no Firefox version.
 
 ## Quick start
 
-Install it from the [Chrome Web Store](https://chromewebstore.google.com/search/Lightmorphic%20Sidebar), then click
+Install it from the [Chrome Web Store](https://chromewebstore.google.com/detail/lightmorphic-sidebar/bgppfeckflfdoibaelfolpgcdoifoili), then click
 the Lightmorphic Sidebar button in the toolbar to open the panel. To pin a
 site, open it in a tab, press **+** on the rail and save.
 
