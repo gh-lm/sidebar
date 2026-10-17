@@ -275,6 +275,35 @@ def main() -> None:
         (SITE / f"{slug}.html").write_text(html)
         print("wrote", f"site/{slug}.html")
 
+    # Cloudflare Pages serves 404.html for any address that does not exist.
+    # Without one a mistyped address returned the home page with a 200.
+    not_found = f"""<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Page not found &mdash; Lightmorphic Sidebar</title>
+<meta name="theme-color" content="#101013">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/legal.css">
+</head>
+<body>
+<main>
+<a href="/" class="back"><img class="mark" src="/images/lightmorphic-sidebar-mark-112.png" alt="Lightmorphic Sidebar" width="56" height="56"></a>
+<h1>Page not found</h1>
+<p class="lede">There is nothing at this address.</p>
+<p><a href="/">Go to the home page</a>.</p>
+{oss_bar()}
+{sub_footer("")}
+</main>
+</body>
+</html>
+"""
+    (SITE / "404.html").write_text(not_found)
+    print("wrote", "site/404.html")
+
     # The home page is written by hand, but its GitHub strip is not: it sits
     # between two markers and is replaced from the same template, so the home
     # page and the legal pages cannot drift apart.
