@@ -303,8 +303,9 @@
     line-height: 1.5;
     color: var(--dim);
   }
-  .legal p { margin: 0; max-width: 52ch; }
-  .legal .updated { display: block; }
+  .legal p { margin: 0; }
+  /* One fact per line: the company line, then the office, then the date. */
+  .legal .line { display: block; }
   .legal a { color: inherit; text-decoration: none; }
   .legal a:hover { color: var(--ink); }
 
@@ -1133,9 +1134,9 @@ John</span></button>
 <!-- oss-bar:end -->
 
       <div class="legal">
-        <p>&copy; <span id="year">2026</span> Lightmorphic Ltd. Registered in England and Wales, company&nbsp;number&nbsp;<a href="https://find-and-update.company-information.service.gov.uk/company/17423646">17423646</a>.
-          Registered office: 82A James Carter Road, Mildenhall, IP28 7DE.
-          <span class="updated">Page last updated: <time datetime="2026-10-17" id="updated">17 October 2026</time>.</span></p>
+        <p><span class="line">&copy; <span id="year">2026</span> Lightmorphic Ltd. Registered in England and Wales, company&nbsp;number&nbsp;<a href="https://find-and-update.company-information.service.gov.uk/company/17423646">17423646</a>.</span>
+          <span class="line">Registered office: 82A James Carter Road, Mildenhall, IP28 7DE.</span>
+          <span class="line"><span class="updated">Page last updated: <time datetime="2026-10-17" id="updated">17 October 2026</time>.</span></span></p>
         <nav aria-label="Legal">
           <a href="/privacy">Privacy</a>
           <a href="/cookies">Cookies</a>

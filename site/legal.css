@@ -71,8 +71,9 @@ a:hover { color: var(--accent); }
   line-height: 1.5;
 }
 
-.legal p { margin: 0; max-width: 46ch; }
-.legal .updated { display: block; }
+.legal p { margin: 0; }
+/* One fact per line: the company line, then the office, then the date. */
+.legal .line { display: block; }
 .legal a { color: var(--muted-fg); text-decoration: none; }
 .legal a:hover { color: var(--fg); }
 
