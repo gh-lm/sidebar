@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8">
+<style>
+@font-face { font-family: "Manrope"; src: url("../../../chrome/fonts/Manrope.woff2") format("woff2"); font-weight: 200 800; }
+html, body { margin: 0; width: 1280px; height: 360px; overflow: hidden; }
+body { background: #0e1525; font-family: "Manrope", system-ui, sans-serif; color: #fafafa; position: relative; }
+.bar { position: absolute; left: 0; right: 0; top: 0; height: 8px; background: #fbc711; }
+.mark { position: absolute; left: 96px; top: 96px; width: 116px; height: 116px; }
+h1 { position: absolute; left: 248px; top: 84px; margin: 0; font-weight: 300; font-size: 76px; letter-spacing: -1px; line-height: 1.1; }
+p { position: absolute; left: 250px; top: 184px; margin: 0; font-size: 26px; font-weight: 300; color: #b6bccb; line-height: 1.35; width: 960px; white-space: nowrap; }
+.chips { position: absolute; left: 250px; top: 262px; display: flex; gap: 14px; }
+.chip { padding: 9px 20px; border-radius: 999px; border: 1.5px solid #5a5e70; font-size: 20px; font-weight: 600; color: #e6e8ee; }
+.chip.y { background: #fbc711; border-color: #fbc711; color: #111827; }
+</style></head><body>
+<div class="bar"></div>
+<svg class="mark" viewBox="0 0 128 128" aria-hidden="true">
+  <rect width="128" height="128" rx="28" fill="#FBC711"/>
+  <rect x="20" y="30" width="52" height="68" rx="8" fill="#111827" opacity="0.22"/>
+  <rect x="80" y="30" width="28" height="68" rx="8" fill="#111827"/>
+  <circle cx="94" cy="46" r="4.5" fill="#FBC711"/><circle cx="94" cy="64" r="4.5" fill="#FBC711"/><circle cx="94" cy="82" r="4.5" fill="#FBC711"/>
+</svg>
+<h1>Lightmorphic Sidebar</h1>
+<p>A private side panel for Chrome, beside the page you are reading.</p>
+<div class="chips"><span class="chip y">Free and open source</span><span class="chip">No account</span><span class="chip">No server</span></div>
+</body></html>

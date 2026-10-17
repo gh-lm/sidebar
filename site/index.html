@@ -279,13 +279,47 @@
   .legal a { color: inherit; text-decoration: none; }
   .legal a:hover { color: var(--ink); }
 
-  /* The source band: marks on the left, links on the right, ruled off from
-     the legal line under it. */
-  .legal.source { padding-bottom: 1.25rem; border-bottom: 1px solid var(--rule); }
-  .legal + .legal { margin-top: 0; padding-top: 1.25rem; border-top: 0; }
-  .marks { display: flex; align-items: center; gap: 0.9rem; }
-  .marks a { display: inline-flex; color: var(--dim); }
-  .marks a:hover { color: var(--ink); }
+  /* The GitHub strip, above the legal footer. Marks and links are 44px
+     targets; on a narrow screen the links wrap and align left. */
+  .oss-bar {
+    width: 100%;
+    align-self: stretch;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    color: var(--dim);
+    font-size: 0.9375rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    text-align: left;
+  }
+  .oss-bar .marks { display: flex; align-items: center; gap: 2px; margin-left: -10px; }
+  .oss-bar .marks a {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: 8px;
+    color: var(--dim); text-decoration: none;
+  }
+  .oss-bar .marks a:hover { color: var(--ink); background: var(--paper-2); }
+  .oss-bar .marks svg { width: 21px; height: 21px; display: block; }
+  .oss-bar nav {
+    flex: 0 1 auto; max-width: 100%;
+    display: flex; flex-wrap: wrap; justify-content: flex-end;
+    margin-right: -6px;
+  }
+  .oss-bar nav a {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 12px 6px; min-width: 44px; min-height: 44px;
+    color: var(--dim); font-size: 0.9375rem; text-decoration: none;
+  }
+  .oss-bar nav a:hover { color: var(--ink); }
+  .oss-bar + .legal { margin-top: 0; }
+  @media (max-width: 700px) {
+    .oss-bar nav { justify-content: flex-start; margin-left: -6px; margin-right: 0; }
+  }
+  .legal + .legal { margin-top: 0; }
   .legal nav {
     margin-left: auto;
     display: flex;
@@ -379,7 +413,7 @@
   footer .col { padding-block: 2rem 3rem; display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; }
   /* The source band is the first thing in the footer now, so it does not
      need the gap that separated it from the site's own links. */
-  footer .col > .legal:first-child { margin-top: 0; }
+  footer .col > .oss-bar:first-child { margin-top: 0; }
   footer nav { margin-left: auto; display: flex; gap: 1.5rem; flex-wrap: wrap; }
   footer a { text-decoration: none; }
   footer a:hover { color: var(--ink); }
@@ -643,7 +677,7 @@
       "https://find-and-update.company-information.service.gov.uk/company/17423646"
     ]
   },
-  "dateModified": "2026-09-06"
+  "dateModified": "2026-10-17"
 }
 </script>
 <script type="application/ld+json">
@@ -676,7 +710,7 @@
       "https://find-and-update.company-information.service.gov.uk/company/17423646"
     ]
   },
-  "dateModified": "2026-09-06"
+  "dateModified": "2026-10-17"
 }
 </script>
 <script type="application/ld+json">
@@ -771,7 +805,6 @@
       <a href="#how">How it works</a>
       <a href="#questions">Questions</a>
       <a href="#private">Privacy</a>
-      <a href="https://github.com/gh-lm/sidebar">Source</a>
       <a class="get" href="https://chromewebstore.google.com/search/Lightmorphic%20Sidebar">Get it</a>
       <div id="all-apps"></div>
     </nav>
@@ -817,7 +850,7 @@
   invoice 214 still unpaid
   book the ferry before the price goes up
 
-Sarah's new address
+John Smith's new address
   14 Bell Lane, Norwich NR2 1AB</p>
     </div>
 
@@ -827,7 +860,7 @@ Sarah's new address
       <button type="button" class="demo-snip"><span>07700 900123</span></button>
       <button type="button" class="demo-snip"><span>1 Example Street, London SW1A 1AA</span></button>
       <button type="button" class="demo-snip"><span>Best wishes,
-Charlie</span></button>
+John</span></button>
       <button type="button" class="demo-snip"><span>Thanks for getting in touch. I will come back to you properly in the next day or two, once I have had a proper look.</span></button>
     </div>
 
@@ -1085,30 +1118,28 @@ Charlie</span></button>
     <div class="col">
       <!-- Where the code is. Its own band between the site's own links and
            the legal ones, because it is neither. -->
-      <div class="legal source">
-        <p class="marks">
-          <a href="https://github.com/gh-lm/sidebar" aria-label="Lightmorphic Sidebar on GitHub" title="On GitHub">
-            <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-          </a>
-          <a href="https://opensource.org/licenses/GPL-3.0" aria-label="Open source, under the GNU GPL version 3" title="Open source, GPL v3">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="6.4" r="3.1"/><circle cx="6.4" cy="16.4" r="3.1"/><circle cx="17.6" cy="16.4" r="3.1"/><path d="M10.4 9.1 8 13.7M13.6 9.1 16 13.7M9.5 16.4h5"/></svg>
-          </a>
-        </p>
-        <nav aria-label="Source code">
-          <a href="https://github.com/gh-lm/sidebar">Repository</a>
-          <a href="https://github.com/gh-lm/sidebar#readme">Documentation</a>
-          <a href="https://github.com/gh-lm/sidebar/security/policy">Security</a>
-          <a href="https://github.com/gh-lm/sidebar/blob/main/LICENSE">Licence</a>
-          <a href="https://github.com/gh-lm/sidebar/blob/main/CHANGELOG.md">Changelog</a>
-          <a href="https://github.com/gh-lm/sidebar/issues">Issues</a>
-        </nav>
-      </div>
+      <!-- oss-bar:start (written by tools/build-legal.py; do not edit by hand) -->
+<div class="oss-bar">
+  <div class="marks">
+    <a href="https://github.com/gh-lm/sidebar" target="_blank" rel="noopener noreferrer" aria-label="Lightmorphic Sidebar on GitHub (opens in a new tab)"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a>
+    <a href="https://opensource.org" target="_blank" rel="noopener noreferrer" aria-label="Open Source Initiative (opens in a new tab)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2.6"/><circle cx="5.2" cy="17" r="2.6"/><circle cx="18.8" cy="17" r="2.6"/><path d="M10.7 7.3 6.5 14.7M13.3 7.3l4.2 7.4M7.8 17h8.4"/></svg></a>
+  </div>
+  <nav aria-label="Source code">
+    <a href="https://github.com/gh-lm/sidebar" target="_blank" rel="noopener noreferrer" aria-label="Repository on GitHub (opens in a new tab)">Repository</a>
+    <a href="https://github.com/gh-lm/sidebar/blob/main/README.md" target="_blank" rel="noopener noreferrer" aria-label="Documentation on GitHub (opens in a new tab)">Documentation</a>
+    <a href="https://github.com/gh-lm/sidebar/security/policy" target="_blank" rel="noopener noreferrer" aria-label="Security on GitHub (opens in a new tab)">Security</a>
+    <a href="https://github.com/gh-lm/sidebar/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" aria-label="Licence on GitHub (opens in a new tab)">Licence</a>
+    <a href="https://github.com/gh-lm/sidebar/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" aria-label="Changelog on GitHub (opens in a new tab)">Changelog</a>
+    <a href="https://github.com/gh-lm/sidebar/issues" target="_blank" rel="noopener noreferrer" aria-label="Issues on GitHub (opens in a new tab)">Issues</a>
+  </nav>
+</div>
+<!-- oss-bar:end -->
 
       <div class="legal">
         <p>&copy; <span id="year">2026</span> Lightmorphic Ltd. Registered in England and Wales, company number
           <a href="https://find-and-update.company-information.service.gov.uk/company/17423646">17423646</a>.
           Registered office: 82A James Carter Road, Mildenhall, IP28 7DE.
-          Page last updated: <time datetime="2026-09-06" id="updated">6 September 2026</time>.</p>
+          Page last updated: <time datetime="2026-10-17" id="updated">17 October 2026</time>.</p>
         <nav aria-label="Legal">
           <a href="privacy.html">Privacy</a>
           <a href="cookies.html">Cookies</a>

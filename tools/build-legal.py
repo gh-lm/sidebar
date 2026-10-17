@@ -6,6 +6,7 @@ the company details and the styling have to be identical on all of them, and
 five copies of anything drift. Re-run after editing the text below.
 """
 import pathlib
+import re
 
 SITE = pathlib.Path(__file__).resolve().parent.parent / "site"
 COMPANY_NO = "17423646"
@@ -59,7 +60,7 @@ BODIES = {
 <p>No analytics, no tracking, no remote code, no external fonts or images, and no requests to any service, including ours.</p>
 
 <h2>This website</h2>
-<p>This site is hosted on Buildmorphic, which Lightmorphic runs. It sets no cookies and runs no analytics. The only script the site loads from elsewhere is our own applications launcher, from apps.lightmorphic.com.</p>
+<p>This site is served as static files by Cloudflare Pages. It sets no cookies and runs no analytics. Cloudflare processes the request in order to serve the page, and its logs are outside our control; see the <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare privacy policy</a>. The only script the site loads from elsewhere is our own applications launcher, from apps.lightmorphic.com.</p>
 
 <h2>Your rights</h2>
 <p>We hold no personal data about you, so there is nothing for us to show you, correct or delete. If you write to us, we keep that message only as long as it takes to answer you. You can complain to the Information Commissioner's Office at <a href="https://ico.org.uk">ico.org.uk</a>.</p>
@@ -138,43 +139,55 @@ BODIES = {
 <p>Say so, and ask for it to be looked at again. A complaint that has been through that and is still unresolved can be taken further: to the Information Commissioner's Office at <a href="https://ico.org.uk">ico.org.uk</a> for anything about personal data, or to the Equality Advisory and Support Service at <a href="https://www.equalityadvisoryservice.com">equalityadvisoryservice.com</a> for accessibility.</p>
 
 <h2>Faults rather than complaints</h2>
-<p>A bug is usually quicker to raise in the open, where anyone can see it is being worked on: <a href="https://github.com/gh-lm/sidebar/issues">the bug list</a>.</p>
+<p>A bug is usually quicker to raise in the open, where anyone can see it is being worked on: the Issues link in the footer.</p>
 """,
 }
 
 
+REPO = "https://github.com/gh-lm/sidebar"
+
+# The seven from the GitHub layout, less Releases: the extension is installed
+# from the Chrome Web Store only, so a Releases page would offer a download
+# that does not exist.
 SOURCE_LINKS = [
-    ("Repository", "https://github.com/gh-lm/sidebar"),
-    ("Documentation", "https://github.com/gh-lm/sidebar#readme"),
-    ("Security", "https://github.com/gh-lm/sidebar/security/policy"),
-    ("Licence", "https://github.com/gh-lm/sidebar/blob/main/LICENSE"),
-    ("Changelog", "https://github.com/gh-lm/sidebar/blob/main/CHANGELOG.md"),
-    ("Issues", "https://github.com/gh-lm/sidebar/issues"),
+    ("Repository", "Repository", REPO),
+    ("Documentation", "Documentation", REPO + "/blob/main/README.md"),
+    ("Security", "Security", REPO + "/security/policy"),
+    ("Licence", "Licence", REPO + "/blob/main/LICENSE"),
+    ("Changelog", "Changelog", REPO + "/blob/main/CHANGELOG.md"),
+    ("Issues", "Issues", REPO + "/issues"),
 ]
 
-
 GITHUB_MARK = (
-    '<svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>'
+    '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">'
+    '<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>'
 )
 
-
+# A plain drawn mark, not the Open Source Initiative's own logo, which is a
+# registered certification mark.
 OSI_MARK = (
-    '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" '
-    'stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="6.4" r="3.1"/>'
-    '<circle cx="6.4" cy="16.4" r="3.1"/><circle cx="17.6" cy="16.4" r="3.1"/>'
-    '<path d="M10.4 9.1 8 13.7M13.6 9.1 16 13.7M9.5 16.4h5"/></svg>'
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" '
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    '<circle cx="12" cy="5" r="2.6"/><circle cx="5.2" cy="17" r="2.6"/><circle cx="18.8" cy="17" r="2.6"/>'
+    '<path d="M10.7 7.3 6.5 14.7M13.3 7.3l4.2 7.4M7.8 17h8.4"/></svg>'
 )
 
+OSS_START = "<!-- oss-bar:start (written by tools/build-legal.py; do not edit by hand) -->"
+OSS_END = "<!-- oss-bar:end -->"
 
-def source_footer() -> str:
+
+def oss_bar() -> str:
+    """The GitHub strip, directly above the legal footer on every page."""
+    new_tab = 'target="_blank" rel="noopener noreferrer"'
     links = "\n".join(
-        f'    <a href="{path}">{label}</a>' for label, path in SOURCE_LINKS
+        f'    <a href="{href}" {new_tab} aria-label="{label} on GitHub (opens in a new tab)">{text}</a>'
+        for label, text, href in SOURCE_LINKS
     )
-    return f"""<div class="legal source">
-  <p class="marks">
-    <a href="https://github.com/gh-lm/sidebar" aria-label="Lightmorphic Sidebar on GitHub" title="On GitHub">{GITHUB_MARK}</a>
-    <a href="https://opensource.org/licenses/GPL-3.0" aria-label="Open source, under the GNU GPL version 3" title="Open source, GPL v3">{OSI_MARK}</a>
-  </p>
+    return f"""<div class="oss-bar">
+  <div class="marks">
+    <a href="{REPO}" {new_tab} aria-label="Lightmorphic Sidebar on GitHub (opens in a new tab)">{GITHUB_MARK}</a>
+    <a href="https://opensource.org" {new_tab} aria-label="Open Source Initiative (opens in a new tab)">{OSI_MARK}</a>
+  </div>
   <nav aria-label="Source code">
 {links}
   </nav>
@@ -257,10 +270,22 @@ def main() -> None:
             description=description,
             date_iso=DATE_ISO,
             body=BODIES[slug].strip(),
-            footer=source_footer() + "\n" + sub_footer(slug),
+            footer=oss_bar() + "\n" + sub_footer(slug),
         )
         (SITE / f"{slug}.html").write_text(html)
         print("wrote", f"site/{slug}.html")
+
+    # The home page is written by hand, but its GitHub strip is not: it sits
+    # between two markers and is replaced from the same template, so the home
+    # page and the legal pages cannot drift apart.
+    home = SITE / "index.html"
+    text = home.read_text()
+    block = OSS_START + "\n" + oss_bar() + "\n" + OSS_END
+    pattern = re.compile(re.escape(OSS_START) + r".*?" + re.escape(OSS_END), re.S)
+    if not pattern.search(text):
+        raise SystemExit("index.html has no oss-bar markers")
+    home.write_text(pattern.sub(lambda m: block, text))
+    print("wrote", "site/index.html (GitHub strip)")
 
 
 if __name__ == "__main__":

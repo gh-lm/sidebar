@@ -1,0 +1,8 @@
+# Cloudflare Pages reads this file. Old addresses from when the site was
+# served by Buildmorphic, so a link someone kept still lands somewhere useful.
+/code        https://github.com/gh-lm/sidebar            301
+/bugs        https://github.com/gh-lm/sidebar/issues     301
+/whats-new   https://github.com/gh-lm/sidebar/blob/main/CHANGELOG.md  301
+/downloads   /                                          301
+/blog        /                                          301
+/community   /                                          301

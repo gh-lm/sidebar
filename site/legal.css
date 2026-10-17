@@ -87,15 +87,41 @@ a:hover { color: var(--accent); }
   .legal nav { margin-left: 0; justify-content: flex-start; }
 }
 
-/* The source band, above the legal one. */
-.legal.source {
-  margin-top: 2.5rem;
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--panel-border);
+/* The GitHub strip, above the legal footer. Marks and links are 44px
+   targets; on a narrow screen the links wrap and align left. */
+.oss-bar {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--panel-border);
+  color: var(--muted-fg);
+  font-size: 0.9375rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  text-align: left;
 }
-
-.legal + .legal { margin-top: 0; padding-top: 1.25rem; border-top: 0; }
-
-.marks { display: flex; align-items: center; gap: 0.9rem; }
-.marks a { display: inline-flex; color: var(--muted-fg); }
-.marks a:hover { color: var(--fg); }
+.oss-bar .marks { display: flex; align-items: center; gap: 2px; margin-left: -10px; }
+.oss-bar .marks a {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 8px;
+  color: var(--muted-fg); text-decoration: none;
+}
+.oss-bar .marks a:hover { color: var(--fg); background: var(--panel-border); }
+.oss-bar .marks svg { width: 21px; height: 21px; display: block; }
+.oss-bar nav {
+  flex: 0 1 auto; max-width: 100%;
+  display: flex; flex-wrap: wrap; justify-content: flex-end;
+  margin-right: -6px;
+}
+.oss-bar nav a {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 6px; min-width: 44px; min-height: 44px;
+  color: var(--muted-fg); font-size: 0.9375rem; text-decoration: none;
+}
+.oss-bar nav a:hover { color: var(--fg); }
+.oss-bar + .legal { margin-top: 0; }
+@media (max-width: 700px) {
+  .oss-bar nav { justify-content: flex-start; margin-left: -6px; margin-right: 0; }
+}
