@@ -385,24 +385,6 @@
   }
   .faq-list dd { margin: 0.5rem 0 0; color: var(--quiet-ink); }
 
-  /* ---------- lightmorphic promo ---------- */
-  .promo { border-top: 1px solid var(--rule); }
-  .promo .col { padding-block: clamp(3rem, 6vw, 4.5rem); }
-
-  .promo-card {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: clamp(1rem, 3vw, 2rem);
-    background: var(--paper-2);
-    border: 1px solid var(--rule);
-    border-radius: 1.25rem;
-    padding: clamp(1.25rem, 3vw, 2rem);
-  }
-  .promo-card h3 { margin: 0 0 0.375rem; font-size: 1.25rem; letter-spacing: -0.02em; }
-  .promo-card p { margin: 0; color: var(--dim); font-size: 0.9375rem; max-width: 44ch; }
-  .promo-mark { width: 54px; height: 54px; flex: 0 0 auto; }
-
   /* ---------- footer ---------- */
   footer { border-top: 1px solid var(--rule); font-size: 0.875rem; color: var(--dim); }
   .who { width: 100%; margin-bottom: 1.25rem; }
@@ -610,15 +592,18 @@
     .mast nav { gap: 0.75rem; }
     .chapter { grid-template-columns: 1fr; gap: 0.5rem; }
     .num { font-size: 2.25rem; }
-    .promo-card { grid-template-columns: auto 1fr; }
-    .promo-card .cta-side { grid-column: 1 / -1; text-align: center; }
     .demo-panel { margin-left: var(--gutter); margin-right: var(--gutter); max-width: none; }
+  }
+
+  @media (max-width: 480px) {
+    /* The store button names the store, which is longer than the old label,
+       so on a phone the masthead keeps the mark and drops the name. */
+    .mast b { display: none; }
+    .mast nav { gap: 0.5rem; }
   }
 
   @media (max-width: 420px) {
     .hero h1 { font-size: 2.35rem; }
-    .promo-card { grid-template-columns: 1fr; }
-    .promo-mark { width: 44px; height: 44px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -805,7 +790,7 @@
       <a href="#how">How it works</a>
       <a href="#questions">Questions</a>
       <a href="#private">Privacy</a>
-      <a class="get" href="https://chromewebstore.google.com/search/Lightmorphic%20Sidebar">Get it</a>
+      <a class="get" href="https://chromewebstore.google.com/search/Lightmorphic%20Sidebar" rel="noopener">Chrome Web Store</a>
       <div id="all-apps"></div>
     </nav>
   </header>
@@ -818,7 +803,7 @@
         read everything else. There is a working one on this page, have a go at
         it.</p>
       <div class="actions">
-        <a class="cta-main" href="https://chromewebstore.google.com/search/Lightmorphic%20Sidebar">Get Lightmorphic Sidebar</a>
+        <a class="cta-main" href="https://chromewebstore.google.com/search/Lightmorphic%20Sidebar" rel="noopener">Get it on the Chrome Web Store</a>
         <a class="cta-side" href="#how">See what it does</a>
       </div>
       <p class="fine">Chrome, Edge, Brave, Vivaldi, Opera · no account · no server · nothing sent anywhere</p>
@@ -1095,24 +1080,6 @@ John</span></button>
     </dl>
   </section>
 
-  <section class="promo">
-    <div class="col">
-      <div class="promo-card">
-        <svg class="promo-mark" viewBox="0 0 54 54" role="img" aria-label="Lightmorphic">
-          <rect width="54" height="54" rx="13" fill="var(--navy)"/>
-          <path d="M15 38V16h5.5v17H31v5z" fill="var(--accent)"/>
-          <circle cx="37" cy="20" r="4.5" fill="var(--accent)"/>
-        </svg>
-        <div>
-          <h3><span translate="no">Built by Lightmorphic</span></h3>
-          <p>Lightmorphic Sidebar is one of a family of small, private tools: desktop apps,
-            browser extensions and websites, made without accounts, tracking or
-            anything phoning home. See the rest of them.</p>
-        </div>
-        <a class="cta-side" href="https://lightmorphic.com" target="_blank" rel="noopener">lightmorphic.com ↗</a>
-      </div>
-    </div>
-  </section>
 
   <footer>
     <div class="col">
