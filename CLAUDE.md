@@ -37,7 +37,9 @@ justification at submission, so don't add one casually.
 
 No git identity is configured on this machine, so pass it inline:
 `git -c user.name='FOSSCharlie' -c user.email='github@lightmorphic.co.uk' commit`.
-Push with a `GIT_ASKPASS` script reading `~/9-Claude/secrets/sidebar/sidebar-token`
+The repo is `https://github.com/gh-lm/sidebar` (Buildmorphic is gone; the old
+`lightmorphic/sidebar` repo is not used). Push over HTTPS as user `gh-lm` with a
+`GIT_ASKPASS` script reading `~/9-Claude/secrets/sidebar/sidebar-github-token`
 — never echo the token.
 
 ## Testing
