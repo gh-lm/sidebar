@@ -37,10 +37,11 @@ justification at submission, so don't add one casually.
 
 No git identity is configured on this machine, so pass it inline:
 `git -c user.name='FOSSCharlie' -c user.email='github@lightmorphic.co.uk' commit`.
-The repo is `https://github.com/gh-lm/sidebar` (Buildmorphic is gone; the old
-`lightmorphic/sidebar` repo is not used). Push over HTTPS as user `gh-lm` with a
-`GIT_ASKPASS` script reading `~/9-Claude/secrets/sidebar/sidebar-github-token`
-— never echo the token.
+The repo is `https://github.com/gh-lm/sidebar` (the old `lightmorphic/sidebar`
+repo and Buildmorphic are not used). Push over HTTPS as user `gh-lm` with a
+`GIT_ASKPASS` script that reads this project's push token from the project's
+folder under Charlie's secrets directory. The path is deliberately not written
+here, because this file is public. Never echo the token.
 
 ## Testing
 

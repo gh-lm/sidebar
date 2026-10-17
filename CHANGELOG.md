@@ -2,7 +2,12 @@
 
 Dates are when the version was submitted to the Chrome Web Store.
 
-## 1.1.1 — 9 September 2026
+## Unreleased
+
+- The logo is Lightmorphic yellow with a dark rail, at every size: toolbar,
+  store icon, panel and website.
+
+## 1.1.1 - 9 September 2026
 
 - Logging in to sites could fail while the extension was enabled. The rule
   that asks a panel site for its phone layout was reaching every tab in the
@@ -27,7 +32,7 @@ Dates are when the version was submitted to the Chrome Web Store.
   plain one, and its buttons stay in view in a short window.
 - The example pin that ships with a new install is Wikipedia.
 
-## 1.1.0 — 6 September 2026
+## 1.1.0 - 6 September 2026
 
 - A site's icon is taken when it is pinned and kept, so it is there whether
   or not the site has been visited or is reachable.
@@ -47,12 +52,12 @@ Dates are when the version was submitted to the Chrome Web Store.
 - The bin is labelled Danger zone and says what it takes, including the
   bookmarks folder the extension made.
 
-## 1.0.1 — 4 September 2026
+## 1.0.1 - 4 September 2026
 
 - Pinned sites that answered on a different address came back as "refused to
   connect". Permission now covers a site's subdomains, and allowing every
   site installs one rule that applies everywhere.
 
-## 1.0.0 — 2 September 2026
+## 1.0.0 - 2 September 2026
 
 First release.
