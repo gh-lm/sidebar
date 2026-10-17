@@ -200,9 +200,9 @@ def sub_footer(current: str) -> str:
         for slug, label, _, _ in PAGES
     )
     return f"""<div class="legal">
-  <p>&copy; Lightmorphic Ltd. Registered in England and Wales, company&nbsp;number&nbsp;<a href="https://find-and-update.company-information.service.gov.uk/company/{COMPANY_NO}">{COMPANY_NO}</a>.
-    Registered office: {OFFICE}.
-    <span class="updated">Page last updated: <time datetime="{DATE_ISO}" id="updated">{DATE_HUMAN}</time>.</span></p>
+  <p><span class="line">&copy; Lightmorphic Ltd. Registered in England and Wales, company&nbsp;number&nbsp;<a href="https://find-and-update.company-information.service.gov.uk/company/{COMPANY_NO}">{COMPANY_NO}</a>.</span>
+    <span class="line">Registered office: {OFFICE}.</span>
+    <span class="line"><span class="updated">Page last updated: <time datetime="{DATE_ISO}" id="updated">{DATE_HUMAN}</time>.</span></span></p>
   <nav aria-label="Legal">
 {links}
   </nav>
