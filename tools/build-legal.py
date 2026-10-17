@@ -138,19 +138,18 @@ BODIES = {
 <p>Say so, and ask for it to be looked at again. A complaint that has been through that and is still unresolved can be taken further: to the Information Commissioner's Office at <a href="https://ico.org.uk">ico.org.uk</a> for anything about personal data, or to the Equality Advisory and Support Service at <a href="https://www.equalityadvisoryservice.com">equalityadvisoryservice.com</a> for accessibility.</p>
 
 <h2>Faults rather than complaints</h2>
-<p>A bug is usually quicker to raise in the open, where anyone can see it is being worked on: <a href="/bugs">the bug list</a>.</p>
+<p>A bug is usually quicker to raise in the open, where anyone can see it is being worked on: <a href="https://github.com/lightmorphic/sidebar/issues">the bug list</a>.</p>
 """,
 }
 
 
 SOURCE_LINKS = [
-    ("Repository", "/code"),
-    ("Documentation", "/code/file/README.md"),
-    ("Security", "/code/file/SECURITY.md"),
-    ("Licence", "/code/file/LICENSE"),
-    ("Changelog", "/whats-new"),
-    ("Issues", "/bugs"),
-    ("Releases", "/downloads"),
+    ("Repository", "https://github.com/lightmorphic/sidebar"),
+    ("Documentation", "https://github.com/lightmorphic/sidebar#readme"),
+    ("Security", "https://github.com/lightmorphic/sidebar/security/policy"),
+    ("Licence", "https://github.com/lightmorphic/sidebar/blob/main/LICENSE"),
+    ("Changelog", "https://github.com/lightmorphic/sidebar/blob/main/CHANGELOG.md"),
+    ("Issues", "https://github.com/lightmorphic/sidebar/issues"),
 ]
 # Blog and community follow the owner's switches on Buildmorphic: a marked
 # element is left out while that part is off.

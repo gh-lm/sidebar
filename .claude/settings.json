@@ -1,0 +1,62 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/charlie/.local/share/prismor-venv/bin/python3\" \"/home/charlie/.prismor/hook-dispatch.py\" hook-dispatch --agent claude --workspace \"/home/charlie/Claude_Repos/sidebar\" --mode enforce"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Task|Agent|Skill|Bash|Read|Edit|MultiEdit|Write|WebFetch|WebSearch|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/charlie/.local/share/prismor-venv/bin/python3\" \"/home/charlie/.prismor/hook-dispatch.py\" hook-dispatch --agent claude --workspace \"/home/charlie/Claude_Repos/sidebar\" --mode enforce"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Task|Agent|Skill|Bash|Read|Edit|MultiEdit|Write|WebFetch|WebSearch|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/charlie/.local/share/prismor-venv/bin/python3\" \"/home/charlie/.prismor/hook-dispatch.py\" hook-dispatch --agent claude --workspace \"/home/charlie/Claude_Repos/sidebar\" --mode enforce"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Task|Agent|Skill|Bash|Read|Edit|MultiEdit|Write|WebFetch|WebSearch|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/charlie/.local/share/prismor-venv/bin/python3\" \"/home/charlie/.prismor/hook-dispatch.py\" hook-dispatch --agent claude --workspace \"/home/charlie/Claude_Repos/sidebar\" --mode enforce"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/charlie/.local/share/prismor-venv/bin/python3\" \"/home/charlie/.prismor/hook-dispatch.py\" hook-dispatch --agent claude --workspace \"/home/charlie/Claude_Repos/sidebar\" --mode enforce"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "PRISMOR_WORKSPACE": "/home/charlie/Claude_Repos/sidebar"
+  }
+}

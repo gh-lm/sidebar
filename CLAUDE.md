@@ -37,7 +37,7 @@ justification at submission, so don't add one casually.
 
 No git identity is configured on this machine, so pass it inline:
 `git -c user.name='FOSSCharlie' -c user.email='github@lightmorphic.co.uk' commit`.
-Push with a `GIT_ASKPASS` script reading `~/9-Claude/Tokens/sidebar-token`
+Push with a `GIT_ASKPASS` script reading `~/9-Claude/secrets/sidebar/sidebar-token`
 — never echo the token.
 
 ## Testing
