@@ -45,11 +45,21 @@ PY
 # travel with the font.
 [ -f chrome/fonts/OFL.txt ] || fail "chrome/fonts/OFL.txt is missing; the bundled font's licence must ship."
 
+# The GPL asks for its text to travel with the work.
+[ -f chrome/LICENSE ] || fail "chrome/LICENSE is missing; the GPL must ship inside the package."
+
 # The extension finds a user's existing data by the name it had before the
 # rename. Blanket find-and-replace over these orphans every existing user's
 # saved work, and nothing errors - the panel simply comes up empty.
 grep -q 'OLD_ROOT_TITLES' chrome/lib/store.js || fail "the rename migration constants are gone from lib/store.js."
 grep -q 'sidemorphic.invalid' chrome/lib/store.js || fail "the old data prefix is gone from lib/store.js."
+
+# The header rule is browser-wide. This condition is the only thing keeping it
+# inside the panel; without it, ordinary pages load as one browser and fetch as
+# another, logins break, and any site can frame a site that forbids framing.
+# tools/dnr-test proves it properly -- this is here so it cannot ship without.
+grep -q 'tabIds: \[chrome.tabs.TAB_ID_NONE\]' chrome/sidebar/sidebar.js ||
+  fail "the header rule is no longer confined to the panel; see tools/dnr-test/README.md."
 
 mkdir -p dist
 rm -f "$ZIP"

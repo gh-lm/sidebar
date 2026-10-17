@@ -20,6 +20,72 @@
 
   if (document.getElementById("lightmorphic-sidebar-scroll")) return;
 
+  // Tell the panel where this frame has actually got to. Following a link in
+  // here is invisible from outside -- the frame is another site and its
+  // address cannot be read from the panel -- so without this, Open and
+  // Reload act on the address the panel was first sent to rather than the
+  // page you are looking at.
+  let toldPanel = "";
+  function tellPanel() {
+    if (location.href === toldPanel) return;
+    toldPanel = location.href;
+    try {
+      chrome.runtime.sendMessage({ type: "panel-frame-url", url: location.href }).catch(() => {});
+    } catch {
+      /* an orphaned copy after a reload of the extension */
+    }
+  }
+  tellPanel();
+  addEventListener("popstate", tellPanel);
+  addEventListener("hashchange", tellPanel);
+  // Sites that change the address without a navigation, which the events
+  // above do not always cover.
+  setInterval(tellPanel, 1500);
+
+  // Following a link inside the panel keeps you in a column about a phone
+  // wide. Set to do so, a click hands the link to the main window instead,
+  // at full width, and leaves the panel on the results you came from.
+  let linksToMainWindow = false;
+  const readLinkSetting = () =>
+    chrome.storage.local
+      .get("linksOpenIn")
+      .then(({ linksOpenIn }) => {
+        linksToMainWindow = linksOpenIn === "tab";
+      })
+      .catch(() => {});
+  readLinkSetting();
+  try {
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === "local" && "linksOpenIn" in changes) readLinkSetting();
+    });
+  } catch {
+    /* an orphaned copy after a reload; the page will get a fresh one */
+  }
+
+  document.addEventListener(
+    "click",
+    (e) => {
+      if (!linksToMainWindow || e.defaultPrevented || e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target.closest && e.target.closest("a[href]");
+      if (!a) return;
+      let href;
+      try {
+        href = new URL(a.href, location.href);
+      } catch {
+        return;
+      }
+      if (!/^https?:$/.test(href.protocol)) return;
+      // Staying on the same site is usually paging or a filter, and belongs
+      // in the panel. It is leaving for a result that wants the room.
+      if (href.hostname === location.hostname) return;
+      e.preventDefault();
+      e.stopPropagation();
+      chrome.runtime.sendMessage({ type: "open-tab", url: href.href }).catch(() => {});
+    },
+    true
+  );
+
   // Dark blob on a light page, light blob on a dark one. Read once the page
   // has painted, because the background is often set by a stylesheet.
   function inkFor() {
@@ -78,13 +144,12 @@
     }
   }
 
-  // Match the panel: this makes the browser's own colours inside the page —
-  // form fields, default backgrounds — follow it, and any site written with
-  // light-dark() follows too.
+  // Match the panel, which is always dark: the browser's own colours inside
+  // the page — form fields, default backgrounds — follow it, and any site
+  // written with light-dark() follows too.
   function matchScheme() {
     try {
-      const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      document.documentElement.style.colorScheme = dark ? "dark" : "light";
+      document.documentElement.style.colorScheme = "dark";
     } catch {
       /* nothing to do */
     }

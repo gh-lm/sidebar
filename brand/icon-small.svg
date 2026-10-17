@@ -2,9 +2,9 @@
   <!-- The same shape as icon.svg, for sizes where the full mark cannot be
        read: a toolbar button and a browser tab are 16px, and at that size
        the three dots are half a pixel across and the faint panel block
-       disappears. Two blocks, no dots, a wider rail and a panel light
+       disappears. Two blocks, no dots, a wider rail and a panel dark
        enough to see. -->
-  <rect width="128" height="128" rx="26" fill="#111827"/>
-  <rect x="18" y="26" width="50" height="76" rx="9" fill="#ffffff" opacity="0.40"/>
-  <rect x="78" y="26" width="32" height="76" rx="9" fill="#FBC711"/>
+  <rect width="128" height="128" rx="26" fill="#FBC711"/>
+  <rect x="18" y="26" width="50" height="76" rx="9" fill="#111827" opacity="0.30"/>
+  <rect x="78" y="26" width="32" height="76" rx="9" fill="#111827"/>
 </svg>
