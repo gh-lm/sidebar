@@ -63,7 +63,7 @@ a:hover { color: var(--accent); }
   border-top: 1px solid var(--panel-border);
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 1rem 2rem;
   color: var(--muted-fg);
@@ -72,6 +72,7 @@ a:hover { color: var(--accent); }
 }
 
 .legal p { margin: 0; max-width: 46ch; }
+.legal .updated { display: block; }
 .legal a { color: var(--muted-fg); text-decoration: none; }
 .legal a:hover { color: var(--fg); }
 
