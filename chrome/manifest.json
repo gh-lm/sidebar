@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Lightmorphic Sidebar",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "description": "Pin any website to a side panel and read it beside the page you're on. Plus search, a scratchpad and snippets. Private by default.",
   "minimum_chrome_version": "114",
   "icons": {
@@ -38,6 +38,7 @@
     "clipboardWrite",
     "tabs",
     "scripting",
+    "cookies",
     "bookmarks",
     "declarativeNetRequestWithHostAccess",
     "favicon"
@@ -49,7 +50,9 @@
     {
       "resources": [
         "lib/mobile-ua.js",
-        "lib/panel-scroll.js"
+        "lib/panel-scroll.js",
+        "lib/page-rail.js",
+        "icons/icon-32.png"
       ],
       "matches": [
         "*://*/*"

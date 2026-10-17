@@ -1,15 +1,18 @@
-# Submitting Lightmorphic Sidebar 1.0.1 to the Chrome Web Store
+# Submitting Lightmorphic Sidebar 1.1.1 to the Chrome Web Store
 
 Everything on this page is ready to copy straight into the form at
 <https://chrome.google.com/webstore/devconsole>. Nothing else needs writing.
 
-Upload: `dist/lightmorphic-sidebar-1.0.1.zip`
+Upload: `dist/lightmorphic-sidebar-1.1.1.zip`
 
 1.0.0 is published and live, so that number can never be used again. This is
 an update, not a first submission: the code has changed since, and the
-version is now 1.0.1. Updates are usually reviewed faster than a first
-submission, unless they ask for a permission the published version did not
-have. This one does not.
+version is now 1.1.1.
+
+**This one adds a permission**, `cookies`, so expect the slower review an
+update normally escapes. It is there for one thing: a site in the panel is
+inside a frame and cannot see its own cookies, so cookie banners come back
+every time. The justification below explains it.
 
 ---
 
@@ -36,7 +39,7 @@ how many of something there are. The permission justifications are not
 public listing text and can stay specific.
 
 The corrected listing went on to be published as 1.0.0. Everything below now
-describes the 1.0.1 update.
+describes the 1.1.1 update.
 
 ---
 
@@ -82,8 +85,6 @@ It installs with access to no websites at all. When you open a pinned panel it
 asks for that one site, and nothing else. Nothing is sent anywhere: no
 accounts, no servers, no analytics, no remote code. Everything stays in your
 browser.
-
-Light, dark, or following the browser, on one button.
 
 Lightmorphic Sidebar does not touch your new tab page or anything else in the
 browser. It is a side panel and nothing more.
@@ -134,7 +135,7 @@ PNG with no alpha. At least one is required.
 | 2 | `store/02-search.png` |
 | 3 | `store/03-scratchpad.png` |
 | 4 | `store/04-snippets.png` |
-| 5 | `store/05-light.png` |
+| 5 | `store/05-private.png` |
 
 All five are 1280x800, 24-bit, no alpha. They are full bleed with square
 corners and no border, which is what the store asks for.
@@ -177,10 +178,10 @@ https://sidebar.lightmorphic.com/
 **Support URL**
 
 ```
-https://github.com/lightmorphic/sidebar/issues
+https://sidebar.lightmorphic.com/bugs
 ```
 
-Issues are enabled on the repository and the page is public, so anyone
+The bug list is public, so anyone
 reaching it from the listing can read what has been reported and open
 something themselves without being asked for anything first.
 
@@ -251,6 +252,21 @@ Two things, for one site at a time and only after the user has granted
 permission for that site: removing the headers that stop a site being displayed
 inside a panel, and requesting that site's phone layout, because the panel is
 about as wide as a phone.
+```
+
+`cookies`
+
+```
+A site shown in the panel sits inside a frame, and a frame counts as a
+different site from the page around it, so the browser holds back most of
+that site's own cookies. In practice that means a cookie banner the user
+already answered in an ordinary tab reappears in the panel every single
+time. When the user opens a site in the panel, and only for that site, its
+cookies are copied into a storage partition belonging to this extension, so
+the site can see its own settings there. The originals are never modified
+and keep their SameSite protection everywhere else in the browser; the
+copies are readable only inside this extension's own panel. No cookie is
+read for any other purpose, and none is sent anywhere.
 ```
 
 `favicon`
@@ -340,30 +356,45 @@ adds a permission goes back into the slow queue.
 
 ---
 
-## What changed in 1.0.1
+## What changed since the published version
 
 Worth having to hand if the review asks, and worth putting in the "what's
 new" box if the form offers one:
 
-Pinned sites that answered on a different address than the one typed came
-back as "refused to connect". bbc.com serves www.bbc.com, and permission for
-the first did not cover the second, so the header that blocks framing
-survived. Permission now covers a site's subdomains as well.
+A site shown in the panel sits inside a frame, so the browser withholds most
+of that site's own cookies and a banner answered in an ordinary tab came
+back every time. Copies of that site's cookies now go into a storage
+partition belonging to this extension; the originals are untouched. This is
+what the new `cookies` permission is for.
 
-Separately, the rule that strips that header was tied to the pinned site's
-own domain even for someone who had allowed every site, so a site that
-redirects to a different domain entirely was never covered. Allowing every
-site now installs one rule that applies everywhere.
-
-A pinned site also showed a grey globe instead of its icon unless the site
+A pinned site showed a grey globe instead of its icon unless the site
 had already been opened in a tab, because the icon came only from the
 browser's own cache. It now falls back to the site's own icon.
+
+The panel is dark throughout. The light theme and its switch are gone: the
+panel sits against web pages of every colour, and one ground it can be
+recognised by beats following the browser somewhere it does not suit.
 
 The arrow at the top of the icon strip now folds the panel away to just
 those icons, instead of closing it. Chromium's own close button still closes
 it outright.
 
-No new permissions. Nothing else changed.
+A bin at the foot of the rail removes everything the extension has saved,
+on two presses. Chrome offers no hook at uninstall, so the offer has to come
+beforehand.
+
+Reading no longer creates the bookmarks folder. Opening the panel used to
+put one in your bookmarks whether or not you had saved anything.
+
+Text throughout the panel was too small or too faint and has been raised.
+
+The on-page strip drew twice on some sites and the spare could not be
+closed; only one is drawn now. Dragging it rebuilt it mid-gesture, so it
+sprang back; it stays under the pointer. Folding on the Web Store gave advice
+that could not help, since Chrome forbids every extension from drawing there;
+it now says so.
+
+One new permission, `cookies`, justified above. Nothing else changed.
 
 ---
 
@@ -371,7 +402,7 @@ No new permissions. Nothing else changed.
 
 - [ ] Developer account fee of $5 paid
 - [ ] Publisher email verified in the account settings
-- [ ] `dist/lightmorphic-sidebar-1.0.1.zip` uploaded (68 KB, 18 files)
+- [ ] `dist/lightmorphic-sidebar-1.1.1.zip` uploaded (101 KB, 20 files)
 - [ ] Detailed description pasted
 - [ ] Website and support URL both filled in, and they are different
 - [ ] Five screenshots, small promo tile and marquee all uploaded

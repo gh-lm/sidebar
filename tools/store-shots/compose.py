@@ -13,8 +13,8 @@ PANEL_W, PANEL_H = 430, 720
 PANEL_X, PANEL_Y = W - 72 - PANEL_W, 40
 RADIUS = 16
 
+# One ground, because there is one theme.
 DARK = {"bg": (14, 21, 36), "h1": (243, 245, 249), "p": (154, 166, 189), "shadow": 150}
-LIGHT = {"bg": (244, 242, 236), "h1": (17, 24, 39), "p": (75, 85, 99), "shadow": 60}
 YELLOW = (251, 199, 17)
 
 def font(size, weight):
@@ -30,7 +30,7 @@ def rounded(im, radius):
 
 shots = json.load(open(f"{OUT}/shots.json"))
 for shot in shots:
-    t = LIGHT if shot.get("light") else DARK
+    t = DARK
     canvas = Image.new("RGB", (W, H), t["bg"])
     draw = ImageDraw.Draw(canvas)
     draw.rectangle([0, 0, W, 5], fill=YELLOW)

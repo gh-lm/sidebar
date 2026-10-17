@@ -5,64 +5,63 @@
   font-display: swap;
 }
 :root {
-  color-scheme: light dark;
-  --bg: #ffffff; --fg: #09090b;
-  --panel: #ffffff; --panel-border: rgba(24, 24, 40, 0.10);
-  --border: #e4e4e7; --muted: #f4f4f5; --muted-fg: #71717a;
+  /* Dark, always. There is no light theme and no switch: the panel sits
+     against web pages of every colour, and one predictable ground it can be
+     recognised by beats following the browser somewhere it does not suit. */
+  color-scheme: dark;
+  --bg: #09090b; --fg: #fafafa;
+  --panel: #1b1d29; --panel-border: rgba(255, 255, 255, 0.09);
+  --border: #27272a; --muted: #1c1c1f; --muted-fg: #b4b5bd;
   --accent: #fbc711; --accent-hover: #ddaf0f; --on-accent: #645007;
-  --danger: #cc372d; --danger-bg: #fef2f1;
+  --danger: #f34236; --danger-bg: #350f0c;
   --radius: 0.875rem;
   --rail-width: 44px;
-  /* Tooltip: dark bubble on light mode (contrasts with the page),
-     reversed on dark mode. */
-  --tip-bg: #111827; --tip-fg: #ffffff;
-}
-
-/* Follow the browser's own light/dark mode automatically -- the panel is
-   dark when the browser is dark, light when it's light, and tracks the OS
-   on "auto". Standard prefers-color-scheme, no toggle, no override. */
-/* Dark applies when the browser asks for it AND the user has not chosen
-   light, or when the user has chosen dark outright. Written twice rather
-   than once, because a media query cannot be overridden by an attribute
-   from inside itself. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #09090b; --fg: #fafafa;
-    --panel: #1b1d29; --panel-border: rgba(255,255,255,.09);
-    --border: #27272a; --muted: #1c1c1f; --muted-fg: #a1a1aa;
-    --danger: #f34236; --danger-bg: #350f0c;
-    --tip-bg: #fafafa; --tip-fg: #111827;
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg: #09090b; --fg: #fafafa;
-  --panel: #1b1d29; --panel-border: rgba(255,255,255,.09);
-  --border: #27272a; --muted: #1c1c1f; --muted-fg: #a1a1aa;
-  --danger: #f34236; --danger-bg: #350f0c;
+  /* The outline of anything you are meant to find and click into. The old
+     one was 1.12:1 against the panel, which is not an edge, it is a rumour.
+     This is 2.6:1 -- visible without shouting. */
+  --edge: #5a5e70;
   --tip-bg: #fafafa; --tip-fg: #111827;
 }
 
-:root[data-theme="light"] { color-scheme: light; }
-:root[data-theme="dark"] { color-scheme: dark; }
-
 * { box-sizing: border-box; }
+
+/* The browser draws placeholder text at about half strength, which put the
+   search box and the snippet box below the readable minimum. Set outright. */
+::placeholder {
+  color: var(--muted-fg);
+  opacity: 1;
+}
 
 body {
   margin: 0;
   height: 100vh;
   font-family: "Manrope", system-ui, sans-serif;
+  /* The panel is a narrow column of text and the browser's default was
+     leaving a lot of it at twelve pixels. Nothing here is now below
+     fourteen, and the greys were lifted to clear the contrast minimum. */
+  font-size: 1rem;
+  line-height: 1.55;
   background: var(--bg);
   color: var(--fg);
 }
 
 .shell {
   display: flex;
-  /* Rail sits on the RIGHT edge of the panel (the outermost edge of the
-     window, since Chromium docks the side panel on the right) -- content
-     first, rail second. */
+  position: relative;
+  /* The rail sits on the edge nearest the page, so it is the part the eye
+     lands on. Chromium docks the panel on the right by default, which puts
+     the rail on the panel's left... except the panel can be moved to the
+     left of the window, and then the mirror image is right. Which way round
+     is decided at runtime from sidePanel.getLayout(). */
   flex-direction: row-reverse;
   height: 100%;
+}
+
+.shell.rail-left { flex-direction: row; }
+
+.shell.rail-left .rail {
+  border-left: 0;
+  border-right: 1px solid var(--border);
 }
 
 /* Icon rail -- Vivaldi-style: a slim strip of icon-only buttons, one per
@@ -143,7 +142,7 @@ body {
   background: var(--tip-bg);
   color: var(--tip-fg);
   font-weight: 700;
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
   line-height: 1;
   white-space: nowrap;
   padding: 6px 9px;
@@ -207,7 +206,7 @@ body {
 /* Cookie policy selects */
 .select-row {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 0.5rem; margin-bottom: 0.625rem; font-size: 0.875rem;
+  gap: 0.5rem; margin-bottom: 0.625rem; font-size: 0.9375rem;
 }
 .select-row select {
   padding: 0.375rem 0.5rem;
@@ -215,7 +214,7 @@ body {
   border-radius: var(--radius);
   background: var(--panel);
   color: var(--fg);
-  font: inherit; font-size: 0.8125rem;
+  font: inherit; font-size: 0.875rem;
 }
 
 .rail-divider {
@@ -260,11 +259,51 @@ body {
 
 .panel-view.active { display: flex; }
 
+/* The hint used to be placeholder text, which sits small and pale in the
+   top corner. It is its own element now: in the middle, big enough to read,
+   and out of the way the moment anything is typed. */
+.pad-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.pad-hint {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  text-align: center;
+  pointer-events: none;
+  color: var(--fg);
+  font-size: 1.6rem;
+  font-weight: 600;
+  /* Faint enough to read as a hint, strong enough to actually read. */
+  opacity: 0.8;
+}
+
+.pad-hint span {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  max-width: 24ch;
+}
+
+/* Gone as soon as there is anything to read. */
+#notepad:not(:placeholder-shown) + .pad-hint,
+#notepad:focus + .pad-hint { opacity: 0; }
+
 #notepad {
   flex: 1;
   width: 100%;
   resize: none;
-  border: 1px solid var(--panel-border);
+  border: 1px solid var(--edge);
   border-radius: var(--radius);
   background: var(--panel);
   color: var(--fg);
@@ -286,11 +325,11 @@ body {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.625rem;
-  border: 1px solid var(--panel-border);
+  border: 1px solid var(--edge);
   border-radius: var(--radius);
   background: var(--panel);
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
 }
 
 .panel-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -304,7 +343,7 @@ body {
   line-height: 1;
 }
 
-.add-manual { font-size: 0.8125rem; }
+.add-manual { font-size: 0.875rem; }
 .add-manual summary {
   color: var(--muted-fg);
   cursor: pointer;
@@ -387,8 +426,8 @@ body {
 
 .panel-zoom {
   width: auto !important;
-  padding: 0 0.35rem;
-  font-size: 0.6875rem !important;
+  padding: 0 0.4rem;
+  font-size: 0.875rem !important;
   font-weight: 600;
   color: var(--muted-fg);
 }
@@ -444,7 +483,7 @@ body {
 }
 
 .update-version {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--fg);
 }
@@ -463,7 +502,7 @@ body {
   border: 1px solid var(--panel-border);
   border-radius: var(--radius);
   background: var(--panel);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: var(--muted-fg);
 }
 
@@ -520,10 +559,10 @@ body {
 .checkbox-row { display: flex; align-items: center; gap: 0.5rem; }
 .checkbox-row input { width: auto; margin: 0; }
 
-.hint { font-size: 0.8125rem; color: var(--muted-fg); margin: -0.5rem 0 0.75rem; }
+.hint { font-size: 0.875rem; color: var(--muted-fg); margin: -0.5rem 0 0.75rem; }
 
 .empty-state {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: var(--muted-fg);
   line-height: 1.5;
   margin: 0;
@@ -538,8 +577,8 @@ body {
   flex-shrink: 0;
 }
 .panel-nav button {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -550,20 +589,107 @@ body {
   cursor: pointer;
   flex-shrink: 0;
 }
-.panel-nav button svg { width: 17px; height: 17px; }
+.panel-nav button svg { width: 20px; height: 20px; }
 .panel-nav button:hover { background: var(--muted); }
 .panel-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-#panelPopOut { margin-left: 0.25rem; }
+/* The one thing in this bar that takes you out of the panel, so it is the
+   one that reads as a button rather than another glyph. The rest are
+   navigation and stay as icons. */
+#panelPopOut {
+  width: auto;
+  height: 34px;
+  gap: 0.35rem;
+  padding: 0 0.7rem;
+  /* Hard against the right edge, away from the navigation. The address used
+     to push it there, but the address is dropped in a narrow panel and the
+     button then slid back to sit among the arrows. */
+  margin-left: auto;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  font: 500 0.875rem/1 inherit;
+  font-family: inherit;
+}
+
+#panelPopOut svg { width: 17px; height: 17px; }
+
+#panelPopOut:hover {
+  background: var(--accent);
+  border-color: transparent;
+  color: #111827;
+}
+
+/* Squeezed into the narrowest panel Chrome allows, the address shrinks to a
+   stub like "ligh..." which tells you nothing. Better to drop it and leave
+   the buttons room; the page below says where you are. */
+@media (max-width: 400px) {
+  .panel-nav-host { display: none; }
+}
 
 .panel-nav-host {
-  flex: 1;
+  /* Takes only the room it needs and gives it up first. The Open button is
+     pushed right by its own auto margin, so the address no longer has to
+     act as the spacer. */
+  flex: 0 1 auto;
   min-width: 0;
   margin-left: 0.25rem;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: var(--muted-fg);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* The first-run dialog. Left to the browser's own dialog styling it was a
+   white box in the middle of a dark panel; this is the same card as the
+   warning shown when the panel cannot fold, so the two read as one voice. */
+dialog#welcomeDialog {
+  margin: auto;
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--fg);
+  padding: 1rem 1.1rem 1.1rem;
+  width: min(300px, calc(100vw - 1.5rem));
+  /* A side panel can be short. The words scroll; the two buttons stay put,
+     because a dialog whose answer is off the bottom of the screen looks like
+     a dialog with no way out. */
+  max-height: calc(100vh - 1.5rem);
+  overflow: hidden;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+dialog#welcomeDialog::backdrop { background: rgba(0, 0, 0, 0.55); }
+
+dialog#welcomeDialog[open] { display: flex; flex-direction: column; }
+
+dialog#welcomeDialog p { margin: 0 0 0.6rem; }
+
+.dialog-body { overflow-y: auto; min-height: 0; }
+
+.dialog-body p:last-child { margin-bottom: 0; }
+
+.dialog-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.dialog-then { color: var(--muted-fg); }
+
+/* Side by side is two cramped buttons at this width; stacked, the one that
+   settles it sits under the thumb. */
+dialog#welcomeDialog .dialog-actions {
+  flex-direction: column-reverse;
+  gap: 0.4rem;
+  margin-top: 0.9rem;
+}
+
+dialog#welcomeDialog .dialog-actions button {
+  width: 100%;
+  align-self: stretch;
+  padding: 0.55rem 0.8rem;
 }
 
 /* Add/edit-site dialog */
@@ -627,7 +753,7 @@ dialog#siteDialog input {
   border-radius: var(--radius);
   color: var(--fg);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   cursor: pointer;
 }
 .ctx-menu button:hover { background: var(--muted); }
@@ -684,7 +810,7 @@ dialog#siteDialog input {
   transform: translateY(-50%);
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   padding: 0.125rem 0.5rem;
   border-radius: 999px;
@@ -736,18 +862,70 @@ dialog#siteDialog input {
 }
 
 /* The add box is the same shape as a snippet, because that is what it
-   becomes. */
+   becomes.
+
+   With nothing saved yet it sits in the middle of the panel with its
+   explanation beside it, because an empty list at the top of an empty panel
+   tells you nothing. The moment there is a snippet it goes back to the top,
+   out of the way of the thing you came to click. */
+.snippet-add-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.snippets-empty .snippet-add-wrap {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 0.5rem 3rem;
+}
+
+.snippets-empty .snippet-add {
+  max-width: 22rem;
+  min-height: 5.5rem;
+  font-size: 1rem;
+}
+
+.snippet-first { display: none; }
+
+.snippets-empty .snippet-first {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  order: -1;
+  color: var(--fg);
+  font-size: 1.4rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.snippet-first span {
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.5;
+  max-width: 26ch;
+  opacity: 0.85;
+}
+
+/* Nothing to click at when there is nothing yet. */
+.snippets-empty .hint,
+.snippets-empty .panel-list { display: none; }
+
 .snippet-add {
   display: block;
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: 0.5rem;
   font: inherit;
   color: inherit;
   background: var(--panel);
-  border: 1px dashed var(--border);
+  /* A dashed hairline at nine per cent was all but invisible against the
+     panel behind it. Solid, and light enough to find. */
+  border: 1px dashed var(--edge);
   border-radius: var(--radius);
-  padding: 0.625rem 0.75rem;
+  padding: 0.75rem 0.85rem;
   resize: vertical;
 }
 
@@ -768,7 +946,7 @@ dialog#siteDialog input {
 
 .info-hero img { border-radius: 12px; }
 .info-hero h2 { margin: 0; font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
-.info-hero p { margin: 0.125rem 0 0; color: var(--muted-fg); font-size: 0.875rem; }
+.info-hero p { margin: 0.125rem 0 0; color: var(--muted-fg); font-size: 0.9375rem; }
 
 .info-card {
   background: var(--panel);
@@ -795,10 +973,10 @@ dialog#siteDialog input {
   font-weight: 600;
 }
 
-.info-card p { margin: 0 0 0.625rem; font-size: 0.875rem; line-height: 1.55; }
+.info-card p { margin: 0 0 0.625rem; font-size: 0.9375rem; line-height: 1.55; }
 .info-card p:last-child { margin-bottom: 0; }
 
-.info-aside { color: var(--muted-fg); font-size: 0.8125rem !important; }
+.info-aside { color: var(--muted-fg); font-size: 0.875rem !important; }
 
 .info-links {
   display: grid;
@@ -822,8 +1000,8 @@ dialog#siteDialog input {
 }
 
 .info-link:hover { border-color: var(--accent); }
-.info-link span { font-weight: 600; font-size: 0.875rem; }
-.info-link small { color: var(--muted-fg); font-size: 0.75rem; }
+.info-link span { font-weight: 600; font-size: 0.9375rem; }
+.info-link small { color: var(--muted-fg); font-size: 0.8125rem; }
 
 /* ---- Search ----
    The panel opens on this: the mark, the name, one box. It is the new-tab
@@ -884,7 +1062,7 @@ dialog#siteDialog input {
   display: grid;
   place-items: center;
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--muted-fg);
   background: none;
@@ -980,13 +1158,30 @@ dialog#siteDialog input {
 #panel-search { position: relative; overflow: hidden; }
 
 /* The panel is a column; this sits on the floor of it rather than under the
-   search box, where it would be the second thing you read. */
+   search box, where it would be the second thing you read. A label rather
+   than a line of loose text, so it reads as a note about the panel and not
+   as something left over. */
 .footnote {
-  margin-top: auto;
+  margin: auto 0 0;
   padding-top: 1.5rem;
-  font-size: 0.75rem;
-  opacity: 0.75;
+  display: flex;
+  justify-content: center;
 }
+
+.footnote-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  color: var(--muted-fg);
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+
+.footnote-label svg { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.9; }
 
 #panel-search.active { display: flex; flex-direction: column; }
 
@@ -1001,7 +1196,7 @@ dialog#siteDialog input {
   border-top: 1px solid var(--panel-border);
 }
 .allow-all > div { flex: 1; min-width: 0; }
-.allow-all-title { margin: 0 0 0.125rem; font-size: 0.875rem; font-weight: 600; }
+.allow-all-title { margin: 0 0 0.125rem; font-size: 0.9375rem; font-weight: 600; }
 .allow-all .btn-secondary { flex: 0 0 auto; white-space: nowrap; }
 
 .panel-nav button:disabled { opacity: 0.3; cursor: default; }
@@ -1022,18 +1217,6 @@ dialog#siteDialog input {
 }
 
 :root {
-  --scroll-thumb: rgba(24, 24, 40, 0.22);
-  --scroll-thumb-strong: rgba(24, 24, 40, 0.4);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --scroll-thumb: rgba(255, 255, 255, 0.18);
-    --scroll-thumb-strong: rgba(255, 255, 255, 0.34);
-  }
-}
-
-:root[data-theme="dark"] {
   --scroll-thumb: rgba(255, 255, 255, 0.18);
   --scroll-thumb-strong: rgba(255, 255, 255, 0.34);
 }
@@ -1053,3 +1236,165 @@ dialog#siteDialog input {
 
 :hover::-webkit-scrollbar-thumb { background: var(--scroll-thumb); background-clip: content-box; }
 ::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-strong); background-clip: content-box; }
+
+/* Which side the strip sits on. Radio buttons rather than a cycling button:
+   there are three states and no obvious order to cycle them in. */
+.side-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.side-choice label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.side-choice input {
+  accent-color: var(--accent);
+  margin: 0;
+}
+
+/* Why a fold did nothing. Sits above whatever section is open, and goes on
+   its own after a few seconds. */
+.fold-problem {
+  /* In the middle of the panel, not tucked at the top: it is the answer to
+     a button that has just refused to work, so it belongs where the eye is
+     already looking. Fixed to the panel rather than to whichever view is
+     open, so a scrolled section cannot carry it away. */
+  position: fixed;
+  top: 50%;
+  left: 0.75rem;
+  right: calc(var(--rail-width) + 0.75rem);
+  transform: translateY(-50%);
+  z-index: 50;
+  margin: 0;
+  padding: 1rem 1.1rem 1.1rem;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+  color: var(--fg);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.fold-problem p { margin: 0 0 0.6rem; }
+
+.fold-problem-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.fold-problem-then { color: var(--muted-fg); }
+
+.fold-problem-ok {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--fg);
+  font: 600 0.9375rem inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.fold-problem-ok:hover { background: var(--accent); color: #111827; border-color: transparent; }
+.fold-problem-ok:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.fold-problem[hidden] { display: none; }
+
+.shell.rail-left .fold-problem {
+  left: calc(var(--rail-width) + 0.75rem);
+  right: 0.75rem;
+}
+
+.info-try {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--fg);
+  font: 500 0.875rem inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.info-try:hover { background: var(--accent); color: #111827; border-color: transparent; }
+
+.info-trace {
+  margin: 0.6rem 0 0;
+  padding: 0.6rem;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--muted-fg);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.info-trace[hidden] { display: none; }
+
+/* Remove everything. Quiet until it is armed, then unmistakably red. */
+.rail-wipe { color: var(--muted-fg); }
+.rail-wipe:hover { color: var(--danger); }
+
+.rail-wipe.armed {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+/* The warning that comes with it. A tooltip cannot hold this much and does
+   not wrap, so the armed state opens a proper panel over the content. */
+.wipe-warn {
+  position: absolute;
+  right: calc(var(--rail-width) + 0.5rem);
+  bottom: 0.5rem;
+  left: 0.5rem;
+  z-index: 70;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.875rem;
+  color: var(--fg);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  box-shadow: 0 8px 26px rgba(0,0,0,.45);
+}
+
+.shell.rail-left .wipe-warn {
+  right: 0.5rem;
+  left: calc(var(--rail-width) + 0.5rem);
+}
+
+.wipe-warn[hidden] { display: none; }
+.wipe-warn p { margin: 0 0 0.5rem; }
+.wipe-warn p:last-child { margin-bottom: 0; }
+
+.wipe-warn-title {
+  color: var(--danger);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  letter-spacing: 0.01em;
+}
+
+.wipe-warn ul {
+  margin: 0 0 0.5rem;
+  padding-left: 1.1rem;
+}
+
+.wipe-warn li { margin-bottom: 0.15rem; }
+
+.wipe-warn-do { color: var(--muted-fg); }
