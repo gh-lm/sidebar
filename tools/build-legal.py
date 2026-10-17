@@ -79,7 +79,7 @@ BODIES = {
 
 <h2>Sites you open in the panel</h2>
 <p>A website opened inside the panel is a real visit to that website. It can set its own cookies exactly as it would in a tab, under your browser's own cookie settings. Those are that site's cookies, not ours.</p>
-<p>The panel shows a site inside a frame, and a browser treats a framed site as a different site from the page around it, so it holds back most of that site's own cookies. A banner you have already answered would come back every time. So that a site can see its own settings, the extension copies that site's cookies into a storage area belonging to this extension, for a site you have granted access to and at the moment you open it in the panel. The originals are never changed, the copies are readable only inside this extension's panel, and nothing is sent anywhere or seen by us. There is more on this in the <a href="privacy.html">privacy statement</a>.</p>
+<p>The panel shows a site inside a frame, and a browser treats a framed site as a different site from the page around it, so it holds back most of that site's own cookies. A banner you have already answered would come back every time. So that a site can see its own settings, the extension copies that site's cookies into a storage area belonging to this extension, for a site you have granted access to and at the moment you open it in the panel. The originals are never changed, the copies are readable only inside this extension's panel, and nothing is sent anywhere or seen by us. There is more on this in the <a href="/privacy">privacy statement</a>.</p>
 
 <h2>Asking us</h2>
 <p>Questions about this page: <a href="mailto:privacy@lightmorphic.com">privacy@lightmorphic.com</a>.</p>
@@ -196,7 +196,7 @@ def oss_bar() -> str:
 
 def sub_footer(current: str) -> str:
     links = "\n".join(
-        f'    <a href="{slug}.html"{" aria-current=\"page\"" if slug == current else ""}>{label}</a>'
+        f'    <a href="/{slug}"{" aria-current=\"page\"" if slug == current else ""}>{label}</a>'
         for slug, label, _, _ in PAGES
     )
     return f"""<div class="legal">
@@ -218,7 +218,7 @@ TEMPLATE = """<!doctype html>
 <title>{title} &mdash; Lightmorphic Sidebar</title>
 <meta name="description" content="{description}">
 <meta name="theme-color" content="#101013">
-<link rel="canonical" href="https://sidebar.lightmorphic.com/{slug}.html">
+<link rel="canonical" href="https://sidebar.lightmorphic.com/{slug}">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/images/lightmorphic-sidebar-mark-180.png">
@@ -228,7 +228,7 @@ TEMPLATE = """<!doctype html>
   "@context": "https://schema.org",
   "@type": "WebPage",
   "name": "Lightmorphic Sidebar {title_lower}",
-  "url": "https://sidebar.lightmorphic.com/{slug}.html",
+  "url": "https://sidebar.lightmorphic.com/{slug}",
   "inLanguage": "en-GB",
   "description": "{description}",
   "dateModified": "{date_iso}",
@@ -250,7 +250,7 @@ TEMPLATE = """<!doctype html>
 </head>
 <body>
 <main>
-<a href="index.html" class="back"><img class="mark" src="images/lightmorphic-sidebar-mark-112.png" alt="Lightmorphic Sidebar" width="56" height="56"></a>
+<a href="/" class="back"><img class="mark" src="images/lightmorphic-sidebar-mark-112.png" alt="Lightmorphic Sidebar" width="56" height="56"></a>
 <h1>{heading}</h1>
 {body}
 {footer}
