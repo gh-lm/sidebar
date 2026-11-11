@@ -1,9 +1,4 @@
-/* Photographs the extension actually running.
-   Chrome is launched with chrome/ loaded unpacked, and every shot is a
-   capture of chrome-extension://<id>/sidebar/sidebar.html -- the real page,
-   with the real chrome.bookmarks, chrome.storage and favicon service behind
-   it. The sample data is written through the browser's own bookmarks API,
-   so the panel reads it exactly as it reads a real user's. */
+// Photographs the extension actually running.
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
@@ -19,9 +14,6 @@ const SHOTS = [
     file: "01-panel.png",
     h: "Any website,|beside the one|you are reading",
     s: "Pin a site to the rail and it opens here in the panel,|like a small window beside whatever you are reading.",
-    // A neutral third-party site, not our own. The listing was once rejected
-    // for a run of brand names, and our own hero carries a list of browsers
-    // in its small print, which is the same thing in a picture.
     open: "https://en.wikipedia.org/wiki/Side_panel",
     settle: 5000,
   },
@@ -77,8 +69,6 @@ const SHOTS = [
   const PANEL = `chrome-extension://${id}/sidebar/sidebar.html`;
   console.log("extension id", id);
 
-  // Write the sample data through the real bookmarks API, from a page that
-  // is the extension itself, so nothing here is a stand-in for the store.
   const seed = await browser.newPage();
   await seed.goto(PANEL, { waitUntil: "domcontentloaded" });
   await seed.evaluate(async (sample) => {
@@ -97,9 +87,6 @@ const SHOTS = [
     await chrome.bookmarks.create({ parentId: folder.id, title: "Lightmorphic Sidebar snippets", url: enc(sample.snippets) });
   }, SAMPLE);
 
-  // Answer the first-run dialog the way a user would, with a real click on
-  // "Allow all sites", so the pinned site in shot 1 is being shown under a
-  // permission the extension actually holds.
   await seed.reload({ waitUntil: "networkidle2" });
   await new Promise((r) => setTimeout(r, 1000));
   const welcome = await seed.$("#welcomeAllow");
@@ -112,10 +99,6 @@ const SHOTS = [
   }
   await seed.close();
 
-  // Headless Chrome has no UI to confirm an optional permission, so the
-  // click above cannot grant it. Write the grant into the profile instead
-  // and reopen: the same end state as a user pressing "Allow all sites",
-  // and shot 1 then shows a site the extension really is allowed to load.
   if (!granted) {
     await browser.close();
     const prefsPath = path.join(PROFILE, "Default", "Preferences");
@@ -138,10 +121,6 @@ const SHOTS = [
     await check.close();
   }
 
-  // The rail draws each pin with Chrome's own cached favicon. A fresh
-  // profile has cached nothing, so every pin would come out as the generic
-  // globe. Visiting each site once fills the cache, the same way it fills
-  // for a real user who has been to the site they pinned.
   const warm = await browser.newPage();
   for (const url of SAMPLE.pins) {
     await warm.goto(url, { waitUntil: "networkidle2", timeout: 45000 }).catch(() => {});
@@ -150,9 +129,6 @@ const SHOTS = [
   await warm.close();
   await new Promise((r) => setTimeout(r, 1500));
 
-  // Each shot is a straight capture of the extension's own page. No
-  // composition page in front of it: sidebar.html is not a web-accessible
-  // resource, so an http page cannot frame it, and it should not have to.
   const page = await browser.newPage();
   await page.setViewport({ width: 430, height: 720, deviceScaleFactor: 3 });
 

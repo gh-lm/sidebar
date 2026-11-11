@@ -1,10 +1,5 @@
 #!/bin/bash
 # Makes a numbered test copy at ~/Claude_Repos/sidebar-testbuild.
-#
-# Every run bumps the fourth part of the version and the name, so the card at
-# chrome://extensions says which build is loaded without opening anything.
-# Chrome allows four dot-separated numbers; the store only ever sees the
-# first three, because the store build comes from package.sh, not this.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 REPO=$(pwd)
@@ -28,11 +23,9 @@ p.write_text(json.dumps(d, indent=2) + "\n")
 print(f"{d['name']}  version {d['version']}")
 PY
 
-# Only the current one, so there is never a question of which zip is which.
 rm -f "$DEST"/lightmorphic-sidebar-test-*.zip
 ( cd "$DEST/extension" && zip -qr "../lightmorphic-sidebar-test-$N.zip" . -x '.*' )
 
-# Keep the readme's headline in step with what was just built.
 if [ -f "$DEST/README.md" ]; then
   python3 - "$DEST/README.md" "$N" <<'PY2'
 import pathlib, re, sys

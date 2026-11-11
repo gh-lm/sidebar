@@ -11,12 +11,10 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 OUT, DEST, FONT, ICON = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 BG, INK, DIM, YELLOW = (14, 21, 36), (243, 245, 249), (154, 166, 189), (251, 199, 17)
 
-
 def font(size, weight):
     f = ImageFont.truetype(FONT, size)
     f.set_variation_by_axes([weight])
     return f
-
 
 def mark(size):
     """The 128 icon carries 16px of transparent padding on each side for the
@@ -26,13 +24,11 @@ def mark(size):
     box = im.getbbox()
     return im.crop(box).resize((size, size), Image.LANCZOS)
 
-
 def rounded(im, radius):
     mask = Image.new("L", im.size, 0)
     ImageDraw.Draw(mask).rounded_rectangle([0, 0, im.size[0] - 1, im.size[1] - 1], radius, fill=255)
     im.putalpha(mask)
     return im
-
 
 def small_tile():
     W, H = 440, 280
@@ -54,7 +50,6 @@ def small_tile():
     tile.save(out)
     print(out, tile.size, tile.mode)
 
-
 def marquee():
     W, H = 1400, 560
     PW, PY, RADIUS = 360, 52, 16
@@ -70,8 +65,6 @@ def marquee():
     d.text((130, 356), "Any website, beside the one you are reading.", font=font(24, 300), fill=DIM)
     d.text((130, 394), "Plus search, a scratchpad and snippets.", font=font(24, 300), fill=DIM)
 
-    # The panel runs off the bottom edge rather than being shrunk to fit,
-    # so it stays readable at the size the store actually draws this.
     panel = Image.open(f"{OUT}/panel-01-panel.png").convert("RGB")
     scale = PW / panel.width
     panel = panel.resize((PW, round(panel.height * scale)), Image.LANCZOS)
@@ -87,7 +80,6 @@ def marquee():
     out = f"{DEST}/promo-marquee-1400x560.png"
     canvas.convert("RGB").save(out)
     print(out, (W, H), "RGB")
-
 
 small_tile()
 marquee()

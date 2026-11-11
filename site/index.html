@@ -28,9 +28,6 @@
   }
 
   :root {
-    /* Dark, always. There is no light theme and no switch. Ink and warm
-       off-white rather than the light palette inverted: paper grain at full
-       strength on a dark ground reads as dirt, so it is kept low. */
     color-scheme: dark;
     --ink: #f2f1ec;
     --paper: #101013;
@@ -61,7 +58,6 @@
     overflow-x: hidden;
   }
 
-  /* Paper, not a dark app screen. The grain is drawn, not downloaded. */
   body::before {
     content: "";
     position: fixed;
@@ -74,23 +70,14 @@
 
   a { color: inherit; }
 
-  /* ---------- the page is split: reading column, then the panel ---------- */
   .page { padding-right: var(--panel-w); position: relative; z-index: 2; }
-  /* The reading column is centred in the space left of the panel, so the gap
-     between its text and the panel is the same as the gap between its text and
-     the edge of the page. Pinned to the left it left a strip of nothing beside
-     the panel on a wide screen. */
   .col { padding-left: var(--gutter); padding-right: var(--gutter); max-width: 66rem; margin-inline: auto; }
 
-  /* A wide screen gets a bigger page, not a wider gap: everything is in rem,
-     so growing the root size grows the type, the column and the panel together. */
   @media (min-width: 1440px) {
     html { font-size: clamp(16px, calc(0.75vw + 5.2px), 22px); }
     :root { --panel-w: 21rem; }
   }
 
-  /* Reachable by keyboard, out of sight otherwise. It had no styling at all
-     until now, so it simply rendered as the first line of the page. */
   .skip {
     position: absolute;
     left: 0;
@@ -106,16 +93,13 @@
   }
   .skip:focus { transform: translateY(0); }
 
-  /* No 300ms wait for a double tap that is not coming. */
   a, button, input, .demo-snip { touch-action: manipulation; }
   :root { -webkit-tap-highlight-color: rgba(251, 199, 17, 0.3); }
 
-  /* ---------- masthead ---------- */
   .mast {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    /* The masthead lines up with the reading column, not the window edge. */
     padding: 1.25rem max(var(--gutter), calc((100% - 66rem) / 2 + var(--gutter)));
     border-bottom: 1px solid var(--rule);
     position: sticky;
@@ -128,8 +112,6 @@
   .mast nav { margin-left: auto; display: flex; align-items: center; gap: 1.5rem; font-size: 0.875rem; }
   .mast nav a { color: var(--dim); text-decoration: none; }
   .mast nav a:hover { color: var(--ink); }
-  /* The pill is not a nav link: without this the rule above wins on
-     specificity and paints its text grey on near-black, 2.95:1. */
   .mast nav a.get { color: var(--bg-contrast); }
   .mast nav a.get:hover { color: #fff; }
 
@@ -145,11 +127,7 @@
   }
   .get:hover { background: var(--navy); color: #fff; }
 
-  /* A circle holding a sun or a moon. In automatic it shows whichever is
-     actually on screen, with a dot to say the browser is choosing. A third
-     neutral icon would tell you nothing about what you are looking at. */
 
-  /* ---------- hero ---------- */
   .hero { padding-block: clamp(3rem, 9vw, 7rem) clamp(2.5rem, 6vw, 4rem); }
 
   .kicker {
@@ -169,8 +147,6 @@
     text-wrap: balance;
   }
 
-  /* The second sentence is set lighter and one step down, so the emphasis
-     comes from the typesetting rather than from painting over words. */
   .hero h1 .quietly {
     display: block;
     margin-top: 0.28em;
@@ -210,12 +186,10 @@
 
   .fine { font-size: 0.8125rem; color: var(--dim); margin-top: 1.25rem; }
 
-  /* ---------- the tab-collapse drawing ---------- */
   .collapse { padding-block: 1rem clamp(3rem, 7vw, 5rem); }
   .collapse svg { width: 100%; height: auto; display: block; }
   .caption { font-size: 0.8125rem; color: var(--dim); margin: 0.875rem 0 0; }
 
-  /* ---------- numbered sections ---------- */
   .band { border-top: 1px solid var(--rule); }
 
   .chapter {
@@ -246,8 +220,6 @@
 
   .chapter p { margin: 0 0 1rem; font-size: 1.0625rem; max-width: 48ch; }
 
-  /* With room to spare, a chapter is the heading on the left and its words on
-     the right, instead of everything stacked in the left third of the page. */
   @media (min-width: 1500px) {
     .chapter > div:not(.num) {
       display: grid;
@@ -283,12 +255,7 @@
   figure { margin: 1.75rem 0 0; }
   figure svg { width: 100%; height: auto; display: block; }
 
-  /* The legal sub-footer: who we are on the left, the five pages on the
-     right, dropping under each other only when there is no room. */
   .legal {
-    /* The column lays its children out to their own width, so without this
-       each band stopped at its own content and the three right edges did
-       not line up. */
     width: 100%;
     align-self: stretch;
     margin-top: 2rem;
@@ -304,13 +271,10 @@
     color: var(--dim);
   }
   .legal p { margin: 0; }
-  /* One fact per line: the company line, then the office, then the date. */
   .legal .line { display: block; }
   .legal a { color: inherit; text-decoration: none; }
   .legal a:hover { color: var(--ink); }
 
-  /* The GitHub strip, above the legal footer. Marks and links are 44px
-     targets; on a narrow screen the links wrap and align left. */
   .oss-bar {
     width: 100%;
     align-self: stretch;
@@ -361,10 +325,6 @@
     .legal nav { margin-left: 0; justify-content: flex-start; }
   }
 
-  /* ---------- inverted block ---------- */
-  /* This band is dark whichever theme is on, so its text is set outright
-     rather than with a token that swaps: --paper is near-black in dark mode,
-     which put dark text on a dark band. */
   .invert {
     background: var(--navy);
     color: #f2f1ec;
@@ -386,7 +346,6 @@
   .tally dt { display: block; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.04em; color: var(--accent); line-height: 1; font-weight: 800; }
   .tally dd { font-size: 0.875rem; color: #9a9ca6; display: block; margin: 0.375rem 0 0; }
 
-  /* ---------- questions ---------- */
   .faq { border-top: 1px solid var(--rule); }
   .faq .faq-title {
     font-size: clamp(1.75rem, 4vw, 2.5rem);
@@ -394,16 +353,10 @@
     margin: 0 0 2rem;
     padding-top: clamp(3rem, 6vw, 4.5rem);
   }
-  /* Two columns where there is room: the answers are short, and one long
-     ribbon down the left of a wide page wastes the whole right half. Pairs
-     are wrapped so a break can never land between a question and its
-     answer. */
   .faq-list {
     margin: 0 0 clamp(3rem, 6vw, 4.5rem);
     display: grid;
     gap: 1.75rem 3rem;
-    /* min() or the 22rem floor is itself wider than a small phone, and the
-       whole column hangs off the screen. */
     grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
     align-items: start;
   }
@@ -415,8 +368,6 @@
   }
   .faq-list dd { margin: 0.5rem 0 0; color: var(--quiet-ink); }
 
-  /* ---------- footer ---------- */
-  /* No rule of its own: the GitHub strip carries the one line above the footer's links. */
   footer { font-size: 0.875rem; color: var(--dim); }
   .who { width: 100%; margin-bottom: 1.25rem; }
   .who p { margin: 0 0 0.25rem; }
@@ -424,16 +375,11 @@
   .who a:hover { color: var(--ink); }
 
   footer .col { padding-block: 2rem 3rem; display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; }
-  /* The source band is the first thing in the footer now, so it does not
-     need the gap that separated it from the site's own links. */
   footer .col > .oss-bar:first-child { margin-top: 0; }
   footer nav { margin-left: auto; display: flex; gap: 1.5rem; flex-wrap: wrap; }
   footer a { text-decoration: none; }
   footer a:hover { color: var(--ink); }
 
-  /* ---------- the live panel ----------
-     Not a screenshot: the real thing, in HTML, welded to the edge of the
-     window exactly as the extension is. Clicking its rail works. */
   .demo-panel {
     position: fixed;
     top: 0;
@@ -489,10 +435,6 @@
     margin: 0;
   }
 
-  /* Two lines, a soft edge, and the text itself as the label: the same
-     row the extension draws. */
-  /* A button, not a div with a click handler: it copies when pressed, so
-     the keyboard should reach it too. */
   .demo-snip {
     display: block;
     width: 100%;
@@ -521,8 +463,6 @@
     margin: 0 0 0.5rem;
     padding: 0.55rem 0.7rem;
     font-size: 0.8125rem;
-    /* Placeholder grey, but not so grey it fails on the panel's dark
-       ground: this was 3.72:1 against #14161f. */
     color: #9a9ca6;
     border: 1px dashed rgba(255,255,255,.16);
     border-radius: 12px;
@@ -554,8 +494,6 @@
     font-weight: 700;
   }
 
-  /* The real panel centres this block in the space it has, so the demo
-     does too. */
   .demo-stage { display: flex; flex-direction: column; align-items: center; padding: 1.5rem 0 0.5rem; }
   .demo-stage-centred { flex: 1; justify-content: center; padding-bottom: 3rem; }
   .demo-view[data-view="search"].on { display: flex; flex-direction: column; height: 100%; }
@@ -563,8 +501,6 @@
   .demo-stage b { margin: 0.5rem 0 1rem; font-size: 1.0625rem; letter-spacing: -0.02em; }
   .demo-stage .demo-search { width: 100%; }
   .demo-letters { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.75rem; }
-  /* All one element type: the active letter used to be a <b>, which
-     inherited the wordmark's margin and sat 8px lower than the rest. */
   .demo-letters span {
     width: 1.6rem;
     height: 1.6rem;
@@ -579,7 +515,6 @@
   .demo-letters span.on { background: var(--accent); border-color: var(--accent); color: #3f3204; }
 
   .demo-h { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: #8a8c96; margin: 0 0 0.75rem; }
-  /* Held at its own proportions, so it is never stretched to fit. */
   .demo-site { border: 1px solid rgba(255,255,255,.1); border-radius: 12px; overflow: hidden; }
   .demo-site img { width: 100%; height: auto; display: block; aspect-ratio: 356 / 788; object-fit: cover; object-position: top; }
   .demo-hint { font-size: 0.75rem; color: #8a8c96; margin: 0.75rem 0 0; }
@@ -599,10 +534,6 @@
     border-radius: 6px 0 0 6px;
   }
 
-  /* ---------- responsive ----------
-     The fixed panel is the first thing to go: below 1080 there is not
-     enough room for a reading column beside it, so it becomes a normal
-     block in the flow, still real and still clickable. */
   @media (max-width: 1080px) {
     .page { padding-right: 0; }
     .demo-panel {
@@ -627,8 +558,6 @@
   }
 
   @media (max-width: 480px) {
-    /* The store button names the store, which is longer than the old label,
-       so on a phone the masthead keeps the mark and drops the name. */
     .mast b { display: none; }
     .mast nav { gap: 0.5rem; }
   }
@@ -840,8 +769,6 @@
       <p class="fine">Chrome, Edge, Brave, Vivaldi, Opera · no account · no server · nothing sent anywhere</p>
     </section>
 
-<!-- The panel is real HTML, not a picture of one. It is the same shape as
-     the extension, and its rail works. -->
 <aside class="demo-panel" aria-label="A working example of the Lightmorphic Sidebar panel">
   <span class="demo-flag">Try it</span>
   <div class="demo-body">
@@ -909,7 +836,6 @@ John</span></button>
       <svg viewBox="0 0 900 150" role="img">
         <title>A row of crowded tabs collapsing into a single panel</title>
         <g fill="none" stroke="currentColor" stroke-opacity=".35">
-          <!-- the crush of tabs, getting narrower to the right -->
           <path d="M2 40h96v70H2z"/><path d="M104 40h88v70h-88z"/><path d="M198 40h80v70h-80z"/>
           <path d="M284 40h72v70h-72z"/><path d="M362 40h64v70h-64z"/><path d="M432 40h56v70h-56z"/>
           <path d="M494 40h48v70h-48z"/><path d="M548 40h40v70h-40z"/><path d="M594 40h32v70h-32z"/>
@@ -1114,8 +1040,6 @@ John</span></button>
 
   <footer>
     <div class="col">
-      <!-- Where the code is. Its own band between the site's own links and
-           the legal ones, because it is neither. -->
       <!-- oss-bar:start (written by tools/build-legal.py; do not edit by hand) -->
 <div class="oss-bar">
   <div class="marks">
@@ -1160,7 +1084,6 @@ John</span></button>
 
   tabs.forEach((t) => t.addEventListener("click", () => show(t.dataset.view)));
 
-  // "Show me in the panel" from the reading column drives the same panel.
   document.querySelectorAll(".try").forEach((b) =>
     b.addEventListener("click", () => {
       show(b.dataset.show);
@@ -1170,8 +1093,6 @@ John</span></button>
     })
   );
 
-  // The snippets in the demo really do copy, so the idea lands before
-  // anyone installs anything.
   document.querySelectorAll(".demo-snip").forEach((s) =>
     s.addEventListener("click", async () => {
       try {

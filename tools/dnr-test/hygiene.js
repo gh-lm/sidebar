@@ -1,19 +1,4 @@
-/* Is an ordinary website, in an ordinary tab, in any way different because
-   this extension is installed?
-
-   Every measurement is taken twice: once in a browser with the extension
-   loaded, once in a browser with nothing loaded at all. Anything that does
-   not match is a way the extension is reaching into pages it has no business
-   in, which is what broke logins.
-
-   Four states are measured, because the fault only appeared in one of them:
-     clean    no extension
-     idle     installed, every site allowed, nothing opened
-     panel    a site open in the panel  (this is what installs the header rule)
-     strip    that site folded away to the strip on the page
-
-   Usage:  DISPLAY=:0 node hygiene.js <repo> <scratch dir>
-*/
+// Is an ordinary website, in an ordinary tab, in any way different because
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
@@ -25,7 +10,7 @@ const EXT = path.join(REPO, "chrome");
 const PORT = 8761;
 const ORIGIN = `http://127.0.0.1:${PORT}`;
 
-let requests = []; // every header the server was given
+let requests = [];
 
 const server = http.createServer((req, res) => {
   requests.push({
@@ -40,8 +25,6 @@ const server = http.createServer((req, res) => {
 
   switch (req.url) {
     case "/":
-      // Pulls in one of every kind of thing a page loads, so each is
-      // measured separately: they are separate resource types to the rule.
       return send(200, { "content-type": "text/html", "set-cookie": ["sid=real; Path=/; HttpOnly; SameSite=Lax"] }, `<!doctype html><title>site</title>
 <link rel="stylesheet" href="/style.css">
 <style>@font-face{font-family:P;src:url(/font.woff2) format("woff2")} body{font-family:P}</style>
@@ -57,7 +40,6 @@ const server = http.createServer((req, res) => {
     case "/inner": return send(200, { "content-type": "text/html" }, "<!doctype html><p>inner</p>");
     case "/echo": return send(200, { "content-type": "application/json" }, JSON.stringify({ ok: true }));
     case "/csp":
-      // If the policy survives, the inline script cannot run.
       return send(200, { "content-type": "text/html", "content-security-policy": "script-src 'none'" },
         `<!doctype html><title>csp</title><p id="ran">no</p><script>document.getElementById("ran").textContent="yes"</script>`);
     case "/denyframe":
@@ -87,7 +69,6 @@ const workerTarget = async (browser) => {
   throw new Error("the extension's service worker never started");
 };
 
-// Everything measurable about an ordinary page, from inside it.
 async function measure(browser) {
   requests = [];
   const tab = await browser.newPage();
@@ -114,11 +95,9 @@ async function measure(browser) {
     };
   });
 
-  // Is the content security policy still enforced?
   const csp = await tab.goto(`${ORIGIN}/csp`, { waitUntil: "domcontentloaded" })
     .then(() => tab.evaluate(() => document.getElementById("ran").textContent));
 
-  // Is X-Frame-Options still honoured in an ordinary page?
   await tab.goto(`${ORIGIN}/framer`, { waitUntil: "domcontentloaded" });
   await new Promise((r) => setTimeout(r, 700));
   const framedSecret = await tab.evaluate(() => {
@@ -132,9 +111,6 @@ async function measure(browser) {
 
   await tab.close();
 
-  // Keyed by what was asked for, so the browser fetching its own favicon in
-  // one profile and not another does not read as a difference. Only the
-  // headers matter, and only for things both runs asked for.
   const byUrl = {};
   for (const r of requests) {
     if (r.url === "/favicon.ico") continue;
@@ -175,7 +151,6 @@ async function openPanel(browser, id) {
   fs.mkdirSync(SCRATCH, { recursive: true });
   const results = {};
 
-  // ---- with the extension, in its three states ----
   const profile = path.join(SCRATCH, "ext");
   let browser = await launch(profile, true);
   const id = new URL((await workerTarget(browser)).url()).host;
@@ -202,30 +177,21 @@ async function openPanel(browser, id) {
   await new Promise((r) => setTimeout(r, 3000));
   results.panel = await measure(browser);
 
-  // Folding draws the strip on the page the user is looking at, so an
-  // ordinary page has to be the one in front -- fold with an extension page
-  // in front and it refuses, and the state under test never happens.
   const front = await browser.newPage();
   await front.goto(`${ORIGIN}/`, { waitUntil: "domcontentloaded" });
   await front.bringToFront();
   await sidePanel.evaluate(() => chrome.runtime.sendMessage({ type: "fold" }));
   await new Promise((r) => setTimeout(r, 3500));
-  // A successful fold closes the panel, so ask an extension page that is
-  // still open rather than the one that has just gone.
   const fold = await opener.evaluate(() => chrome.storage.local.get(["pageStrip", "lastFold"]));
   console.log("fold:", fold.pageStrip ? "strip is on" : "REFUSED", "-", (fold.lastFold?.steps || []).slice(-2).join(" / "));
   results.strip = await measure(browser);
   await browser.close();
 
-  // ---- and with nothing installed at all ----
   const bare = await launch(path.join(SCRATCH, "bare"), false);
   results.clean = await measure(bare);
   await bare.close();
   server.close();
 
-  // ---- report ----
-  // Headers are compared request by request, so the browser fetching its
-  // own favicon in one profile and not the other is not read as a change.
   const headerDiff = (state) => {
     const a = results.clean.headers;
     const b = results[state].headers;
@@ -242,7 +208,6 @@ async function openPanel(browser, id) {
   for (const state of STATES) {
     const diffs = fields.filter((f) => results[state][f] !== results.clean[f]);
     if (headerDiffs[state].length) diffs.push("headers");
-    // The strip is meant to be on the page in that state, and nowhere else.
     const expected = state === "strip" ? ["ourNodes", "htmlChildren"] : [];
     const unexpected = diffs.filter((d) => !expected.includes(d));
     console.log(`\n== ${state} vs a browser with no extension ==`);
@@ -271,7 +236,6 @@ async function openPanel(browser, id) {
   console.log("   inline script blocked by the policy :", ["clean", ...STATES].map((s2) => `${s2}=${results[s2].csp}`).join(" "));
   console.log("   framing a DENY page still refused   :", ["clean", ...STATES].map((s2) => `${s2}=${results[s2].framedSecret}`).join(" "));
 
-  // If the strip was never drawn, the state that matters was never tested.
   const stripWasThere = results.strip.ourNodes === 1;
   console.log("\nthe strip really was on the page in the strip run:", stripWasThere);
   if (!stripWasThere) bad += 1;

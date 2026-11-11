@@ -141,6 +141,8 @@ choose **Load unpacked** and pick the `chrome/` folder.
 
 Contributions are described in [CONTRIBUTING.md](CONTRIBUTING.md).
 
+Comments are stripped from the published code to keep it lean.
+
 ## Licence
 
 Copyright (c) Lightmorphic Ltd. Version 1.1.0 and later are released under the

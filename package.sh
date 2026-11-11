@@ -1,7 +1,5 @@
 #!/bin/bash
 # Builds the store zip. Refuses rather than producing something broken:
-# what gets reviewed is the zip, and every check below is here because the
-# failure it catches is silent.
 set -euo pipefail
 cd "$(dirname "$0")"
 VERSION=$(python3 -c "import json;print(json.load(open('chrome/manifest.json'))['version'])")
@@ -15,19 +13,15 @@ if grep -rn "src=[\"']http\|url([\"']\?http\|@import.*http" chrome/ ; then
   fail "a remote asset is referenced above."
 fi
 
-# Developer leftovers that must never ship.
 if find chrome -name '*.map' -o -name '.DS_Store' -o -name 'dev-*' | grep -q .; then
   find chrome -name '*.map' -o -name '.DS_Store' -o -name 'dev-*'
   fail "a developer-only file is inside chrome/."
 fi
 
-# Every script must parse. A rename once shipped a content script with a
-# hyphen in an identifier; it failed silently on every page.
 for j in $(find chrome -name '*.js'); do
   node --check "$j" >/dev/null || fail "$j does not parse."
 done
 
-# Every file the manifest names must exist.
 python3 - <<'PY' || exit 1
 import json, pathlib, sys
 m = json.load(open("chrome/manifest.json"))
@@ -41,23 +35,13 @@ if missing:
     sys.exit(1)
 PY
 
-# Manrope is bundled, and the SIL Open Font License asks for its text to
-# travel with the font.
 [ -f chrome/fonts/OFL.txt ] || fail "chrome/fonts/OFL.txt is missing; the bundled font's licence must ship."
 
-# The GPL asks for its text to travel with the work.
 [ -f chrome/LICENSE ] || fail "chrome/LICENSE is missing; the GPL must ship inside the package."
 
-# The extension finds a user's existing data by the name it had before the
-# rename. Blanket find-and-replace over these orphans every existing user's
-# saved work, and nothing errors - the panel simply comes up empty.
 grep -q 'OLD_ROOT_TITLES' chrome/lib/store.js || fail "the rename migration constants are gone from lib/store.js."
 grep -q 'sidemorphic.invalid' chrome/lib/store.js || fail "the old data prefix is gone from lib/store.js."
 
-# The header rule is browser-wide. This condition is the only thing keeping it
-# inside the panel; without it, ordinary pages load as one browser and fetch as
-# another, logins break, and any site can frame a site that forbids framing.
-# tools/dnr-test proves it properly -- this is here so it cannot ship without.
 grep -q 'tabIds: \[chrome.tabs.TAB_ID_NONE\]' chrome/sidebar/sidebar.js ||
   fail "the header rule is no longer confined to the panel; see tools/dnr-test/README.md."
 

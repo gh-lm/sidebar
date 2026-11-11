@@ -1,14 +1,4 @@
-/* Runs inside a page opened in the Lightmorphic Sidebar panel, before the page's own
-   scripts, in the page's world.
-
-   The panel already asks for the phone layout in the request headers, which
-   is enough for anything rendered on a server. It is not enough for a site
-   that decides in JavaScript: those read navigator, see a desktop browser,
-   and lay out a desktop page — which then cannot fit however far it is
-   zoomed out. This tells them the same thing the headers do.
-
-   It applies ONLY to a frame whose ancestor is this extension. A tab the
-   user opens themselves is a top-level frame and is never touched. */
+// Runs inside a page opened in the Lightmorphic Sidebar panel, before the page's own
 (() => {
   try {
     const inPanel =
@@ -17,7 +7,7 @@
       Array.from(location.ancestorOrigins).some((o) => o.startsWith("chrome-extension://"));
     if (!inPanel) return;
   } catch {
-    return; // no ancestorOrigins: assume not ours and leave the page alone
+    return;
   }
 
   const UA =
@@ -27,7 +17,6 @@
     try {
       Object.defineProperty(obj, prop, { get: () => value, configurable: true });
     } catch {
-      /* some properties are locked down; the rest still help */
     }
   };
 

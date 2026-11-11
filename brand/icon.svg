@@ -1,7 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <!-- Brand yellow tile, brand navy side rail: the panel and its rail,
-       the one shape the product is. Reads at 16px because it is two
-       blocks and nothing else. -->
   <rect width="128" height="128" rx="28" fill="#FBC711"/>
   <rect x="20" y="30" width="52" height="68" rx="8" fill="#111827" opacity="0.22"/>
   <rect x="80" y="30" width="28" height="68" rx="8" fill="#111827"/>

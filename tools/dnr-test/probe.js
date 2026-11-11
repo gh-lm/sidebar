@@ -1,8 +1,4 @@
-/* Does the panel's header rule reach ordinary tabs?
-
-   Launches the real extension, grants every site the way a user would,
-   makes the panel open a site (which is what installs the rule), then asks
-   an ordinary tab what the server saw. */
+// Does the panel's header rule reach ordinary tabs?
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
@@ -12,7 +8,6 @@ const REPO = process.argv[2];
 const PROFILE = process.argv[3];
 const EXT = path.join(REPO, "chrome");
 
-// Says back what it was sent, so a header set by the extension is visible.
 const echo = http.createServer((req, res) => {
   const body = JSON.stringify({
     ua: req.headers["user-agent"],
@@ -51,8 +46,6 @@ const echo = http.createServer((req, res) => {
   const id = new URL((await worker()).url()).host;
   const PANEL = `chrome-extension://${id}/sidebar/sidebar.html`;
 
-  // Grant every site by writing the profile, as the screenshot harness does:
-  // headless Chrome cannot show the permission prompt.
   await browser.close();
   const prefsPath = path.join(PROFILE, "Default", "Preferences");
   const prefs = JSON.parse(fs.readFileSync(prefsPath, "utf8"));
@@ -70,7 +63,6 @@ const echo = http.createServer((req, res) => {
   await panel.evaluate(() => chrome.storage.local.set({ welcomeSeen: true, accessChoice: "all" }));
   console.log("all sites allowed:", await panel.evaluate(() => chrome.permissions.contains({ origins: ["*://*/*"] })));
 
-  // Open a site in the panel, which is what installs the header rule.
   await panel.evaluate(() => {
     const box = document.getElementById("searchBox");
     box.value = "http://127.0.0.1:8756/page";
@@ -81,15 +73,12 @@ const echo = http.createServer((req, res) => {
   const rules = await panel.evaluate(() => chrome.declarativeNetRequest.getSessionRules());
   console.log("session rules:", JSON.stringify(rules, null, 1));
 
-  // Now an ordinary tab, nothing to do with the panel.
   const tab = await browser.newPage();
   await tab.goto("http://127.0.0.1:8756/page", { waitUntil: "domcontentloaded" });
   const seen = await tab.evaluate(async () => ({
     page: navigator.userAgent,
     fetch: await (await fetch("/echo")).json(),
   }));
-  // And the panel itself: the probe page refuses framing, so if it rendered
-  // there, the rule is still doing its job where it is wanted.
   const framed = panel.frames().find((f) => f.url().startsWith("http://127.0.0.1:8756/"));
   let panelText = "(no frame)";
   if (framed) panelText = await framed.evaluate(() => document.body.innerText.trim()).catch((e) => "(unreadable: " + e.message + ")");

@@ -8,9 +8,6 @@
 <body>
   <div class="shell">
     <nav class="rail" role="tablist" aria-label="Sidebar sections">
-      <!-- Folds the panel away to just this strip of icons. Chromium's own
-           header (the pin and X up top) closes it outright and cannot be
-           altered by an extension, so the two do different jobs. -->
       <button class="rail-btn rail-btn-min" id="railMinimize" type="button" aria-expanded="true" data-tip="Fold away to a strip of icons" aria-label="Fold the panel away to a strip of icons on the page">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>
       </button>
@@ -23,21 +20,15 @@
       <button class="rail-btn" data-panel="scratchpad" role="tab" aria-selected="false" data-tip="Scratchpad" aria-label="Scratchpad">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h9l3 3v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v3h3"/><path d="M6.5 9.5h7M6.5 12.5h7M6.5 15.5h4"/></svg>
       </button>
-      <!-- No separate "Panels" tab -- the pinned-site favicons further
-           down the rail ARE the panels UI; a redundant tab just confused
-           things. Clicking a favicon activates the panel view directly. -->
       <button class="rail-btn" data-panel="snippets" role="tab" aria-selected="false" data-tip="Snippets" aria-label="Snippets">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="10" height="13" rx="1.2"/><path d="M8 3.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H8a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M7.5 9h5M7.5 12h5"/></svg>
       </button>
       <div class="rail-divider"></div>
-      <!-- Pinned sites render here as favicon buttons, Vivaldi-style -->
       <div class="rail-sites" id="railSites"></div>
       <button class="rail-btn" id="railAddSite" type="button" data-tip="Pin this page" aria-label="Pin the page you're on now">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4.5v11M4.5 10h11"/></svg>
       </button>
       <div class="rail-spacer"></div>
-      <!-- Chrome gives an extension nothing to hang a question on when it is
-           uninstalled, so the offer to clear up has to come before that. -->
       <button class="rail-btn rail-wipe" id="railWipe" type="button" data-tip="Danger zone" aria-label="Danger zone: remove everything this has saved">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6h11"/><path d="M8 6V4.5h4V6"/><path d="M6 6l.7 9.2a1 1 0 0 0 1 .8h4.6a1 1 0 0 0 1-.8L14 6"/><path d="M8.75 9v4.5M11.25 9v4.5"/></svg>
       </button>
@@ -45,8 +36,6 @@
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.25"/><path d="M10 9v4.5"/><path d="M10 6.4h.01"/></svg>
       </button>
     </nav>
-  <!-- The warning has to say the bookmarks go too: they sit in the user's own
-       bookmarks bar, so people reasonably assume they survive. -->
   <div class="wipe-warn" id="wipeWarn" hidden>
     <p class="wipe-warn-title">Danger zone</p>
     <p>This removes <strong>everything the sidebar has saved</strong>:</p>
@@ -84,8 +73,6 @@
           </span>
         </p>
 
-        <!-- Recent searches live off to the side, so the search itself is
-             the only thing in the middle. -->
         <aside class="recent-drawer" id="recentDrawer" hidden aria-label="Recent searches">
           <div class="recent-head-row">
             <p class="hint recent-head">Recent</p>
@@ -126,15 +113,7 @@
             <span>Open</span>
           </button>
         </div>
-        <!-- The frame is deliberately wider than this box and the overflow is
-             clipped, which crops the page's own scrollbar off the right edge.
-             Without that the scrollbar eats the page's right-hand gutter and
-             everything looks shoved over. -->
         <div class="frame-clip" id="frameClip" hidden>
-          <!-- Everything a normal page needs, minus allow-top-navigation: without
-               that, a site can replace the whole panel with itself, taking the
-               rail and the buttons with it. Some search results do exactly
-               that on purpose, to break out of frames. -->
           <iframe id="webPanelFrame" class="web-frame"
             sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads allow-storage-access-by-user-activation"></iframe>
         </div>
@@ -312,9 +291,6 @@
     </div>
   </div>
 
-  <!-- Shown once, the first time the panel is opened. Where things are
-       kept is the one thing someone should be told without going looking
-       for it. -->
   <dialog id="welcomeDialog" aria-labelledby="welcomeTitle">
     <p class="dialog-title" id="welcomeTitle">Everything stays in your browser</p>
     <div class="dialog-body">
@@ -333,14 +309,9 @@
     </div>
   </dialog>
 
-  <!-- Add / edit a pinned site. The URL is pre-filled (current tab when
-       adding) and editable before saving. -->
   <dialog id="siteDialog">
     <form id="siteForm" method="dialog">
       <h2 id="siteDialogTitle">Pin this page</h2>
-      <!-- type=text, NOT type=url: url inputs reject "bbc.com" outright,
-           forcing the user to type https:// by hand. We normalise instead
-           (https:// is prepended automatically on save). -->
       <label>Address
         <input id="siteUrl" type="text" placeholder="e.g. bbc.com" required autocomplete="off" spellcheck="false">
       </label>
@@ -351,7 +322,6 @@
     </form>
   </dialog>
 
-  <!-- Right-click menu for a pinned rail icon. -->
   <div id="siteMenu" class="ctx-menu" hidden>
     <button type="button" data-act="edit">Edit URL</button>
     <button type="button" data-act="delete">Remove</button>

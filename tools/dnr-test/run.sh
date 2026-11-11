@@ -1,13 +1,5 @@
 #!/bin/bash
 # Every check that an ordinary website is untouched by this extension.
-#
-# Needs a screen: the side panel can only be opened by a real click, so these
-# run a visible Chrome. Puppeteer and a Chrome for testing are downloaded on
-# first run into tools/store-shots/work, which is not committed.
-#
-#   tools/dnr-test/run.sh              check the working tree
-#   tools/dnr-test/run.sh <other-dir>  check another checkout, e.g. to prove
-#                                      these tests catch a fault that is fixed
 set -euo pipefail
 cd "$(dirname "$0")/.."
 HERE=$(pwd)

@@ -13,7 +13,6 @@ PANEL_W, PANEL_H = 430, 720
 PANEL_X, PANEL_Y = W - 72 - PANEL_W, 40
 RADIUS = 16
 
-# One ground, because there is one theme.
 DARK = {"bg": (14, 21, 36), "h1": (243, 245, 249), "p": (154, 166, 189), "shadow": 150}
 YELLOW = (251, 199, 17)
 
@@ -50,7 +49,6 @@ for shot in shots:
     panel = panel.resize((PANEL_W, PANEL_H), Image.LANCZOS)
     panel = rounded(panel, RADIUS)
 
-    # Soft drop shadow, drawn from the panel's own rounded silhouette.
     shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     ImageDraw.Draw(shadow).rounded_rectangle(
         [PANEL_X, PANEL_Y + 18, PANEL_X + PANEL_W, PANEL_Y + PANEL_H + 18],
