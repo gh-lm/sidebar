@@ -2,3 +2,7 @@ dist/
 .DS_Store
 *.zip
 .publish/
+
+CLAUDE.md
+.claude/
+.prismor/
