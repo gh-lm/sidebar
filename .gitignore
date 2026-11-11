@@ -4,3 +4,7 @@ dist/
 .publish/
 .prismor/
 charlie-tasks.md
+
+CLAUDE.md
+.claude/
+.prismor/
