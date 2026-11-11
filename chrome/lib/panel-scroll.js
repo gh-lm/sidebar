@@ -1,12 +1,4 @@
-/* Runs in a page opened in the Lightmorphic Sidebar panel.
-
-   Deliberately in the ISOLATED world, unlike the identity script: this only
-   needs the DOM, and the isolated world is the one browsers are least fussy
-   about. When the other script is blocked, this still runs.
-
-   The platform scrollbar is a wide trough with a raised block in it. It is
-   hidden and replaced with a small blob that fades in while scrolling and
-   can be dragged — the thing phones have had for fifteen years. */
+// Runs in a page opened in the Lightmorphic Sidebar panel.
 (() => {
   try {
     const inPanel =
@@ -20,11 +12,6 @@
 
   if (document.getElementById("lightmorphic-sidebar-scroll")) return;
 
-  // Tell the panel where this frame has actually got to. Following a link in
-  // here is invisible from outside -- the frame is another site and its
-  // address cannot be read from the panel -- so without this, Open and
-  // Reload act on the address the panel was first sent to rather than the
-  // page you are looking at.
   let toldPanel = "";
   function tellPanel() {
     if (location.href === toldPanel) return;
@@ -32,19 +19,13 @@
     try {
       chrome.runtime.sendMessage({ type: "panel-frame-url", url: location.href }).catch(() => {});
     } catch {
-      /* an orphaned copy after a reload of the extension */
     }
   }
   tellPanel();
   addEventListener("popstate", tellPanel);
   addEventListener("hashchange", tellPanel);
-  // Sites that change the address without a navigation, which the events
-  // above do not always cover.
   setInterval(tellPanel, 1500);
 
-  // Following a link inside the panel keeps you in a column about a phone
-  // wide. Set to do so, a click hands the link to the main window instead,
-  // at full width, and leaves the panel on the results you came from.
   let linksToMainWindow = false;
   const readLinkSetting = () =>
     chrome.storage.local
@@ -59,7 +40,6 @@
       if (area === "local" && "linksOpenIn" in changes) readLinkSetting();
     });
   } catch {
-    /* an orphaned copy after a reload; the page will get a fresh one */
   }
 
   document.addEventListener(
@@ -76,8 +56,6 @@
         return;
       }
       if (!/^https?:$/.test(href.protocol)) return;
-      // Staying on the same site is usually paging or a filter, and belongs
-      // in the panel. It is leaving for a result that wants the room.
       if (href.hostname === location.hostname) return;
       e.preventDefault();
       e.stopPropagation();
@@ -86,8 +64,6 @@
     true
   );
 
-  // Dark blob on a light page, light blob on a dark one. Read once the page
-  // has painted, because the background is often set by a stylesheet.
   function inkFor() {
     let bg = "";
     try {
@@ -95,7 +71,6 @@
       const h = getComputedStyle(document.documentElement).backgroundColor;
       bg = b && b !== "rgba(0, 0, 0, 0)" ? b : h;
     } catch {
-      /* fall through to the default */
     }
     const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(bg || "");
     if (!m) return { rest: "rgba(0,0,0,.42)", hot: "rgba(0,0,0,.62)" };
@@ -128,10 +103,6 @@
     `;
   }
 
-  // Fit the page to the panel from the inside. Scaling the frame from the
-  // outside cannot help a page that lays out wider than the frame — it just
-  // makes a wider page — but zoom applied to the document reflows it, which
-  // is what "fit to width" actually means. Only ever shrinks, never grows.
   function fitWidth() {
     const de = document.documentElement;
     try {
@@ -140,18 +111,13 @@
       const have = window.innerWidth;
       if (need > have + 2) de.style.zoom = String(Math.max(0.45, have / need));
     } catch {
-      /* zoom unsupported: the page simply scrolls sideways as before */
     }
   }
 
-  // Match the panel, which is always dark: the browser's own colours inside
-  // the page — form fields, default backgrounds — follow it, and any site
-  // written with light-dark() follows too.
   function matchScheme() {
     try {
       document.documentElement.style.colorScheme = "dark";
     } catch {
-      /* nothing to do */
     }
   }
 
@@ -160,7 +126,7 @@
     paint();
     (document.head || document.documentElement).appendChild(style);
     document.documentElement.appendChild(blob);
-    setTimeout(paint, 700); // the page has its real colours by now
+    setTimeout(paint, 700);
 
     const doc = () => document.scrollingElement || document.documentElement;
     let fade = null;
@@ -190,7 +156,7 @@
     blob.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       dragging = true;
-      try { blob.setPointerCapture(e.pointerId); } catch { /* older engines */ }
+      try { blob.setPointerCapture(e.pointerId); } catch { }
       const d = doc();
       const startY = e.clientY;
       const startTop = d.scrollTop;
@@ -217,8 +183,6 @@
     window.addEventListener("scroll", () => { place(); show(); }, { passive: true, capture: true });
     window.addEventListener("resize", remeasure);
     window.addEventListener("load", remeasure);
-    // Results arrive after the first paint, so keep measuring for a while
-    // rather than sizing the blob once and leaving it wrong.
     new MutationObserver(remeasure).observe(document.documentElement, { childList: true, subtree: true });
     fitWidth();
     place();

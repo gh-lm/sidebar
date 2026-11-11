@@ -15,7 +15,6 @@ PAGES = ("site/index.html", "site/privacy.html", "site/cookies.html",
          "site/terms.html", "site/accessibility.html", "site/complaints.html")
 SITEMAP = "site/sitemap.xml"
 
-
 def content_date() -> str:
     if len(sys.argv) > 1:
         return sys.argv[1]
@@ -25,13 +24,11 @@ def content_date() -> str:
     ).stdout.strip()
     return out or date.today().isoformat()
 
-
 def human(iso: str) -> str:
     y, m, d = (int(part) for part in iso.split("-"))
     months = ("January", "February", "March", "April", "May", "June", "July",
               "August", "September", "October", "November", "December")
     return f"{d} {months[m - 1]} {y}"
-
 
 def main() -> None:
     iso = content_date()
@@ -53,14 +50,11 @@ def main() -> None:
         page = re.sub(r'<span id="year">[^<]*</span>', f'<span id="year">{iso[:4]}</span>', page)
         open(path, "w").write(page)
 
-    # The sitemap carries the same date, for the same reason: a hard-coded
-    # one is wrong the moment anything changes.
     sitemap = open(SITEMAP).read()
     sitemap = re.sub(r"<lastmod>[^<]*</lastmod>", f"<lastmod>{iso}</lastmod>", sitemap)
     open(SITEMAP, "w").write(sitemap)
 
     print(f"stamped {iso}")
-
 
 if __name__ == "__main__":
     main()

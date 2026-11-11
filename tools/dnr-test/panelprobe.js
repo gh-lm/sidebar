@@ -1,9 +1,4 @@
-/* Does the rule still reach the side panel itself?
-
-   The question the first probe could not answer: a side panel is not a tab,
-   but that has to be shown, not assumed. So this opens the real side panel
-   -- through a real click, which is the only thing sidePanel.open() accepts
-   -- and asks whether a page that refuses framing appears in it. */
+// Does the rule still reach the side panel itself?
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
@@ -59,8 +54,6 @@ const echo = http.createServer((req, res) => {
   await opener.goto(PANEL, { waitUntil: "domcontentloaded" });
   await opener.evaluate(() => chrome.storage.local.set({ welcomeSeen: true, accessChoice: "all" }));
 
-  // sidePanel.open() only works from a real gesture, so put a real button on
-  // the page and click it with the mouse.
   await opener.evaluate(() => {
     const b = document.createElement("button");
     b.id = "openIt";
@@ -92,7 +85,6 @@ const echo = http.createServer((req, res) => {
   }
   console.log("got the side panel");
 
-  // A logged-in tab, in effect: the same site, with a session cookie.
   const tab = await browser.newPage();
   await tab.goto("http://127.0.0.1:8757/", { waitUntil: "domcontentloaded" });
   const before = await tab.cookies();

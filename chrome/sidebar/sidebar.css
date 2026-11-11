@@ -5,9 +5,6 @@
   font-display: swap;
 }
 :root {
-  /* Dark, always. There is no light theme and no switch: the panel sits
-     against web pages of every colour, and one predictable ground it can be
-     recognised by beats following the browser somewhere it does not suit. */
   color-scheme: dark;
   --bg: #09090b; --fg: #fafafa;
   --panel: #1b1d29; --panel-border: rgba(255, 255, 255, 0.09);
@@ -16,17 +13,12 @@
   --danger: #f34236; --danger-bg: #350f0c;
   --radius: 0.875rem;
   --rail-width: 44px;
-  /* The outline of anything you are meant to find and click into. The old
-     one was 1.12:1 against the panel, which is not an edge, it is a rumour.
-     This is 2.6:1 -- visible without shouting. */
   --edge: #5a5e70;
   --tip-bg: #fafafa; --tip-fg: #111827;
 }
 
 * { box-sizing: border-box; }
 
-/* The browser draws placeholder text at about half strength, which put the
-   search box and the snippet box below the readable minimum. Set outright. */
 ::placeholder {
   color: var(--muted-fg);
   opacity: 1;
@@ -36,9 +28,6 @@ body {
   margin: 0;
   height: 100vh;
   font-family: "Manrope", system-ui, sans-serif;
-  /* The panel is a narrow column of text and the browser's default was
-     leaving a lot of it at twelve pixels. Nothing here is now below
-     fourteen, and the greys were lifted to clear the contrast minimum. */
   font-size: 1rem;
   line-height: 1.55;
   background: var(--bg);
@@ -48,11 +37,6 @@ body {
 .shell {
   display: flex;
   position: relative;
-  /* The rail sits on the edge nearest the page, so it is the part the eye
-     lands on. Chromium docks the panel on the right by default, which puts
-     the rail on the panel's left... except the panel can be moved to the
-     left of the window, and then the mirror image is right. Which way round
-     is decided at runtime from sidePanel.getLayout(). */
   flex-direction: row-reverse;
   height: 100%;
 }
@@ -64,11 +48,6 @@ body {
   border-right: 1px solid var(--border);
 }
 
-/* Icon rail -- Vivaldi-style: a slim strip of icon-only buttons, one per
-   section, with the active section's content filling the rest of the
-   panel. Sits on the edge adjacent to page content (the side panel itself
-   is already docked to the browser's own edge), so this rail is the part
-   the eye lands on first. */
 .rail {
   width: var(--rail-width);
   flex-shrink: 0;
@@ -81,10 +60,6 @@ body {
   background: var(--muted);
 }
 
-/* Folded away: the icons stay, everything else goes. Chromium owns the
-   panel's width and gives an extension no way to change it, so folding does
-   not narrow the panel on its own -- drag its edge and the rail sits there
-   as a strip of buttons until you want the panel back. */
 .shell.folded .content { display: none; }
 
 .shell.folded .rail { border-left: 0; }
@@ -130,9 +105,6 @@ body {
 
 .rail-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* Custom tooltips (house speech-bubble style), shown to the LEFT of the
-   rail since the rail sits on the right edge. 400ms hover delay. Dark
-   bubble on light mode, light bubble on dark mode (see --tip-* vars). */
 .rail-btn[data-tip]::after {
   content: attr(data-tip);
   position: absolute;
@@ -173,21 +145,15 @@ body {
 
 .rail-spacer { flex: 1; }
 
-/* The mark sits under the close chevron: an identity, not a tab, so it
-   never takes the active highlight. */
 .rail-logo { padding: 0; }
 .rail-logo img { display: block; border-radius: 5px; }
 .rail-logo:hover img { opacity: 0.85; }
 
-/* Close chevron: quieter than the tab icons, and pointing off the right
-   edge, the way the panel leaves. */
 .rail-btn-min { color: var(--muted-fg); }
 .rail-btn-min:hover { color: var(--fg); }
 
-/* Drag-and-drop reorder target for pinned-site icons */
 .rail-sites .rail-btn.drop-target { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* Shield protection levels */
 .shield-levels { display: flex; flex-direction: column; gap: 0.375rem; margin-bottom: 0.75rem; }
 .shield-level {
   display: flex; align-items: flex-start; gap: 0.5rem;
@@ -203,7 +169,6 @@ body {
 .shield-level small { color: var(--muted-fg); }
 .shield-site-host { font-weight: 600; word-break: break-all; }
 
-/* Cookie policy selects */
 .select-row {
   display: flex; align-items: center; justify-content: space-between;
   gap: 0.5rem; margin-bottom: 0.625rem; font-size: 0.9375rem;
@@ -259,9 +224,6 @@ body {
 
 .panel-view.active { display: flex; }
 
-/* The hint used to be placeholder text, which sits small and pale in the
-   top corner. It is its own element now: in the middle, big enough to read,
-   and out of the way the moment anything is typed. */
 .pad-wrap {
   position: relative;
   flex: 1;
@@ -284,7 +246,6 @@ body {
   color: var(--fg);
   font-size: 1.6rem;
   font-weight: 600;
-  /* Faint enough to read as a hint, strong enough to actually read. */
   opacity: 0.8;
 }
 
@@ -295,7 +256,6 @@ body {
   max-width: 24ch;
 }
 
-/* Gone as soon as there is anything to read. */
 #notepad:not(:placeholder-shown) + .pad-hint,
 #notepad:focus + .pad-hint { opacity: 0; }
 
@@ -398,9 +358,6 @@ body {
   align-self: flex-start;
 }
 
-/* Pinned sites render at the panel's natural (narrow) width, same as a
-   phone viewport -- a responsive site's own media queries do the rest.
-   No user-agent spoofing needed or wanted. */
 .frame-clip {
   flex: 1;
   min-height: 0;
@@ -411,10 +368,6 @@ body {
 }
 .frame-clip[hidden] { display: none; }
 
-/* The page is laid out at a wider size and drawn smaller, so a site built
-   for a phone-and-a-half fits the panel with both its margins intact. The
-   frame is scaled up in size by the same amount it is scaled down visually,
-   so it still fills the box exactly and nothing is cropped. */
 .web-frame {
   display: block;
   border: 0;
@@ -440,7 +393,6 @@ body {
   padding: 0.25rem 0.5rem;
 }
 
-/* Version number, then the status circle -- left aligned. */
 .update-widget {
   display: flex;
   align-items: center;
@@ -568,7 +520,6 @@ body {
   margin: 0;
 }
 
-/* Back / forward / reload bar shown above an open pinned site. */
 .panel-nav {
   display: flex;
   align-items: center;
@@ -592,17 +543,11 @@ body {
 .panel-nav button svg { width: 20px; height: 20px; }
 .panel-nav button:hover { background: var(--muted); }
 .panel-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-/* The one thing in this bar that takes you out of the panel, so it is the
-   one that reads as a button rather than another glyph. The rest are
-   navigation and stay as icons. */
 #panelPopOut {
   width: auto;
   height: 34px;
   gap: 0.35rem;
   padding: 0 0.7rem;
-  /* Hard against the right edge, away from the navigation. The address used
-     to push it there, but the address is dropped in a narrow panel and the
-     button then slid back to sit among the arrows. */
   margin-left: auto;
   background: var(--muted);
   border: 1px solid var(--border);
@@ -618,17 +563,11 @@ body {
   color: #111827;
 }
 
-/* Squeezed into the narrowest panel Chrome allows, the address shrinks to a
-   stub like "ligh..." which tells you nothing. Better to drop it and leave
-   the buttons room; the page below says where you are. */
 @media (max-width: 400px) {
   .panel-nav-host { display: none; }
 }
 
 .panel-nav-host {
-  /* Takes only the room it needs and gives it up first. The Open button is
-     pushed right by its own auto margin, so the address no longer has to
-     act as the spacer. */
   flex: 0 1 auto;
   min-width: 0;
   margin-left: 0.25rem;
@@ -639,9 +578,6 @@ body {
   white-space: nowrap;
 }
 
-/* The first-run dialog. Left to the browser's own dialog styling it was a
-   white box in the middle of a dark panel; this is the same card as the
-   warning shown when the panel cannot fold, so the two read as one voice. */
 dialog#welcomeDialog {
   margin: auto;
   border: 1px solid var(--edge);
@@ -650,9 +586,6 @@ dialog#welcomeDialog {
   color: var(--fg);
   padding: 1rem 1.1rem 1.1rem;
   width: min(300px, calc(100vw - 1.5rem));
-  /* A side panel can be short. The words scroll; the two buttons stay put,
-     because a dialog whose answer is off the bottom of the screen looks like
-     a dialog with no way out. */
   max-height: calc(100vh - 1.5rem);
   overflow: hidden;
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
@@ -678,8 +611,6 @@ dialog#welcomeDialog p { margin: 0 0 0.6rem; }
 
 .dialog-then { color: var(--muted-fg); }
 
-/* Side by side is two cramped buttons at this width; stacked, the one that
-   settles it sits under the thumb. */
 dialog#welcomeDialog .dialog-actions {
   flex-direction: column-reverse;
   gap: 0.4rem;
@@ -692,7 +623,6 @@ dialog#welcomeDialog .dialog-actions button {
   padding: 0.55rem 0.8rem;
 }
 
-/* Add/edit-site dialog */
 dialog#siteDialog {
   border: 1px solid var(--panel-border);
   border-radius: 1rem;
@@ -724,11 +654,6 @@ dialog#siteDialog input {
   margin-top: 1rem;
 }
 
-/* Right-click menu for pinned rail icons */
-/* An author `display` always beats the browser's own [hidden] rule, whatever
-   the specificity — so anything given a display here has to say what hidden
-   means too, or it can never be hidden again. That is why the pinned-site
-   menu stayed on screen after Remove. */
 .ctx-menu[hidden],
 .panel-nav[hidden],
 .web-frame[hidden] { display: none; }
@@ -759,9 +684,6 @@ dialog#siteDialog input {
 .ctx-menu button:hover { background: var(--muted); }
 .ctx-menu button[data-act="delete"] { color: #f34236; }
 
-/* ---- Snippets ---- */
-/* A snippet shows its own text. Collapsed it is capped at two lines;
-   right-click opens it out to edit. There is no title to keep in step. */
 .snippet-row {
   position: relative;
   display: flex;
@@ -788,7 +710,6 @@ dialog#siteDialog input {
   box-sizing: border-box;
 }
 
-/* Two lines, collapsed. Right-click opens the whole thing for editing. */
 .snippet-clamp {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -800,8 +721,6 @@ dialog#siteDialog input {
 
 .snippet-text:hover { border-color: var(--accent); }
 
-/* Confirmation is written over the row rather than replacing its text,
-   so the snippet you clicked is still readable while it flashes. */
 .snippet-row[data-flash]::after {
   content: attr(data-flash);
   position: absolute;
@@ -829,8 +748,6 @@ dialog#siteDialog input {
   resize: vertical;
 }
 
-/* Quiet until you go near it: a delete that shouts is a delete you press
-   by accident. Two clicks, and it says so before it does anything. */
 .snippet-delete {
   flex: 0 0 auto;
   display: grid;
@@ -852,8 +769,6 @@ dialog#siteDialog input {
 
 .snippet-delete:hover { color: var(--danger); }
 
-/* Asking, not done: the tick is red so it reads as a warning rather than
-   a confirmation that something has already happened. */
 .snippet-delete.armed {
   opacity: 1;
   background: var(--danger-bg);
@@ -861,13 +776,6 @@ dialog#siteDialog input {
   color: var(--danger);
 }
 
-/* The add box is the same shape as a snippet, because that is what it
-   becomes.
-
-   With nothing saved yet it sits in the middle of the panel with its
-   explanation beside it, because an empty list at the top of an empty panel
-   tells you nothing. The moment there is a snippet it goes back to the top,
-   out of the way of the thing you came to click. */
 .snippet-add-wrap {
   display: flex;
   flex-direction: column;
@@ -910,7 +818,6 @@ dialog#siteDialog input {
   opacity: 0.85;
 }
 
-/* Nothing to click at when there is nothing yet. */
 .snippets-empty .hint,
 .snippets-empty .panel-list { display: none; }
 
@@ -921,8 +828,6 @@ dialog#siteDialog input {
   font: inherit;
   color: inherit;
   background: var(--panel);
-  /* A dashed hairline at nine per cent was all but invisible against the
-     panel behind it. Solid, and light enough to find. */
   border: 1px dashed var(--edge);
   border-radius: var(--radius);
   padding: 0.75rem 0.85rem;
@@ -936,7 +841,6 @@ dialog#siteDialog input {
   opacity: 0.7;
 }
 
-/* ---- Information ---- */
 .info-hero {
   display: flex;
   align-items: center;
@@ -956,8 +860,6 @@ dialog#siteDialog input {
   margin-bottom: 0.875rem;
 }
 
-/* The drawing carries the idea; the words underneath explain it. Both use
-   currentColor and the accent, so they follow the theme with the rest. */
 .info-art {
   display: block;
   width: 100%;
@@ -1003,12 +905,6 @@ dialog#siteDialog input {
 .info-link span { font-weight: 600; font-size: 0.9375rem; }
 .info-link small { color: var(--muted-fg); font-size: 0.8125rem; }
 
-/* ---- Search ----
-   The panel opens on this: the mark, the name, one box. It is the new-tab
-   page that used to ship with the extension, moved somewhere that does not
-   require taking over anyone's browser. */
-/* Sits in the middle of the panel rather than at the top of it: with the
-   footnote on the floor, the space above and below the box is the same. */
 .search-stage {
   flex: 1;
   display: flex;
@@ -1016,9 +912,6 @@ dialog#siteDialog input {
   align-items: center;
   justify-content: center;
   padding: 1rem 0;
-  /* The mark, the name and the box move up a touch from dead centre —
-     optically centred rather than measured, which is where the eye
-     expects it. */
   padding-bottom: 3rem;
 }
 
@@ -1046,9 +939,6 @@ dialog#siteDialog input {
 .search-row input:focus { border-color: var(--accent); outline: none; }
 .search-row input::-webkit-search-cancel-button { filter: grayscale(1); }
 
-/* Seven initials in a row: press one and it searches with that engine.
-   The one you used last stays lit, so the row doubles as the answer to
-   "which engine is this box pointed at". */
 .engines {
   display: flex;
   justify-content: center;
@@ -1080,9 +970,6 @@ dialog#siteDialog input {
   color: var(--on-accent);
 }
 
-/* One line saying which engine, and a list when you want a different one.
-   Eight of anything laid out as chips is a wall; a picker is one thing to
-   read and one thing to press. */
 
 
 
@@ -1098,8 +985,6 @@ dialog#siteDialog input {
 
 
 
-/* The clock sits in the corner and only appears once there is something to
-   remember; the middle of the panel stays the search and nothing else. */
 .recent-toggle {
   position: absolute;
   top: 0.75rem;
@@ -1154,13 +1039,8 @@ dialog#siteDialog input {
 .recent-close:hover { color: var(--fg); background: var(--muted); }
 .recent-close svg { width: 0.875rem; height: 0.875rem; }
 
-/* The drawer is positioned against this. */
 #panel-search { position: relative; overflow: hidden; }
 
-/* The panel is a column; this sits on the floor of it rather than under the
-   search box, where it would be the second thing you read. A label rather
-   than a line of loose text, so it reads as a note about the panel and not
-   as something left over. */
 .footnote {
   margin: auto 0 0;
   padding-top: 1.5rem;
@@ -1185,8 +1065,6 @@ dialog#siteDialog input {
 
 #panel-search.active { display: flex; flex-direction: column; }
 
-/* The escape hatch from being asked per site. Deliberately plain and
-   deliberately reversible from the same button. */
 .allow-all {
   display: flex;
   align-items: center;
@@ -1201,11 +1079,6 @@ dialog#siteDialog input {
 
 .panel-nav button:disabled { opacity: 0.3; cursor: default; }
 
-/* ---- Scrollbars ----
-   The platform scrollbar is a wide grey trough with a raised block in it,
-   which is the oldest-looking thing in the panel. These are the width of a
-   pencil line, sit on no track at all, and are almost invisible until the
-   pointer is over the thing they belong to. */
 * {
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
@@ -1228,8 +1101,6 @@ dialog#siteDialog input {
 ::-webkit-scrollbar-thumb {
   background: transparent;
   border-radius: 999px;
-  /* Border rather than width, so the thumb is 4px of colour floating in an
-     8px lane instead of filling it. */
   border: 2px solid transparent;
   background-clip: content-box;
 }
@@ -1237,8 +1108,6 @@ dialog#siteDialog input {
 :hover::-webkit-scrollbar-thumb { background: var(--scroll-thumb); background-clip: content-box; }
 ::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-strong); background-clip: content-box; }
 
-/* Which side the strip sits on. Radio buttons rather than a cycling button:
-   there are three states and no obvious order to cycle them in. */
 .side-choice {
   display: flex;
   flex-direction: column;
@@ -1260,13 +1129,7 @@ dialog#siteDialog input {
   margin: 0;
 }
 
-/* Why a fold did nothing. Sits above whatever section is open, and goes on
-   its own after a few seconds. */
 .fold-problem {
-  /* In the middle of the panel, not tucked at the top: it is the answer to
-     a button that has just refused to work, so it belongs where the eye is
-     already looking. Fixed to the panel rather than to whichever view is
-     open, so a scrolled section cannot carry it away. */
   position: fixed;
   top: 50%;
   left: 0.75rem;
@@ -1347,7 +1210,6 @@ dialog#siteDialog input {
 
 .info-trace[hidden] { display: none; }
 
-/* Remove everything. Quiet until it is armed, then unmistakably red. */
 .rail-wipe { color: var(--muted-fg); }
 .rail-wipe:hover { color: var(--danger); }
 
@@ -1356,8 +1218,6 @@ dialog#siteDialog input {
   color: var(--danger);
 }
 
-/* The warning that comes with it. A tooltip cannot hold this much and does
-   not wrap, so the armed state opens a proper panel over the content. */
 .wipe-warn {
   position: absolute;
   right: calc(var(--rail-width) + 0.5rem);

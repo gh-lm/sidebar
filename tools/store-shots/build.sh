@@ -1,14 +1,5 @@
 #!/bin/bash
 # Rebuilds every image in store/ from the extension actually running.
-#
-# Chrome is launched with chrome/ loaded unpacked, and each screenshot is a
-# capture of the extension's own panel page, with the real chrome.bookmarks,
-# chrome.storage and favicon service behind it. The sample data in
-# store/sample-data.json is written through the browser's own bookmarks API,
-# so the panel reads it exactly as it reads a real user's.
-#
-# Needs node and python3. Headless Chrome and puppeteer are downloaded on
-# first run into work/, which is not committed.
 set -euo pipefail
 cd "$(dirname "$0")"
 HERE=$(pwd)
@@ -22,13 +13,9 @@ export PUPPETEER_CACHE_DIR="$WORK/node/.cache"
 cd "$WORK/node"
 [ -d node_modules/puppeteer ] || { npm init -y >/dev/null 2>&1; npm install puppeteer --no-audit --no-fund >/dev/null; }
 
-# Node resolves modules from the script's own directory, so it runs from
-# beside node_modules rather than from tools/store-shots.
 cp "$HERE/shoot.js" "$WORK/node/"
 node shoot.js "$REPO" "$WORK/out" "$WORK/profile"
 
-# The captures are taken at 3x and resampled down, which is what makes the
-# type crisp at the store's exact pixel sizes.
 FONT=$WORK/Manrope.ttf
 python3 - "$REPO/chrome/fonts/Manrope.woff2" "$FONT" <<'PY'
 import sys
@@ -39,9 +26,6 @@ PY
 python3 "$HERE/compose.py" "$WORK/out" "$REPO/store" "$FONT"
 python3 "$HERE/promo.py" "$WORK/out" "$REPO/store" "$FONT" "$REPO/chrome/icons/icon-128.png"
 
-# Two opposite rules, and neither failure gives a clear error: the tiles and
-# screenshots must have no alpha, while the icon must keep its, so the
-# rounded corners come out transparent rather than as white notches.
 python3 - "$REPO/store" <<'PY'
 import pathlib, sys
 from struct import unpack

@@ -1,9 +1,4 @@
-/* Does opening a site in the panel disturb that site's real cookies?
-
-   A login breaking is what cookies breaking looks like, so the copies the
-   panel makes have to be proved to be copies. Sets a session cookie in an
-   ordinary tab, opens the same site in the real side panel, then reads the
-   tab's cookies back. */
+// Does opening a site in the panel disturb that site's real cookies?
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
@@ -80,7 +75,6 @@ const echo = http.createServer((req, res) => {
   if (!sidePanel) throw new Error("no side panel");
   console.log("got the side panel");
 
-  // A logged-in tab, in effect.
   const tab = await browser.newPage();
   await tab.goto("http://127.0.0.1:8758/", { waitUntil: "domcontentloaded" });
   const before = await tab.cookies();

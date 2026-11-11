@@ -1,17 +1,8 @@
 import * as store from "../lib/store.js";
 
 
-// Wake the background worker and have it run its once-per-launch boot
-// work. This page reliably exists at every launch (the panel auto-opens),
-// which makes it the dependable boot trigger -- the worker itself is NOT
-// started by Chromium at launch on existing profiles, and onStartup
-// doesn't fire for --load-extension extensions.
 chrome.runtime.sendMessage({ type: "sidebar-boot" }).catch(() => {});
 
-// Health probe: a few seconds after the ping, check whether the worker
-// actually produced a fresh boot report. Written to storage so a
-// misbehaving install carries its own evidence (the worker being dead
-// explains every "my setting didn't stick" class of bug at once).
 setTimeout(async () => {
   const { lastBootReport } = await chrome.storage.local.get("lastBootReport");
   const fresh = lastBootReport?.at && Date.now() - Date.parse(lastBootReport.at) < 5 * 60 * 1000;
@@ -20,14 +11,8 @@ setTimeout(async () => {
   });
 }, 5000);
 
-// Every site. Declared up here because it is read while this module is
-// still being evaluated, and a const is unusable before its own line runs.
 const ALL_SITES = ["*://*/*"];
 
-// ---- Icon rail ----
-// Only tab buttons (data-panel) switch views. The "+" button and the
-// pinned-site favicons are .rail-btn too but have their own handlers --
-// binding them here used to deactivate every view when "+" was clicked.
 const HOME_PANEL = "search";
 
 function showPanel(name) {
@@ -43,24 +28,15 @@ function showPanel(name) {
 
 for (const btn of document.querySelectorAll(".rail-btn[data-panel]")) {
   btn.addEventListener("click", () => {
-    // Clicking the tab you are already on takes you back out of it —
-    // otherwise there is no way to shut Information again without picking
-    // something else, which is not what pressing the same button means.
     const alreadyHere = btn.classList.contains("active");
     showPanel(alreadyHere && btn.dataset.panel !== HOME_PANEL ? HOME_PANEL : btn.dataset.panel);
   });
 }
 
-// The mark under the chevron opens the Lightmorphic Sidebar site in the panel,
-// like any pinned site.
 document.getElementById("railLogo")?.addEventListener("click", () => {
   openPanelSite("https://sidebar.lightmorphic.com");
 });
 
-// ---- Page size ----
-// Sites built for a phone are often wider than this panel, and the part that
-// falls off the edge is content, not decoration. Rather than crop it, the
-// page is laid out wider and drawn smaller.
 const ZOOMS = [1, 0.9, 0.8, 0.7];
 const panelZoomBtn = document.getElementById("panelZoom");
 
@@ -69,9 +45,6 @@ function paintZoom(z) {
   if (panelZoomBtn) panelZoomBtn.textContent = `${Math.round(z * 100)}%`;
 }
 
-// Full size by default now: pages fit themselves from the inside, which
-// works on pages that scaling the frame never could. This is left as a
-// preference for anyone who wants everything smaller anyway.
 chrome.storage.local.get("panelZoom").then(({ panelZoom = 1 }) => paintZoom(panelZoom));
 
 panelZoomBtn?.addEventListener("click", async () => {
@@ -81,24 +54,6 @@ panelZoomBtn?.addEventListener("click", async () => {
   paintZoom(next);
 });
 
-// ---- Framing pinned sites ----
-// Most big sites (BBC, Google, etc.) send X-Frame-Options or a CSP
-// frame-ancestors directive that forbids being loaded in an iframe --
-// so a plain iframe just shows "refused to connect". To load them in
-// the panel we strip those response headers, but ONLY for the exact
-// host the user deliberately pinned/opened, via a per-host session
-// declarativeNetRequest rule. Clickjacking protection stays fully intact
-// for every other site in the browser; the tradeoff is limited to sites
-// the user explicitly chose to embed. (DNR can only remove a whole
-// header, not edit within CSP, so the site's entire CSP is dropped for
-// its framed load -- documented, and scoped to that one host.)
-// Registered once per host, and only for a host the user has allowed. The
-// script itself refuses to run anywhere except inside this panel, so a tab
-// the user opens on the same site behaves exactly as it always did.
-// When every site is allowed, register once for everything rather than
-// waiting to meet each host. Charlie's own install is in exactly that state,
-// and per-host registration meant the first visit to a site still got the
-// old scrollbar.
 async function ensureMobileScriptEverywhere() {
   try {
     if (!(await chrome.permissions.contains({ origins: ["*://*/*"] }))) return false;
@@ -106,9 +61,6 @@ async function ensureMobileScriptEverywhere() {
     return false;
   }
   await registerPair("all", "*://*/*");
-  // Per-host registrations made before "every site" was allowed still match,
-  // so a page ran two copies of each script at once. Two copies of the page
-  // rail meant two strips, one of them orphaned and impossible to close.
   try {
     const keep = new Set(["scroll-all", "mobile-all", "pagerail-all"]);
     const stale = (await chrome.scripting.getRegisteredContentScripts())
@@ -116,8 +68,6 @@ async function ensureMobileScriptEverywhere() {
       .filter((id) => /^(scroll|mobile|pagerail)-/.test(id) && !keep.has(id));
     if (stale.length) await chrome.scripting.unregisterContentScripts({ ids: stale });
   } catch {
-    /* nothing registered, or the browser refused; the guard in the script
-       itself still stops a second copy drawing */
   }
   return true;
 }
@@ -140,8 +90,6 @@ async function registerPair(key, match) {
       js: ["lib/mobile-ua.js"],
     },
     {
-      // The icon strip on the page itself. Top frame only, and after the
-      // page has settled, so it is never drawn inside a panel or an ad.
       id: `pagerail-${key}`,
       matches: [match],
       allFrames: false,
@@ -161,25 +109,16 @@ async function registerPair(key, match) {
     try {
       await chrome.scripting.registerContentScripts([script]);
     } catch {
-      /* this one is not allowed here; the other still stands */
     }
   }
 }
 
-// A pinned address and the address it actually serves are often different
-// hosts: bbc.com sends you to www.bbc.com. Permission for the first does not
-// cover the second, so the headers that stop a site being framed survive and
-// the panel shows "refused to connect". Asking for the site's subdomains as
-// well covers the whole family in one prompt. "*." matches no subdomain too,
-// so this includes the bare host.
 function siteScope(host) {
   const bare = host.replace(/^www\./i, "");
   const looksLikeADomain = bare.includes(".") && !/^[\d.]+$/.test(bare) && !bare.includes(":");
   return looksLikeADomain ? `*://*.${bare}/*` : `*://${host}/*`;
 }
 
-// The domain the rule and the pin are keyed on, so www and bare forms of the
-// same site do not end up with two of everything.
 function siteDomain(host) {
   return host.replace(/^www\./i, "");
 }
@@ -189,45 +128,27 @@ async function ensureMobileScript(host) {
   await registerPair(siteDomain(host), siteScope(host));
 }
 
-// A current Chrome on Android. Kept close to the real thing so nothing
-// refuses to serve it.
 const MOBILE_UA =
   "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36";
 
-// Reserved for the single rule used when every site is allowed, so it can
-// be replaced rather than piling up beside the per-site ones.
 const ALL_SITES_RULE_ID = 1;
 
 function hostRuleId(host) {
   let h = 0;
   for (let i = 0; i < host.length; i++) h = (h * 31 + host.charCodeAt(i)) & 0x7fffffff;
-  return (h % 2000000000) + 2; // >= 1, and never ALL_SITES_RULE_ID
+  return (h % 2000000000) + 2;
 }
 
-// Host permission is OPTIONAL and asked for at the moment the user opens
-// a panel, from their own click -- Lightmorphic Sidebar ships with no access to any
-// site until they pin one. Returns false if they decline, so the caller can
-// fall back to opening the site in a tab instead of showing a dead frame.
 async function ensureHostAccess(host) {
   const origins = [siteScope(host)];
   if (await chrome.permissions.contains({ origins })) return true;
   try {
     return await chrome.permissions.request({ origins });
   } catch {
-    return false; // not called from a user gesture
+    return false;
   }
 }
 
-// A site shown in the panel sits inside a frame, and a frame is a different
-// site from the page around it. Most cookies say "only send me to my own
-// site", so the browser holds them back -- which is why a consent banner
-// answered in an ordinary tab comes straight back in the panel, over and
-// over, on a panel it takes up a third of.
-//
-// The originals are not touched. Copies are written into a compartment that
-// belongs to this panel and nothing else, so the site sees its own settings
-// here while its cookies keep their protection everywhere else in the
-// browser.
 async function mirrorCookiesIntoPanel(host) {
   if (!chrome.cookies?.getAll) return;
   const partitionKey = { topLevelSite: `chrome-extension://${chrome.runtime.id}` };
@@ -236,7 +157,7 @@ async function mirrorCookiesIntoPanel(host) {
   try {
     cookies = await chrome.cookies.getAll({ domain });
   } catch {
-    return; // no access to this site's cookies, so nothing to carry over
+    return;
   }
   await Promise.all(
     cookies.map((c) => {
@@ -247,14 +168,12 @@ async function mirrorCookiesIntoPanel(host) {
         path: c.path,
         secure: true,
         httpOnly: c.httpOnly,
-        // Only meaningful inside the panel's own compartment.
         sameSite: "no_restriction",
         partitionKey,
       };
       if (c.domain.startsWith(".")) copy.domain = c.domain;
       if (!c.session) copy.expirationDate = c.expirationDate;
       return chrome.cookies.set(copy).catch(() => {
-        /* one the browser will not copy; the rest still go */
       });
     })
   );
@@ -271,16 +190,10 @@ async function allowFramingFor(url) {
   await ensureMobileScript(host);
   await mirrorCookiesIntoPanel(host);
   const domain = siteDomain(host);
-  // Someone who has allowed every site gets one rule covering every site.
-  // Scoping it to the pinned domain leaves a site that redirects elsewhere
-  // -- bbc.com sends a UK reader to bbc.co.uk -- with its framing headers
-  // intact, so the panel still says "refused to connect" however much
-  // permission has been granted.
   let everywhere = false;
   try {
     everywhere = await chrome.permissions.contains({ origins: ALL_SITES });
   } catch {
-    /* treat as not granted */
   }
   const id = everywhere ? ALL_SITES_RULE_ID : hostRuleId(domain);
   await chrome.declarativeNetRequest.updateSessionRules({
@@ -291,11 +204,6 @@ async function allowFramingFor(url) {
         priority: 1,
         action: {
           type: "modifyHeaders",
-          // Ask for the phone layout. The panel is roughly a phone wide, and
-          // a desktop page in it is unreadable — Google in particular came
-          // back at full width and simply did not fit. Sites decide from the
-          // user-agent and the client hints, so both are set, and both for
-          // the page and everything it loads.
           requestHeaders: [
             { header: "user-agent", operation: "set", value: MOBILE_UA },
             { header: "sec-ch-ua-mobile", operation: "set", value: "?1" },
@@ -308,16 +216,7 @@ async function allowFramingFor(url) {
           ],
         },
         condition: {
-          // Only requests that belong to no tab, which is what the side
-          // panel's own requests are. Without this the rule reached every
-          // tab in the browser: an ordinary page loaded as a desktop browser
-          // while everything it fetched went out as an Android phone, and a
-          // site that ties a session to one browser rejected the login.
-          // It also took the security headers off pages nobody had pinned.
           tabIds: [chrome.tabs.TAB_ID_NONE],
-          // requestDomains matches the domain and everything under it, so
-          // one entry covers www and any other subdomain the site redirects
-          // to. Left off entirely when every site is allowed.
           ...(everywhere ? {} : { requestDomains: [domain] }),
           resourceTypes: ["sub_frame", "xmlhttprequest", "script", "stylesheet", "image", "font", "other"],
         },
@@ -329,8 +228,6 @@ async function allowFramingFor(url) {
 
 async function loadInFrame(frame, url) {
   if (!(await allowFramingFor(url))) {
-    // Declined: a frame without the header rule would just say "refused to
-    // connect", so open it where it does work.
     chrome.tabs.create({ url });
     return;
   }
@@ -338,25 +235,11 @@ async function loadInFrame(frame, url) {
   frameClip.hidden = false;
 }
 
-// ---- Search ----
-// The new-tab page this replaced was a search box and nothing else, and a
-// replaceable page was the wrong home for it: taking over someone's new tab
-// is a big thing to do for one text field. It lives here instead, opens on
-// top when the panel opens, and shows its results here too — nothing about
-// this extension reaches outside the panel.
 const searchForm = document.getElementById("searchForm");
 const searchBox = document.getElementById("searchBox");
 const searchRecent = document.getElementById("searchRecent");
 
-// Seven engines, one letter each. A row of initials is quicker to hit than
-// a menu and takes one line: press the letter and it searches with that
-// engine there and then, rather than setting a preference and waiting.
 const ENGINES = [
-  // The real DuckDuckGo, not its lite endpoint. The lite one was chosen
-  // because the full site was said not to fit a panel and to challenge a
-  // framed request; measured in the panel, neither is true any more. It
-  // fits at panel width, it frames, and it follows the browser into dark on
-  // its own, while lite is a wall of plain text that ignored the dark hint.
   { id: "ddg", letter: "D", name: "DuckDuckGo", url: "https://duckduckgo.com/?q=" },
   { id: "google", letter: "G", name: "Google", url: "https://www.google.com/search?q=" },
   { id: "gimages", letter: "I", name: "Google Images", url: "https://www.google.com/search?tbm=isch&q=" },
@@ -387,13 +270,10 @@ function renderEngines() {
     b.setAttribute("aria-label", `Search with ${e.name}`);
     b.setAttribute("aria-pressed", String(e.id === engine.id));
     b.addEventListener("click", async () => {
-      // Ask first, while the click still counts as a gesture.
       await ensureEngineAccess();
       engine = e;
       await chrome.storage.local.set({ searchEngine: e.id });
       renderEngines();
-      // Pressing a letter is the search, not a setting: if there is
-      // something in the box, go.
       const q = searchBox.value.trim() || lastQuery;
       if (q) runSearch(q);
       else searchBox.focus();
@@ -403,16 +283,11 @@ function renderEngines() {
 }
 
 function searchUrlFor(q) {
-  // Bare domains and addresses go straight there; anything else searches.
   const looksLikeUrl = /^(https?:\/\/|[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$))/i.test(q);
   if (looksLikeUrl) return q.startsWith("http") ? q : `https://${q}`;
-  // The panel is always dark, so any engine that takes a dark hint gets one.
   return engine.url + encodeURIComponent(q) + (engine.dark || "");
 }
 
-// Every engine is a different site, so asking one at a time meant a prompt
-// for each — seven interruptions to use a search box. Ask for all of them
-// once instead, at the first search, in a single prompt.
 const ENGINE_ORIGINS = [
   "*://lite.duckduckgo.com/*",
   "*://www.google.com/*",
@@ -431,7 +306,6 @@ async function ensureEngineAccess() {
     if (await chrome.permissions.contains({ origins: ENGINE_ORIGINS })) return;
     await chrome.permissions.request({ origins: ENGINE_ORIGINS });
   } catch {
-    /* not a user gesture, or declined — the per-site ask still covers it */
   }
 }
 
@@ -444,16 +318,10 @@ async function runSearch(q) {
   const url = searchUrlFor(query);
   const { searchOpensIn = "panel" } = await chrome.storage.local.get("searchOpensIn").catch(() => ({}));
   if (searchOpensIn === "tab") {
-    // Results in the main window, beside the tab you are on, with the panel
-    // left on the search page ready for the next one.
     const [here] = await chrome.tabs.query({ active: true, currentWindow: true }).catch(() => []);
     chrome.tabs.create({ url, index: here ? here.index + 1 : undefined }).catch(() => {});
     showPanel("search");
   } else {
-    // Everything stays in the panel: the results load here, the same way a
-    // pinned site does, which means asking for that one host the first time.
-    // Only a refusal sends it to a tab, and that is the fallback in
-    // loadInFrame rather than a choice made here.
     openPanelSite(url);
   }
   const { recentSearches = [] } = await chrome.storage.local.get("recentSearches");
@@ -467,8 +335,6 @@ const recentDrawer = document.getElementById("recentDrawer");
 
 function openRecent() {
   recentDrawer.hidden = false;
-  // A frame between showing it and sliding it, or there is nothing to
-  // transition from.
   requestAnimationFrame(() => recentDrawer.classList.add("open"));
   recentToggle.setAttribute("aria-expanded", "true");
 }
@@ -534,7 +400,6 @@ searchForm.addEventListener("submit", async (e) => {
   runSearch(q);
 });
 
-// ---- Scratchpad ----
 const notepad = document.getElementById("notepad");
 let scratchpadSaveTimer = null;
 
@@ -551,13 +416,6 @@ notepad.addEventListener("input", () => {
   }, 600);
 });
 
-// ---- Web panels (pinned sites) ----
-// Pinned sites live as favicon buttons in the rail (Vivaldi-style). The
-// "+" grabs the current tab's URL, opens a dialog to edit it before
-// saving, and the saved site appears as a rail icon. Click an icon to
-// open the site in the panel; right-click it to edit or remove. Framing
-// headers are stripped per-host in loadInFrame so sites that block
-// iframing (BBC etc.) still load.
 const webPanelFrame = document.getElementById("webPanelFrame");
 const frameClip = document.getElementById("frameClip");
 const panelsEmpty = document.getElementById("panelsEmpty");
@@ -568,17 +426,11 @@ const railAddSite = document.getElementById("railAddSite");
 
 let currentPanelUrl = null;
 
-// Back / forward / reload for the open pinned site.
-// The frame is cross-origin, so its history is out of reach, and the panel's
-// own history() does not step it either — that was tried and does nothing.
-// So the panel keeps its own list of what it has opened. Back walks that
-// list, and stepping back off the front of it returns to the search page,
-// which is where the journey started.
 const panelBackBtn = document.getElementById("panelBack");
 const panelForwardBtn = document.getElementById("panelForward");
 
 function paintNavButtons() {
-  panelBackBtn.disabled = false; // back always does something: page, or search
+  panelBackBtn.disabled = false;
   panelForwardBtn.disabled = panelIndex >= panelHistory.length - 1;
 }
 
@@ -586,10 +438,6 @@ function reloadPanel() {
   if (currentPanelUrl) webPanelFrame.src = currentPanelUrl;
 }
 
-// Coming back to the search page, the words you searched for are still in
-// the box and selected — so a different engine is one key away, and typing
-// replaces it. Going back to an empty box would mean retyping it to try
-// somewhere else, which is the whole reason for going back.
 function returnToSearch() {
   showPanel(HOME_PANEL);
   if (lastQuery) searchBox.value = lastQuery;
@@ -602,7 +450,6 @@ function panelBack() {
     panelIndex -= 1;
     openPanelSite(panelHistory[panelIndex], { record: false });
   } else {
-    // Off the front of the list: back to where the search started.
     returnToSearch();
   }
 }
@@ -619,14 +466,6 @@ panelForwardBtn.addEventListener("click", panelForward);
 document.getElementById("panelHome").addEventListener("click", returnToSearch);
 document.getElementById("panelReload").addEventListener("click", reloadPanel);
 
-// Some things want the whole window: a form to fill in, something to print,
-// a page to keep. This hands the panel's page to a real tab. It is the one
-// thing here that deliberately reaches outside the panel, and only when
-// asked.
-// A link followed inside the panel changes where you are, and the panel
-// cannot see that for itself: the frame is another site. The script running
-// in there says so, and Open, Reload and the address then act on the page
-// actually in front of you.
 chrome.runtime.onMessage.addListener((message) => {
   if (message?.type !== "panel-frame-url" || !message.url) return false;
   if (!document.getElementById("panel-panels")?.classList.contains("active")) return false;
@@ -634,23 +473,16 @@ chrome.runtime.onMessage.addListener((message) => {
   try {
     panelNavHost.textContent = new URL(message.url).hostname;
   } catch {
-    /* leave the address as it was */
   }
   return false;
 });
 
 document.getElementById("panelPopOut").addEventListener("click", () => {
-  // Taken now. The panel is cleared a few lines down, synchronously, while
-  // the tab is still being opened -- so reading it in there got null and
-  // opened an empty new tab instead of the page.
   const url = currentPanelUrl;
   if (!url) return;
-  // Beside the tab it came from, not at the far end of the strip of tabs.
   chrome.tabs.query({ active: true, currentWindow: true }).then(([here]) => {
     chrome.tabs.create({ url, index: here ? here.index + 1 : undefined });
   }).catch(() => chrome.tabs.create({ url }));
-  // The page is in the main window now, so showing it in the panel as well
-  // is just the same thing twice. Back to the search page.
   webPanelFrame.src = "about:blank";
   currentPanelUrl = null;
   panelHistory = [];
@@ -665,7 +497,7 @@ const siteCancel = document.getElementById("siteCancel");
 const siteDialogTitle = document.getElementById("siteDialogTitle");
 const siteMenu = document.getElementById("siteMenu");
 
-let dialogEditingUrl = null; // null = adding; a string = editing that URL
+let dialogEditingUrl = null;
 let menuTargetUrl = null;
 
 function normaliseUrl(raw) {
@@ -708,14 +540,9 @@ siteForm.addEventListener("submit", async (e) => {
   }
   siteDialog.close();
   openPanelSite(url);
-  // Opening it asks for permission for the site, which is what makes its
-  // icon readable, so the icon is taken straight afterwards.
   captureIconFor(url).catch(() => {});
 });
 
-// What the panel has opened, and where in that list we are. Only navigations
-// the panel makes are in here — a link followed inside the frame is
-// invisible to us, cross-origin.
 let panelHistory = [];
 let panelIndex = -1;
 
@@ -725,8 +552,6 @@ function openPanelSite(url, { record = true } = {}) {
     panelHistory.push(url);
     panelIndex = panelHistory.length - 1;
   }
-  // Deactivate the tab buttons and highlight the favicon of the site
-  // being opened -- the favicons themselves are the "Panels" UI now.
   document.querySelectorAll(".rail-btn[data-panel]").forEach((b) => {
     b.classList.remove("active");
     b.setAttribute("aria-selected", "false");
@@ -747,9 +572,6 @@ function openPanelSite(url, { record = true } = {}) {
 
 function showSiteMenu(x, y, url) {
   menuTargetUrl = url;
-  // Show first so we can measure it, then position. The rail is on the
-  // right edge, so open the menu to the LEFT of the cursor (into the
-  // panel) and clamp to the viewport so it's never off-screen.
   siteMenu.hidden = false;
   const pad = 8;
   const w = siteMenu.offsetWidth;
@@ -792,9 +614,6 @@ function cachedFaviconUrl(pageUrl, size = 32) {
   return favicon.toString();
 }
 
-// What Chrome hands back when it has never seen the site. Learned once, at
-// runtime, by asking for an address that cannot exist -- rather than
-// hard-coding pixels that change with the browser version.
 let placeholderSignature = null;
 
 function signatureOf(image) {
@@ -805,7 +624,7 @@ function signatureOf(image) {
     ctx.drawImage(image, 0, 0, 16, 16);
     return ctx.getImageData(0, 0, 16, 16).data.join(",");
   } catch {
-    return null; // tainted or not drawable: treat as unknown, change nothing
+    return null;
   }
 }
 
@@ -829,9 +648,6 @@ async function getPlaceholderSignature() {
   return placeholderSignature;
 }
 
-// Swap in the site's own icon, but only when the cached one turned out to be
-// the placeholder. A site the user has visited keeps the instant local copy
-// and costs no request at all.
 async function useRealFaviconIfPlaceholder(img, host) {
   const placeholder = await getPlaceholderSignature();
   if (!placeholder) return;
@@ -847,23 +663,17 @@ async function useRealFaviconIfPlaceholder(img, host) {
   keepIcon(host, real);
 }
 
-// Icons taken at pinning time and kept, the way a browser keeps a bookmark's
-// icon. Held in memory so the rail can draw without waiting on a read.
 let keptIcons = {};
 
 chrome.storage.local.get("siteIcons").then(({ siteIcons = {} }) => {
   keptIcons = siteIcons;
 }).catch(() => {});
 
-// Pins made before icons were kept: fetch each one once, quietly.
 chrome.storage.local.get(["webPanels", "siteIcons"]).then(({ webPanels = [], siteIcons = {} }) => {
   keptIcons = siteIcons;
   for (const url of webPanels) captureIconFor(url).catch(() => {});
 }).catch(() => {});
 
-// Stored as the image itself rather than an address, so a pin keeps its icon
-// even if the site later moves it, goes down, or has its permission taken
-// away. A favicon is a couple of kilobytes; anything larger is left alone.
 async function keepIcon(host, iconUrl) {
   const domain = siteDomain(host);
   if (keptIcons[domain]) return;
@@ -871,17 +681,12 @@ async function keepIcon(host, iconUrl) {
     const res = await fetch(iconUrl);
     const blob = await res.blob();
     if (!blob.type.startsWith("image/") || blob.size > 120000) return;
-    // Drawn down to 32px before keeping it. Some sites answer with a 256px
-    // icon, and twenty kilobytes of base64 per pin adds up for something
-    // that is never shown above 22px. The blob is ours by now, so the
-    // canvas is not tainted and can be read back.
     const dataUrl = await shrink(blob).catch(() => readAsDataUrl(blob));
     const { siteIcons = {} } = await chrome.storage.local.get("siteIcons");
     siteIcons[domain] = dataUrl;
     keptIcons = siteIcons;
     await chrome.storage.local.set({ siteIcons });
   } catch {
-    /* not readable from here; the rail keeps whatever it drew */
   }
 }
 
@@ -895,8 +700,6 @@ function readAsDataUrl(blob) {
 }
 
 async function shrink(blob, size = 32) {
-  // SVG has no intrinsic size to a canvas in every engine, and it is small
-  // already, so it is kept as it came.
   if (blob.type.includes("svg")) return readAsDataUrl(blob);
   const bitmap = await createImageBitmap(blob);
   const side = Math.min(size, Math.max(bitmap.width, bitmap.height)) || size;
@@ -907,8 +710,6 @@ async function shrink(blob, size = 32) {
   return readAsDataUrl(await canvas.convertToBlob({ type: "image/png" }));
 }
 
-// Take the icon at the moment of pinning, like Vivaldi does, rather than
-// hoping it can be found later.
 async function captureIconFor(url) {
   let host;
   try {
@@ -922,7 +723,6 @@ async function captureIconFor(url) {
   renderRailSites(await getWebPanels());
 }
 
-// A pin removed should not leave its picture behind.
 async function forgetIcons(keep) {
   const domains = new Set(
     keep.map((u) => {
@@ -947,21 +747,14 @@ async function forgetIcons(keep) {
   }
 }
 
-// Straight to the site the user pinned, and nowhere else. /favicon.ico is
-// only a convention: plenty of sites have none and declare their icon in the
-// page instead, which is why lightmorphic.com came up as a grey globe. So
-// try the usual places, then read the page and use what it actually names.
 async function findSiteIcon(host) {
   for (const path of ["/favicon.ico", "/favicon.svg", "/favicon.png", "/apple-touch-icon.png"]) {
     try {
       const im = await loadImage(`https://${host}${path}`);
       if (im.naturalWidth > 0) return im.src;
     } catch {
-      /* not there; try the next */
     }
   }
-  // Reading the page needs permission for it. Without that the fetch is
-  // refused and fills the console with CORS complaints for no gain.
   try {
     if (!(await chrome.permissions.contains({ origins: [siteScope(host)] }))) return null;
   } catch {
@@ -979,11 +772,9 @@ async function findSiteIcon(host) {
         const im = await loadImage(new URL(href, `https://${host}/`).href);
         if (im.naturalWidth > 0) return im.src;
       } catch {
-        /* declared but not loadable; keep looking */
       }
     }
   } catch {
-    /* no permission for this site, or it would not answer */
   }
   return null;
 }
@@ -1001,8 +792,6 @@ function renderRailSites(webPanels) {
     btn.className = "rail-btn";
     btn.dataset.url = url;
     btn.title = host;
-    // Drag-and-drop reordering; the saved webPanels order is the rail
-    // order, so dropping persists the arrangement.
     btn.draggable = true;
     btn.addEventListener("dragstart", (e) => {
       dragSiteUrl = url;
@@ -1033,14 +822,6 @@ function renderRailSites(webPanels) {
     });
     const img = document.createElement("img");
     img.className = "rail-site-icon";
-    // Chrome's own cached favicon, served from the profile. The browser
-    // version fetched these from DuckDuckGo's icon service, which told a
-    // third party every site the user had pinned, every time the panel
-    // opened — indefensible in a privacy extension, and a remote request
-    // in a package that should make none.
-    // A kept copy first: taken when the site was pinned, so it does not
-    // depend on the browser's cache, on the network, or on still having
-    // permission for the site.
     const kept = keptIcons[siteDomain(host)];
     img.src = kept || cachedFaviconUrl(url);
     img.alt = "";
@@ -1048,10 +829,6 @@ function renderRailSites(webPanels) {
       img.remove();
       btn.textContent = "•";
     });
-    // No kept copy yet: draw whatever the browser has, and go and find the
-    // real one. The browser's cache only holds sites this profile has opened
-    // in a tab, so pin something you have only read about and it hands back
-    // a grey globe -- on exactly the big, obvious sites people pin first.
     if (!kept) useRealFaviconIfPlaceholder(img, host);
     btn.appendChild(img);
     btn.addEventListener("click", () => openPanelSite(url));
@@ -1067,20 +844,12 @@ async function loadWebPanels() {
   renderRailSites(await getWebPanels());
 }
 
-// Keep the rail live: if the background worker changes webPanels after
-// this page loaded (e.g. the one-time leaked-pin cleanup at boot), the
-// favicon list must reflect it without a manual reopen.
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && changes.webPanels) {
     renderRailSites(changes.webPanels.newValue || []);
   }
 });
 
-// ---- Which edge ----
-// Chromium can dock the side panel on either side, and moving it is the
-// user's own setting -- an extension can read it but not set it. So the
-// panel reads it and mirrors itself, and the page strip follows to the same
-// edge, unless Information has been used to pin the strip to one side.
 async function applySide() {
   let { sidePreference = "auto" } = await chrome.storage.local.get("sidePreference").catch(() => ({}));
   let panelSide = "right";
@@ -1090,10 +859,7 @@ async function applySide() {
       if (layout?.side) panelSide = layout.side;
     }
   } catch {
-    /* older Chrome: assume the default */
   }
-  // Panel docked left means the page is to its right, so the rail belongs on
-  // the panel's right edge, and vice versa.
   document.querySelector(".shell").classList.toggle("rail-left", panelSide === "right" ? false : true);
   const stripSide = sidePreference === "auto" ? panelSide : sidePreference;
   await chrome.storage.local.set({ stripSide, panelSide }).catch(() => {});
@@ -1128,17 +894,8 @@ chrome.storage.local.get(["searchOpensIn", "linksOpenIn"]).then((saved) => {
   }
 }).catch(() => {});
 
-// ---- Fold ----
 const railMinimize = document.getElementById("railMinimize");
 
-// Chromium will not let the side panel be narrower than 360px and gives an
-// extension no way to change that, so hiding what is inside the panel leaves
-// the page squeezed exactly as before. The only way to hand the width back
-// and still keep the icons within reach is to close the panel and draw them
-// on the page instead -- lib/page-rail.js, on sites already allowed.
-// Whether we may draw on pages at all, kept current so the click handler can
-// read it without awaiting. chrome.permissions.request only works while the
-// click is still "fresh", and an await spends that.
 let mayDrawOnPages = false;
 
 function refreshDrawPermission() {
@@ -1155,10 +912,6 @@ chrome.permissions.onAdded.addListener(refreshDrawPermission);
 chrome.permissions.onRemoved.addListener(refreshDrawPermission);
 
 async function foldAway() {
-  // The worker does the work: it outlives this page, and it has to put the
-  // strip into tabs that are already open, which a registered content script
-  // never reaches. It answers, so a fold that cannot work says why instead
-  // of closing the panel onto nothing.
   let result;
   try {
     result = await chrome.runtime.sendMessage({ type: "fold" });
@@ -1212,7 +965,6 @@ async function foldAway() {
   showFoldProblem(problem, result?.detail);
 }
 
-// Said in the panel, in the middle where the eye is, rather than in a console.
 function showFoldProblem({ title, body, then }, copyable) {
   let note = document.getElementById("foldProblem");
   if (!note) {
@@ -1249,12 +1001,7 @@ function showFoldProblem({ title, body, then }, copyable) {
 
   note.hidden = false;
   clearTimeout(showFoldProblem.timer);
-  // It stays until it is dismissed. A warning that takes itself away while
-  // it is being read is worse than no warning.
   ok.addEventListener("click", () => {
-    // Worth copying rather than transcribing from the screen. The clipboard
-    // API refuses when the panel does not have focus, which is easy to hit
-    // here, so the text is selected as well and can be copied by hand.
     if (copyable) {
       navigator.clipboard.writeText(copyable).catch(() => {});
       const range = document.createRange();
@@ -1265,7 +1012,6 @@ function showFoldProblem({ title, body, then }, copyable) {
       try {
         document.execCommand("copy");
       } catch {
-        /* left selected, so it can be copied by hand */
       }
     }
     note.hidden = true;
@@ -1274,18 +1020,7 @@ function showFoldProblem({ title, body, then }, copyable) {
 }
 
 railMinimize.addEventListener("click", () => {
-  // The strip is drawn on the page, so it needs to be allowed on pages. Ask
-  // first, from this click, rather than closing the panel and leaving
-  // nothing behind -- which is what it did, and it looks like a broken
-  // button. Requested before anything is awaited, or the click is spent.
   if (!mayDrawOnPages) {
-    // The dialog is Chrome's, and a side panel losing focus while it is up
-    // can leave this promise unsettled. Fold anyway after a moment, so the
-    // button is never simply dead; a fold that then cannot draw explains
-    // itself.
-    // It can throw outright rather than rejecting -- "must be called during
-    // a user gesture" -- and an uncaught throw here would leave the button
-    // doing nothing at all.
     let asked;
     try {
       asked = chrome.permissions.request({ origins: ALL_SITES }).catch(() => false);
@@ -1299,12 +1034,8 @@ railMinimize.addEventListener("click", () => {
   foldAway();
 });
 
-// Opening the panel any other way means the strip has done its job.
 chrome.storage.local.set({ pageStrip: false }).catch(() => {});
 
-// The strip says which section to land on. Read on load, and also watched
-// briefly afterwards: the panel can finish loading before the worker has
-// finished writing which section was asked for.
 function obeyOpenRequest(openPanel) {
   if (!openPanel) return;
   if (typeof openPanel.at === "number" && Date.now() - openPanel.at > 15000) return;
@@ -1324,11 +1055,6 @@ railAddSite.addEventListener("click", async () => {
   openSiteDialog({ url: prefill });
 });
 
-// ---- Snippets ----
-// A snippet is just its text: no title to invent and keep in step with the
-// thing it labels. Collapsed it shows two lines; right-click opens it out
-// to edit, and clicking away saves. Left-click drops it into whatever box
-// you were last typing in.
 const snippetList = document.getElementById("snippetList");
 const addSnippetText = document.getElementById("addSnippetText");
 
@@ -1345,11 +1071,6 @@ async function saveSnippets(list) {
   loadSnippets();
 }
 
-// The active tab's origin, kept current in the background. It has to be
-// known SYNCHRONOUSLY when a snippet is clicked: chrome.permissions.request
-// only counts as user-initiated if it is called before the click handler
-// awaits anything, and looking the tab up first would spend the gesture.
-// That was the bug behind "it copies but never pastes".
 let activeOrigin = null;
 
 async function refreshActiveOrigin() {
@@ -1367,8 +1088,6 @@ chrome.tabs.onUpdated.addListener((id, info) => {
   if (info.url || info.status === "complete") refreshActiveOrigin();
 });
 
-// Runs in the page. Puts the text in at the cursor of whatever was last
-// focused, and tells the page about it the way frameworks expect.
 function insertAtCursor(value) {
   const el = document.activeElement;
   if (!el) return false;
@@ -1386,7 +1105,6 @@ function insertAtCursor(value) {
   try {
     el.setSelectionRange(caret, caret);
   } catch {
-    /* number and email inputs refuse a selection range */
   }
   el.dispatchEvent(new Event("input", { bubbles: true }));
   el.dispatchEvent(new Event("change", { bubbles: true }));
@@ -1394,8 +1112,6 @@ function insertAtCursor(value) {
 }
 
 async function pasteSnippet(text) {
-  // Ask FIRST, while the click still counts as a gesture. Already granted
-  // resolves straight through without a prompt.
   let allowed = false;
   if (activeOrigin) {
     try {
@@ -1415,7 +1131,6 @@ async function pasteSnippet(text) {
       args: [text],
       func: insertAtCursor,
     });
-    // The box may be in a frame, so any frame reporting success counts.
     return results.some((r) => r?.result) ? "pasted" : "copied";
   } catch {
     return "copied";
@@ -1433,9 +1148,6 @@ function renderCollapsed(snippet) {
 
   const body = document.createElement("button");
   body.className = "snippet-text";
-  // The text goes in a span: -webkit-line-clamp does not apply to a
-  // button's own anonymous inner box, so clamping the button directly let
-  // a third line peek out from under the padding.
   const clamped = document.createElement("span");
   clamped.className = "snippet-clamp";
   clamped.textContent = snippet.text;
@@ -1450,9 +1162,6 @@ function renderCollapsed(snippet) {
     loadSnippets();
   });
 
-  // Small and quiet, on the right, and it says what it is about to do at
-  // every step: an x until you go near it, a bin when you do, a red tick
-  // once it is asking. Fixed icon strings, never anything typed.
   const ICON_CROSS =
     '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6.5 6.5l7 7M13.5 6.5l-7 7"/></svg>';
   const ICON_BIN =
@@ -1503,8 +1212,6 @@ function renderCollapsed(snippet) {
     saveSnippets((await getSnippets()).filter((s) => s.id !== snippet.id));
   });
 
-  // Changing your mind should be as easy as doing nothing: moving off the
-  // row puts it back, without waiting out the timer.
   row.addEventListener("mouseleave", () => {
     if (armed) disarm();
   });
@@ -1520,12 +1227,9 @@ function renderExpanded(snippet) {
   const edit = document.createElement("textarea");
   edit.className = "snippet-edit";
   edit.value = snippet.text;
-  // Open it out far enough to see the whole thing, within reason: wrapped
-  // lines count too, or a long single-line snippet opens as a slot.
   const lines = snippet.text.split("\n").length + Math.ceil(snippet.text.length / 38);
   edit.rows = Math.min(14, Math.max(3, lines));
 
-  // No Save button. Clicking away saves; Escape leaves it as it was.
   let cancelled = false;
   edit.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
@@ -1560,15 +1264,11 @@ async function loadSnippets() {
       snippet.id === expandedSnippetId ? renderExpanded(snippet) : renderCollapsed(snippet)
     );
   }
-  // With nothing saved, the add box moves to the middle and explains itself.
-  // The first snippet sends it back to the top, where it is out of the way.
   document
     .getElementById("panel-snippets")
     .classList.toggle("snippets-empty", snippets.length === 0);
 }
 
-// Typing in the box at the bottom and clicking away saves it. Nothing to
-// press, and nothing lost by forgetting to.
 addSnippetText.addEventListener("blur", async () => {
   const text = addSnippetText.value.trim();
   if (!text) return;
@@ -1576,39 +1276,25 @@ addSnippetText.addEventListener("blur", async () => {
   await saveSnippets([...(await getSnippets()), { id: crypto.randomUUID(), text }]);
 });
 
-// ---- Start ----
 loadScratchpad();
 loadWebPanels();
 loadSnippets();
 renderRecentSearches();
 loadEngine();
-// If every site is already allowed, get the scripts in place when the panel
-// opens rather than waiting for the first page to be opened in it.
 ensureMobileScriptEverywhere().catch(() => {});
-// The panel opens on the search box, ready to type.
 searchBox.focus();
 
-// ---- Sync, via bookmarks ----
-// Bookmarks are the one thing Brave and Vivaldi both sync, so that is
-// where the real copy lives; extension storage is only a local mirror so
-// the panel has something to draw immediately. On load, whatever the
-// bookmarks say wins — that is what may have arrived from another
-// machine. First run seeds the folder from whatever is already here.
 async function syncFromBookmarks() {
   if (!(await store.available())) return;
   const remote = await store.readAll();
 
-  // Seed the folder only when it is genuinely empty. Deciding this from a
-  // local "have I seeded" flag would be a data-loss bug: a second machine
-  // with a fresh profile has no flag, and would overwrite the folder that
-  // just synced to it with its own empty state.
   const remoteEmpty =
     remote.webPanels.length === 0 && !remote.notepadText && remote.snippets.length === 0;
   if (remoteEmpty) {
     const local = await chrome.storage.local.get(["webPanels", "notepadText", "snippets"]);
     const localEmpty =
       !(local.webPanels || []).length && !local.notepadText && !(local.snippets || []).length;
-    if (localEmpty) return; // nothing anywhere yet
+    if (localEmpty) return;
     await store.writePanels(local.webPanels || []);
     await store.writeScratchpad(local.notepadText || "");
     await store.writeSnippets(local.snippets || []);
@@ -1616,8 +1302,6 @@ async function syncFromBookmarks() {
   }
   await chrome.storage.local.set({
     webPanels: remote.webPanels,
-    // Never let an empty remote wipe text that only exists here — a
-    // half-created folder would otherwise erase the scratchpad.
     notepadText: remote.notepadText || (await chrome.storage.local.get("notepadText")).notepadText || "",
     snippets: remote.snippets,
   });
@@ -1628,7 +1312,6 @@ async function syncFromBookmarks() {
 }
 syncFromBookmarks().catch(() => {});
 
-// A change arriving from another machine lands as a bookmark event.
 if (chrome.bookmarks?.onChanged) {
   const refresh = () => {
     clearTimeout(refresh.t);
@@ -1640,17 +1323,10 @@ if (chrome.bookmarks?.onChanged) {
   chrome.bookmarks.onMoved.addListener(refresh);
 }
 
-// The two links at the bottom of Information open in the panel itself,
-// the same as any pinned site.
 for (const link of document.querySelectorAll(".info-link")) {
   link.addEventListener("click", () => openPanelSite(link.dataset.site));
 }
 
-// ---- Site access ----
-// One prompt instead of one per site, for anyone who would rather not be
-// asked again. Off by default and revocable from the same button, because
-// "allow everything" should be a decision someone makes rather than one
-// they are walked into.
 const allowAllBtn = document.getElementById("allowAllBtn");
 const allowAllState = document.getElementById("allowAllState");
 
@@ -1660,7 +1336,6 @@ async function paintAllowAll() {
   try {
     on = await chrome.permissions.contains({ origins: ALL_SITES });
   } catch {
-    /* treat as off */
   }
   allowAllBtn.textContent = on ? "Take it back" : "Allow all";
   allowAllState.textContent = on
@@ -1674,13 +1349,11 @@ allowAllBtn?.addEventListener("click", async () => {
   try {
     on = await chrome.permissions.contains({ origins: ALL_SITES });
   } catch {
-    /* treat as off */
   }
   try {
     if (on) await chrome.permissions.remove({ origins: ALL_SITES });
     else await chrome.permissions.request({ origins: ALL_SITES });
   } catch {
-    /* declined */
   }
   paintAllowAll();
 });
@@ -1689,24 +1362,15 @@ paintAllowAll();
 chrome.permissions.onAdded?.addListener(paintAllowAll);
 chrome.permissions.onRemoved?.addListener(paintAllowAll);
 
-// ---- First run ----
-// Chrome gives an extension no install-time dialog, so the panel says it
-// the first time it is opened instead.
 const welcomeDialog = document.getElementById("welcomeDialog");
-// Gated on its own key, not the old welcomeSeen: anyone who dismissed the
-// first version of this dialog had already been marked as seen, so they
-// never got asked the access question and went on being prompted per site —
-// which is exactly the thing the question exists to prevent.
 chrome.storage.local.get("accessChoice").then(async ({ accessChoice }) => {
   if (accessChoice || !welcomeDialog?.showModal) return;
-  // Already allowed everything by hand? Then there is nothing to ask.
   try {
     if (await chrome.permissions.contains({ origins: ALL_SITES })) {
       await chrome.storage.local.set({ accessChoice: "all" });
       return;
     }
   } catch {
-    /* ask anyway */
   }
   welcomeDialog.showModal();
 });
@@ -1717,32 +1381,23 @@ async function dismissWelcome(choice) {
 
 document.getElementById("welcomeAsk")?.addEventListener("click", () => dismissWelcome("ask"));
 
-// One answer here saves being asked per site later — which is the thing
-// people find irritating. Asked from their click, so it is still their
-// decision, and Information can hand it back.
 document.getElementById("welcomeAllow")?.addEventListener("click", async () => {
   try {
     await chrome.permissions.request({ origins: ALL_SITES });
   } catch {
-    /* declined, or no gesture: the per-site ask still covers it */
   }
   paintAllowAll();
   let granted = false;
   try {
     granted = await chrome.permissions.contains({ origins: ALL_SITES });
   } catch {
-    /* treat as not granted */
   }
   dismissWelcome(granted ? "all" : "ask");
 });
 
-// ---- About ----
 const aboutVersion = document.getElementById("aboutVersion");
 if (aboutVersion) aboutVersion.textContent = `v${chrome.runtime.getManifest().version}`;
 
-// Show the shortcut the browser ACTUALLY bound, not the one the manifest
-// asked for. People rebind them and browsers refuse some; a label that
-// lies is worse than no label.
 const shortcutHint = document.getElementById("shortcutHint");
 if (shortcutHint && chrome.commands?.getAll) {
   chrome.commands.getAll().then((cmds) => {
@@ -1756,10 +1411,6 @@ if (shortcutHint && chrome.commands?.getAll) {
 }
 
 
-// ---- Why the strip did not appear ----
-// Runs the same work as folding, minus the closing, and shows what the
-// worker actually did. Guessing at this from the outside cost several
-// rounds; the extension can just say.
 document.getElementById("stripTryNow")?.addEventListener("click", async () => {
   const out = document.getElementById("stripTrace");
   out.hidden = false;
@@ -1784,11 +1435,6 @@ document.getElementById("stripTryNow")?.addEventListener("click", async () => {
 
 
 
-// ---- Remove everything ----
-// Two clicks, the same as deleting a snippet: the first arms it and turns it
-// into a tick, the second does it, and doing nothing puts it back. Chrome
-// gives an extension no hook at uninstall -- no event fires, and afterwards
-// its code is gone -- so this is the only place the question can be asked.
 const railWipe = document.getElementById("railWipe");
 
 if (railWipe) {
@@ -1813,9 +1459,6 @@ if (railWipe) {
   }
 
   railWipe.addEventListener("click", async (e) => {
-    // The dismiss-on-outside-click listener below sees this same click as it
-    // bubbles, and by then the button's icon has been swapped, so the click
-    // target is detached and looks like it came from outside.
     e.stopPropagation();
     if (!armed) {
       armed = true;
@@ -1824,8 +1467,6 @@ if (railWipe) {
       railWipe.dataset.tip = ARMED;
       railWipe.setAttribute("aria-label", ARMED);
       if (wipeWarn) wipeWarn.hidden = false;
-      // Long enough to read the warning through, not so long that it is
-      // still armed when you have forgotten about it.
       armedTimer = setTimeout(disarmWipe, 20000);
       return;
     }
@@ -1843,8 +1484,6 @@ if (railWipe) {
     showPanel("search");
   });
 
-  // Changing your mind should be as easy as doing nothing. Moving off the
-  // button no longer cancels -- you have to move off it to read the warning.
   document.addEventListener("keydown", (e) => {
     if (armed && e.key === "Escape") disarmWipe();
   });
